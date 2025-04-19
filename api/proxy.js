@@ -18,6 +18,11 @@ export default async function handler(req, res) {
     return res.status(405).json({ errore: "Metodo non consentito" });
   }
 
+  const { clienteId, domanda } = req.body;
+
+  if (!clienteId || !domanda) {
+    return res.status(400).json({ errore: "Dati mancanti: clienteId o domanda" });
+  }
 
   try {
     const gasResponse = await fetch("https://script.google.com/macros/s/AKfycbz2hVaNUSMzNzpgQjghkCk3Ov21G0Kuo_z6qq3j_3cRHLt6uFGpzp-bGzlOFdp4Wdwn/exec", {
@@ -31,7 +36,7 @@ export default async function handler(req, res) {
     const data = await gasResponse.json();
     res.status(200).json(data);
   } catch (error) {
-    console.error("Errore durante la richiesta a GAS:", error);
-    res.status(500).json({ errore: "Errore interno proxy" });
+    console.error("❌ Errore durante la richiesta a GAS:", error.message || error);
+    res.status(500).json({ errore: "Errore interno proxy", dettagli: error.message || error.toString() });
   }
 }
