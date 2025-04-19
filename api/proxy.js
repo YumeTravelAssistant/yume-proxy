@@ -11,24 +11,19 @@ export default async function handler(req, res) {
     return res.status(405).json({ errore: "Metodo non consentito" });
   }
 
-  const { clienteId, domanda } = req.body;
+  const { clienteId, domanda } = req.body; // <-- JSON parsing automatico da Vercel
 
   if (!clienteId || !domanda) {
     return res.status(400).json({ errore: "Dati mancanti: clienteId o domanda" });
   }
 
   try {
-    const params = new URLSearchParams();
-    params.append("clienteId", clienteId);
-    params.append("domanda", domanda);
-
-    const gasUrl = "https://script.google.com/macros/s/AKfycbz2hVaNUSMzNzpgQjghkCk3Ov21G0Kuo_z6qq3j_3cRHLt6uFGpzp-bGzlOFdp4Wdwn/exec";
-    const gasResponse = await fetch(gasUrl, {
+    const gasResponse = await fetch("https://script.google.com/macros/s/AKfycbz2hVaNUSMzNzpgQjghkCk3Ov21G0Kuo_z6qq3j_3cRHLt6uFGpzp-bGzlOFdp4Wdwn/exec", {
       method: "POST",
       headers: {
-        "Content-Type": "application/x-www-form-urlencoded"
+        "Content-Type": "application/json"
       },
-      body: params
+      body: JSON.stringify({ clienteId, domanda })
     });
 
     const data = await gasResponse.json();
