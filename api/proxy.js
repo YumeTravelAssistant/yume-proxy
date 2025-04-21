@@ -3,7 +3,7 @@ export default async function handler(req, res) {
     "https://melodious-malabi-90a97a.netlify.app", // sito attuale
     "https://adorable-paletas-a55d09.netlify.app"  // nuovo sito/app
   ];
-
+  
   const origin = req.headers.origin;
 
   if (allowedOrigins.includes(origin)) {
