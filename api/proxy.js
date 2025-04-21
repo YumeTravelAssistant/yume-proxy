@@ -1,9 +1,8 @@
 export default async function handler(req, res) {
   const allowedOrigins = [
-    "https://melodious-malabi-90a97a.netlify.app", // sito attuale
-    "https://adorable-paletas-a55d09.netlify.app"  // nuovo sito/app
+    "https://melodious-malabi-90a97a.netlify.app",
+    "https://adorable-paletas-a55d09.netlify.app"
   ];
-  
   const origin = req.headers.origin;
 
   if (allowedOrigins.includes(origin)) {
@@ -29,15 +28,19 @@ export default async function handler(req, res) {
   }
 
   try {
+    const controller = new AbortController();
+    const timeout = setTimeout(() => controller.abort(), 20000);
+
     const gasResponse = await fetch("https://script.google.com/macros/s/AKfycbz2hVaNUSMzNzpgQjghkCk3Ov21G0Kuo_z6qq3j_3cRHLt6uFGpzp-bGzlOFdp4Wdwn/exec", {
       method: "POST",
-      headers: {
-        "Content-Type": "application/json"
-      },
-      body: JSON.stringify({ clienteId, domanda })
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ clienteId, domanda }),
+      signal: controller.signal
     });
 
-    const data = await gasResponse.json();
+    clearTimeout(timeout);
+    const text = await gasResponse.text();
+    const data = JSON.parse(text);
     res.status(200).json(data);
   } catch (error) {
     console.error("❌ Errore durante la richiesta a GAS:", error.message || error);
