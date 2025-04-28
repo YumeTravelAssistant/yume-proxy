@@ -42,14 +42,12 @@ export default async function handler(req, res) {
     const text = await gasResponse.text();
     const data = JSON.parse(text);
 
-    // Se GAS risponde bene
     if (data && !data.errore) {
       return res.status(200).json(data);
     }
 
     console.warn("⚠️ Risposta anomala da GAS, provo fallback su Azure OpenAI...");
 
-    // Se la risposta di GAS non va bene, usa Azure OpenAI
     const azureData = await callAzureOpenAI(domanda);
     return res.status(200).json({ risposta: azureData.choices[0].message.content });
 
@@ -59,7 +57,7 @@ export default async function handler(req, res) {
   }
 }
 
-// Funzione per chiamare Azure OpenAI GPT-4o
+// Funzione per fallback su Azure OpenAI
 async function callAzureOpenAI(userMessage) {
   const endpoint = "https://yuta-openai.openai.azure.com/openai/deployments/yuta-gpt4o/chat/completions?api-version=2024-04-01-preview";
   const apiKey = process.env.AZURE_OPENAI_API_KEY;
@@ -70,6 +68,7 @@ async function callAzureOpenAI(userMessage) {
   };
 
   const payload = {
+    model: "gpt-4o", // ✅ IMPORTANTE: adesso c'è il campo model!
     messages: [
       { role: "system", content: "Sei un assistente esperto di viaggi in Giappone." },
       { role: "user", content: userMessage }
