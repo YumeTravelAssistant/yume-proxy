@@ -41,9 +41,53 @@ export default async function handler(req, res) {
     clearTimeout(timeout);
     const text = await gasResponse.text();
     const data = JSON.parse(text);
-    res.status(200).json(data);
+
+    // Se GAS risponde bene
+    if (data && !data.errore) {
+      return res.status(200).json(data);
+    }
+
+    console.warn("⚠️ Risposta anomala da GAS, provo fallback su Azure OpenAI...");
+
+    // Se la risposta di GAS non va bene, usa Azure OpenAI
+    const azureData = await callAzureOpenAI(domanda);
+    return res.status(200).json({ risposta: azureData.choices[0].message.content });
+
   } catch (error) {
-    console.error("❌ Errore durante la richiesta a GAS:", error.message || error);
+    console.error("❌ Errore durante la richiesta:", error.message || error);
     res.status(500).json({ errore: "Errore interno proxy", dettagli: error.message || error.toString() });
   }
 }
+
+// Funzione per chiamare Azure OpenAI GPT-4o
+async function callAzureOpenAI(userMessage) {
+  const endpoint = "https://yuta-openai.openai.azure.com/openai/deployments/yuta-gpt4o/chat/completions?api-version=2024-02-15-preview";
+  const apiKey = process.env.AZURE_OPENAI_API_KEY;
+
+  const headers = {
+    "Content-Type": "application/json",
+    "api-key": apiKey
+  };
+
+  const payload = {
+    messages: [
+      { role: "system", content: "Sei un assistente esperto di viaggi in Giappone." },
+      { role: "user", content: userMessage }
+    ],
+    temperature: 0.7,
+    top_p: 0.95,
+    frequency_penalty: 0,
+    presence_penalty: 0,
+    max_tokens: 800
+  };
+
+  const response = await fetch(endpoint, {
+    method: "POST",
+    headers,
+    body: JSON.stringify(payload)
+  });
+
+  const data = await response.json();
+  return data;
+}
+
