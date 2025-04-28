@@ -61,7 +61,7 @@ export default async function handler(req, res) {
 
 // Funzione per chiamare Azure OpenAI GPT-4o
 async function callAzureOpenAI(userMessage) {
-  const endpoint = "https://yuta-openai.openai.azure.com/openai/deployments/yuta-gpt4o/chat/completions?api-version=2024-02-15-preview";
+  const endpoint = "https://yuta-openai.openai.azure.com/openai/deployments/yuta-gpt4o/chat/completions?api-version=2024-04-01-preview";
   const apiKey = process.env.AZURE_OPENAI_API_KEY;
 
   const headers = {
