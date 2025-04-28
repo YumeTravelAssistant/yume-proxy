@@ -87,6 +87,8 @@ async function callAzureOpenAI(userMessage) {
   });
 
   const data = await response.json();
+  console.log("Risposta Azure:", JSON.stringify(data));
+
   return data;
 }
 
