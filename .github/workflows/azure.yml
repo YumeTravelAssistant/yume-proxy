@@ -1,0 +1,33 @@
+# File: .github/workflows/azure.yml
+
+name: Deploy Yume Proxy to Azure
+
+on:
+  push:
+    branches:
+      - main  # Ogni volta che facciamo push su main parte il deploy
+
+jobs:
+  build-and-deploy:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout codice
+        uses: actions/checkout@v3
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v3
+        with:
+          node-version: '20'
+
+      - name: Installa dipendenze
+        run: npm install
+
+      - name: Deploy su Azure Web App
+        uses: azure/webapps-deploy@v2
+        with:
+          app-name: yume-proxy-azure
+          slot-name: Production
+          publish-profile: ${{ secrets.AZUREAPPSERVICE_PUBLISHPROFILE }}
+          package: .
+
