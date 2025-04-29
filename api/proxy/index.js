@@ -1,6 +1,6 @@
-import fetch from 'node-fetch';
+const fetch = require('node-fetch');
 
-export default async function (context, req) {
+module.exports = async function (context, req) {
   const { clienteId, domanda } = req.body || {};
 
   if (!clienteId || !domanda) {
@@ -32,5 +32,5 @@ export default async function (context, req) {
       body: { errore: "Errore nella comunicazione con GAS", dettaglio: error.message }
     };
   }
-}
+};
 
