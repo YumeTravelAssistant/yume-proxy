@@ -1,0 +1,102 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>YUTA - Travel Assistant to Japan</title>
+  <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;700&display=swap" rel="stylesheet">
+  <style>
+    body {
+      margin: 0;
+      font-family: 'Nunito', sans-serif;
+      background-color: #f8f8f8;
+      color: #333;
+      text-align: center;
+    }
+    header {
+      background-color: #d32f2f;
+      color: white;
+      padding: 20px;
+    }
+    header img {
+      width: 80px;
+      margin-bottom: 10px;
+    }
+    header h1 {
+      margin: 10px 0 0 0;
+      font-size: 24px;
+    }
+    .container {
+      margin: 40px auto;
+      max-width: 500px;
+      background: white;
+      padding: 30px;
+      border-radius: 10px;
+      box-shadow: 0 0 15px rgba(0,0,0,0.1);
+    }
+    input, textarea {
+      width: 100%;
+      padding: 12px;
+      margin-top: 10px;
+      border: 1px solid #ccc;
+      border-radius: 6px;
+      font-size: 16px;
+    }
+    button {
+      margin-top: 20px;
+      width: 100%;
+      background-color: #d32f2f;
+      color: white;
+      border: none;
+      padding: 14px;
+      font-size: 16px;
+      border-radius: 6px;
+      cursor: pointer;
+    }
+    button:hover {
+      background-color: #b71c1c;
+    }
+    .response {
+      margin-top: 30px;
+      padding: 15px;
+      background: #f1f1f1;
+      border-radius: 8px;
+      min-height: 50px;
+    }
+  </style>
+</head>
+<body>
+
+<header>
+  <img src="logo-yuta.jpg" alt="Logo Yuta">
+  <h1>YUTA - Travel Assistant 🇯🇵</h1>
+</header>
+
+<div class="container">
+  <form id="yutaForm">
+    <input type="text" id="clientCode" placeholder="Inserisci il tuo Codice Cliente" required>
+    <textarea id="question" placeholder="Scrivi qui la tua domanda..." rows="5" required></textarea>
+    <button type="submit">Invia</button>
+  </form>
+
+  <div class="response" id="response">
+    <!-- Qui verrà mostrata la risposta -->
+  </div>
+</div>
+
+<script>
+  document.getElementById('yutaForm').addEventListener('submit', async function(event) {
+    event.preventDefault();
+    
+    const code = document.getElementById('clientCode').value;
+    const question = document.getElementById('question').value;
+    const responseBox = document.getElementById('response');
+    
+    // Placeholder simulato - poi collegheremo davvero!
+    responseBox.innerHTML = `<strong>Risposta:</strong> <br> Ciao ${code}, hai chiesto: "${question}". (Simulazione risposta YUTA...)`;
+  });
+</script>
+
+</body>
+</html>
+
