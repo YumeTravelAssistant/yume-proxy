@@ -2,101 +2,89 @@
 <html lang="it">
 <head>
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>YUTA - Travel Assistant to Japan</title>
-  <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;700&display=swap" rel="stylesheet">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>YUTA Travel Assistant</title>
   <style>
     body {
-      margin: 0;
-      font-family: 'Nunito', sans-serif;
-      background-color: #f8f8f8;
-      color: #333;
+      font-family: Arial, sans-serif;
+      background-color: #f4f6f8;
       text-align: center;
-    }
-    header {
-      background-color: #d32f2f;
-      color: white;
-      padding: 20px;
-    }
-    header img {
-      width: 80px;
-      margin-bottom: 10px;
-    }
-    header h1 {
-      margin: 10px 0 0 0;
-      font-size: 24px;
-    }
-    .container {
-      margin: 40px auto;
-      max-width: 500px;
-      background: white;
       padding: 30px;
-      border-radius: 10px;
-      box-shadow: 0 0 15px rgba(0,0,0,0.1);
+    }
+    img {
+      width: 220px;
+      margin-bottom: 20px;
+    }
+    h1 {
+      color: #00274d;
+    }
+    form {
+      margin-top: 20px;
     }
     input, textarea {
-      width: 100%;
+      width: 80%;
       padding: 12px;
-      margin-top: 10px;
+      margin: 8px 0;
       border: 1px solid #ccc;
-      border-radius: 6px;
-      font-size: 16px;
+      border-radius: 5px;
     }
     button {
-      margin-top: 20px;
-      width: 100%;
-      background-color: #d32f2f;
+      background-color: #004aad;
       color: white;
+      padding: 12px 20px;
+      margin-top: 10px;
       border: none;
-      padding: 14px;
-      font-size: 16px;
-      border-radius: 6px;
+      border-radius: 5px;
       cursor: pointer;
     }
     button:hover {
-      background-color: #b71c1c;
+      background-color: #003080;
     }
-    .response {
+    .risposta {
       margin-top: 30px;
-      padding: 15px;
-      background: #f1f1f1;
+      padding: 20px;
+      background-color: #ffffff;
       border-radius: 8px;
-      min-height: 50px;
+      box-shadow: 0 2px 5px rgba(0,0,0,0.1);
     }
   </style>
 </head>
 <body>
-
-<header>
-  <img src="logo-yuta.jpg" alt="Logo Yuta">
-  <h1>YUTA - Travel Assistant 🇯🇵</h1>
-</header>
-
-<div class="container">
-  <form id="yutaForm">
-    <input type="text" id="clientCode" placeholder="Inserisci il tuo Codice Cliente" required>
-    <textarea id="question" placeholder="Scrivi qui la tua domanda..." rows="5" required></textarea>
+  <img src="assets/logo-yuta.jpg" alt="YUTA Logo">
+  <h1>YUTA Travel Assistant</h1>
+  <form id="formYuta">
+    <input type="text" id="clienteId" placeholder="Inserisci il tuo nome..." required><br>
+    <textarea id="domanda" rows="4" placeholder="Fai una domanda su Tokyo, Kyoto, Osaka..." required></textarea><br>
     <button type="submit">Invia</button>
   </form>
+  <div id="risposta" class="risposta" style="display: none;"></div>
 
-  <div class="response" id="response">
-    <!-- Qui verrà mostrata la risposta -->
-  </div>
-</div>
+  <script>
+    const form = document.getElementById("formYuta");
+    form.addEventListener("submit", async function(event) {
+      event.preventDefault();
 
-<script>
-  document.getElementById('yutaForm').addEventListener('submit', async function(event) {
-    event.preventDefault();
-    
-    const code = document.getElementById('clientCode').value;
-    const question = document.getElementById('question').value;
-    const responseBox = document.getElementById('response');
-    
-    // Placeholder simulato - poi collegheremo davvero!
-    responseBox.innerHTML = `<strong>Risposta:</strong> <br> Ciao ${code}, hai chiesto: "${question}". (Simulazione risposta YUTA...)`;
-  });
-</script>
+      const clienteId = document.getElementById("clienteId").value;
+      const domanda = document.getElementById("domanda").value;
 
+      const rispostaDiv = document.getElementById("risposta");
+      rispostaDiv.style.display = "block";
+      rispostaDiv.innerHTML = "⏳ Sto pensando...";
+
+      try {
+        const response = await fetch("/api/proxy", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ clienteId, domanda })
+        });
+
+        const data = await response.json();
+        rispostaDiv.innerHTML = `<strong>Risposta:</strong><br><br>${data.risposta}`;
+      } catch (error) {
+        rispostaDiv.innerHTML = "⚠️ Errore nel recuperare la risposta.";
+      }
+    });
+  </script>
 </body>
 </html>
 
