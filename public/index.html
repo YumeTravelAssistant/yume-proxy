@@ -1,90 +1,131 @@
 <!DOCTYPE html>
 <html lang="it">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>YUTA Travel Assistant</title>
-  <style>
-    body {
-      font-family: Arial, sans-serif;
-      background-color: #f4f6f8;
-      text-align: center;
-      padding: 30px;
-    }
-    img {
-      width: 220px;
-      margin-bottom: 20px;
-    }
-    h1 {
-      color: #00274d;
-    }
-    form {
-      margin-top: 20px;
-    }
-    input, textarea {
-      width: 80%;
-      padding: 12px;
-      margin: 8px 0;
-      border: 1px solid #ccc;
-      border-radius: 5px;
-    }
-    button {
-      background-color: #004aad;
-      color: white;
-      padding: 12px 20px;
-      margin-top: 10px;
-      border: none;
-      border-radius: 5px;
-      cursor: pointer;
-    }
-    button:hover {
-      background-color: #003080;
-    }
-    .risposta {
-      margin-top: 30px;
-      padding: 20px;
-      background-color: #ffffff;
-      border-radius: 8px;
-      box-shadow: 0 2px 5px rgba(0,0,0,0.1);
-    }
-  </style>
+  <!-- Favicons -->
+   <link rel="icon" type="image/x-icon" href="favicon.ico">
+   <link rel="icon" type="image/png" sizes="32x32" href="favicon-32x32.png">
+   <link rel="icon" type="image/png" sizes="16x16" href="favicon-16x16.png">
+
+  <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;500;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="assets/styles.css">
+
 </head>
 <body>
-  <img src="assets/logo-yuta.jpg" alt="YUTA Logo">
-  <h1>YUTA Travel Assistant</h1>
-  <form id="formYuta">
-    <input type="text" id="clienteId" placeholder="Inserisci il tuo nome..." required><br>
-    <textarea id="domanda" rows="4" placeholder="Fai una domanda su Tokyo, Kyoto, Osaka..." required></textarea><br>
-    <button type="submit">Invia</button>
-  </form>
-  <div id="risposta" class="risposta" style="display: none;"></div>
 
-  <script>
-    const form = document.getElementById("formYuta");
-    form.addEventListener("submit", async function(event) {
+  <header>
+    <img src="assets/logo-yuta.jpg" alt="Logo YUTA">
+    <h1>YUTA - il tuo assistente di viaggio</h1>
+    <div class="slogan">Accessibile. Autentico. Per te.</div>
+  </header>
+  <div class="hamburger" onclick="toggleSidebar()">☰</div>
+
+  <div id="sidebar" class="sidebar">
+    <a href="home.html">Home</a>
+    <a href="index.html">YUTA</a>
+    <a href="yuta.html">Cos'è YUTA</a>
+    <a href="chi-siamo.html">Chi siamo</a>
+    <a href="contatti.html">Contatti</a>
+    <a href="faq.html">FAQ</a>
+    </div>
+
+  <main>
+    <label for="clienteId">Codice Cliente:</label>
+    <input type="text" id="clienteId" placeholder="Es: YUME123" />
+
+    <label for="domanda">Domanda:</label>
+    <textarea id="domanda" rows="4" placeholder="Es: Quando ho il check-in a Kyoto?"></textarea>
+
+    <button onclick="inviaDomanda()">Invia</button>
+
+    <div class="output" id="risposta"></div>
+    <div id="spinner" class="spinner" style="display:none;"></div>
+
+    <button id="nuovaDomandaBtn" style="display:none; margin-top:20px;" onclick="nuovaDomanda()">➕ Nuova domanda</button>
+  </main>
+
+  <footer>
+    YUTA è un software registrato di Yume Travel Tech.
+  </footer>
+
+<script>
+  const textarea = document.getElementById("domanda");
+  textarea.addEventListener("keydown", function(event) {
+    if (event.key === "Enter" && !event.shiftKey) {
       event.preventDefault();
+      inviaDomanda();
+  }
+  });
+function nuovaDomanda() {
+  document.getElementById("domanda").value = "";
+  document.getElementById("risposta").innerHTML = "";
+  document.getElementById("nuovaDomandaBtn").style.display = "none";
+}
 
-      const clienteId = document.getElementById("clienteId").value;
-      const domanda = document.getElementById("domanda").value;
+  async function inviaDomanda() {
+    const clienteId = document.getElementById("clienteId").value.trim();
+    const domanda = document.getElementById("domanda").value.trim();
+    const rispostaEl = document.getElementById("risposta");
+    rispostaEl.innerHTML = "";
+    document.getElementById("spinner").style.display = "block";
+    document.getElementById("nuovaDomandaBtn").style.display = "inline-block";
 
-      const rispostaDiv = document.getElementById("risposta");
-      rispostaDiv.style.display = "block";
-      rispostaDiv.innerHTML = "⏳ Sto pensando...";
+    try {
+    document.getElementById("nuovaDomandaBtn").style.display = "none"; // nasconde il bottone in partenza
 
-      try {
-        const response = await fetch("/api/proxy", {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ clienteId, domanda })
-        });
-
-        const data = await response.json();
-        rispostaDiv.innerHTML = `<strong>Risposta:</strong><br><br>${data.risposta}`;
-      } catch (error) {
-        rispostaDiv.innerHTML = "⚠️ Errore nel recuperare la risposta.";
-      }
+    const response = await fetch("/api/proxy", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ clienteId, domanda }),
     });
-  </script>
+
+    const json = await response.json();
+    if (json.risposta) {
+      let testo = json.risposta
+        .replace(/\*\*(.*?)\*\*/g, "<strong>$1</strong>")
+        .replace(/\n### (.*?)\n/g, "<h3>$1</h3>")
+        .replace(/\n- (.*?)\n/g, "<ul><li>$1</li></ul>")
+        .replace(/(?:\r\n|\r|\n)/g, "<br>");
+      testo = testo.replace(/<\/ul><ul>/g, "");
+
+      rispostaEl.innerHTML = "";
+      let i = 0;
+      let testoGrezzato = testo.replace(/<[^>]*>?/gm, ""); // Rimuove tag HTML solo per animazione
+
+      function typeChar() {
+        if (i < testoGrezzato.length) {
+          rispostaEl.textContent += testoGrezzato.charAt(i);
+          i++;
+          setTimeout(typeChar, 20); // più lento, circa 3x più umano
+        } else {
+          rispostaEl.innerHTML = testo; // mostra versione HTML completa e stilizzata
+          document.getElementById("spinner").style.display = "none";
+          document.getElementById("nuovaDomandaBtn").style.display = "inline-block";
+        }
+      }
+      typeChar();
+     } else {
+       rispostaEl.textContent = "❌ Nessuna risposta ricevuta.";
+     } 
+    } catch (err) {
+      rispostaEl.textContent = "❌ Errore durante la richiesta.";
+      console.error("Errore:", err);
+    }
+  }
+</script>
+<script>
+  function toggleSidebar() {
+    const sidebar = document.getElementById("sidebar");
+    if (sidebar.style.width === "250px") {
+      sidebar.style.width = "0";
+    } else {
+      sidebar.style.width = "250px";
+    }
+  }
+</script>
+
 </body>
 </html>
 
