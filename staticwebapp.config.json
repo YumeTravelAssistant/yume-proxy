@@ -1,14 +1,15 @@
 {
-  "routes": [
-    {
-      "route": "/api/*",
-      "allowedRoles": ["anonymous"],
-      "rewrite": "/api/*"
-    }
-  ],
   "navigationFallback": {
     "rewrite": "/index.html",
-    "exclude": ["/assets/*", "/favicon.ico"]
+    "exclude": ["/api/*"]
+  },
+  "responseOverrides": {
+    "401": {
+      "redirect": "/index.html"
+    },
+    "403": {
+      "redirect": "/index.html"
+    }
   }
 }
 
