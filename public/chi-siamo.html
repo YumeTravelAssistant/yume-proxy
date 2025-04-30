@@ -10,10 +10,12 @@
     body {
       margin: 0;
       font-family: 'Outfit', sans-serif;
+      background-color: #F4F0E2;
+      color: #1C1C1C;
       display: flex;
     }
 
- .sidebar {
+    .sidebar {
       width: 220px;
       background-color: #8B2C2B;
       color: white;
@@ -48,37 +50,46 @@
       background-color: #721F1E;
     }
 
-    .main-content {
-      margin-left: 220px;
+    .main-wrapper {
+      flex-grow: 1;
+      display: flex;
+      justify-content: center;
+      align-items: flex-start;
       padding: 40px 30px;
-      background-color: #F4F0E2;
-      min-height: 100vh;
-      box-sizing: border-box;
+    }
+
+    .main-content {
+      background: white;
+      max-width: 700px;
       width: 100%;
+      padding: 40px 35px;
+      border-radius: 16px;
+      box-shadow: 0 6px 20px rgba(0,0,0,0.08);
     }
 
     h1 {
       color: #8B2C2B;
+      margin-bottom: 20px;
     }
 
     p {
-      max-width: 700px;
-      line-height: 1.6;
       font-size: 1.1em;
-      color: #1C1C1C;
+      line-height: 1.6;
     }
 
-    @media (max-width: 700px) {
-      .sidebar {
-        display: none;
+    @media (max-width: 768px) {
+      .main-wrapper {
+        padding: 20px;
       }
+
       .main-content {
-        margin: 0;
+        padding: 25px 20px;
       }
     }
   </style>
 </head>
 <body>
+
   <div class="sidebar">
     <img src="assets/logo-yuta.jpg" alt="Logo YUTA">
     <h2>YUTA</h2>
@@ -90,18 +101,21 @@
     <a href="faq.html">FAQ</a>
   </div>
 
-  <div class="main-content">
-    <h1>Chi siamo</h1>
-    <p>
-      Yume Travel Tech nasce dall'idea di rendere il Giappone accessibile, autentico e inclusivo. 
-      Il nostro obiettivo è abbattere barriere culturali, sensoriali e linguistiche, offrendo esperienze di viaggio personalizzate 
-      grazie alla tecnologia e all'empatia.
-    </p>
-    <p>
-      Con YUTA, il nostro assistente AI, trasformiamo la complessità di un viaggio in Giappone in un percorso guidato, fluido e personalizzato, 
-      adattato alle esigenze di ogni viaggiatore.
-    </p>
+  <div class="main-wrapper">
+    <div class="main-content">
+      <h1>Chi siamo</h1>
+      <p>
+        Yume Travel Tech nasce dall'idea di rendere il Giappone accessibile, autentico e inclusivo.
+        Il nostro obiettivo è abbattere barriere culturali, sensoriali e linguistiche, offrendo esperienze di viaggio personalizzate
+        grazie alla tecnologia e all'empatia.
+      </p>
+      <p>
+        Con YUTA, il nostro assistente AI, trasformiamo la complessità di un viaggio in Giappone in un percorso guidato, fluido e personalizzato,
+        adattato alle esigenze di ogni viaggiatore.
+      </p>
+    </div>
   </div>
+
 </body>
 </html>
 
