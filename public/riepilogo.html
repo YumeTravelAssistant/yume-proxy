@@ -1,0 +1,152 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Riepilogo – YUTA</title>
+  <link rel="icon" href="favicon.ico" />
+  <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;500;700&display=swap" rel="stylesheet" />
+  <style>
+    body {
+      margin: 0;
+      font-family: 'Outfit', sans-serif;
+      background-color: #F4F0E2;
+      color: #1C1C1C;
+      display: flex;
+    }
+    .sidebar {
+      width: 220px;
+      background-color: #8B2C2B;
+      color: white;
+      height: 100vh;
+      padding-top: 20px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+    }
+    .sidebar img {
+      width: 120px;
+      margin-bottom: 10px;
+    }
+    .sidebar h2 {
+      margin: 5px 0 20px;
+      font-size: 1.5em;
+    }
+    .sidebar a {
+      color: white;
+      text-decoration: none;
+      padding: 12px 20px;
+      width: 100%;
+      text-align: left;
+      display: block;
+      box-sizing: border-box;
+    }
+    .sidebar a:hover {
+      background-color: #721F1E;
+    }
+    .main-wrapper {
+      flex-grow: 1;
+      display: flex;
+      justify-content: center;
+      align-items: flex-start;
+      padding: 40px 30px;
+    }
+    .main-content {
+      background: white;
+      max-width: 800px;
+      width: 100%;
+      padding: 40px 35px;
+      border-radius: 16px;
+      box-shadow: 0 6px 20px rgba(0,0,0,0.08);
+    }
+    .riepilogo-item {
+      margin-bottom: 12px;
+    }
+    .riepilogo-item strong {
+      color: #8B2C2B;
+    }
+    .button-group {
+      display: flex;
+      justify-content: space-between;
+      margin-top: 40px;
+    }
+    button {
+      background-color: #8B2C2B;
+      color: white;
+      padding: 12px 20px;
+      border: none;
+      border-radius: 6px;
+      font-size: 1em;
+      cursor: pointer;
+    }
+    button:hover {
+      background-color: #721F1E;
+    }
+  </style>
+</head>
+<body>
+  <div class="sidebar">
+    <img src="assets/logo-yuta.jpg" alt="Logo YUTA">
+    <h2>YUTA</h2>
+    <a href="home.html">Home</a>
+    <a href="index.html">YUTA</a>
+    <a href="yuta.html">Cos'è YUTA</a>
+    <a href="chi-siamo.html">Chi siamo</a>
+    <a href="contatti.html">Contatti</a>
+    <a href="faq.html">FAQ</a>
+  </div>
+
+  <div class="main-wrapper">
+    <div class="main-content">
+      <h1>Riepilogo profilo</h1>
+      <div id="riepilogoDati" style="margin-top: 30px;"></div>
+      <div class="button-group">
+        <button type="button" onclick="window.location.href='approfondimenti.html'">← Indietro</button>
+        <button type="button" onclick="inviaProfiloCompleto()">✔ Invia profilo</button>
+      </div>
+    </div>
+  </div>
+
+<script>
+  const profilo = JSON.parse(localStorage.getItem('profiloClienteYUTA') || '{}');
+  const approfondimenti = JSON.parse(localStorage.getItem('approfondimentiClienteYUTA') || '{}');
+  const datiFinali = { ...profilo, ...approfondimenti };
+
+  const contenitore = document.getElementById('riepilogoDati');
+  let html = "";
+
+  Object.entries(datiFinali).forEach(([key, value]) => {
+    html += `
+      <div class="riepilogo-item">
+        <strong>${key}:</strong> ${Array.isArray(value) ? value.join(', ') : value}
+      </div>
+    `;
+  });
+
+  contenitore.innerHTML = html;
+
+  async function inviaProfiloCompleto() {
+    const response = await fetch("https://script.google.com/macros/s/AKfycbz2hVaNUSMzNzpgQjghkCk3Ov21G0Kuo_z6qq3j_3cRHLt6uFGpzp-bGzlOFdp4Wdwn/exec", {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(datiFinali)
+    });
+
+    const result = await response.json();
+
+    if (result.status === 'success') {
+      document.querySelector('.main-content').innerHTML = `
+        <h1>Grazie per aver inviato il tuo profilo!</h1>
+        <p style="font-size: 1.2em; margin-top: 20px;">Il tuo codice cliente è:</p>
+        <div style="font-size: 1.5em; font-weight: bold; color: #8B2C2B; margin: 15px 0;">${result.codice}</div>
+        <p style="color: #555;">Ti consigliamo di salvarlo per richieste future o per ricevere assistenza personalizzata.</p>
+        <button onclick="window.location.href='home.html'" style="margin-top: 30px;">Torna alla Home</button>
+      `;
+    } else {
+      alert("Errore durante l'invio. Riprova più tardi.");
+    }
+  }
+</script>
+</body>
+</html>
+
