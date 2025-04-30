@@ -1,0 +1,4 @@
+{
+  "errore": "Parametri mancanti: clienteId o domanda."
+}--_curl_--"clienteId":"cliente123"
+--_curl_--"domanda":"Qual è il mio itinerario?"
