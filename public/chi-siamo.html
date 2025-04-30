@@ -85,10 +85,47 @@
       .main-content {
         padding: 25px 20px;
       }
-    }
+.hamburger {
+  display: none;
+  position: fixed;
+  top: 15px;
+  left: 15px;
+  background-color: #8B2C2B;
+  color: white;
+  border: none;
+  font-size: 28px;
+  padding: 10px 15px;
+  border-radius: 6px;
+  z-index: 1000;
+}
+
+@media (max-width: 768px) {
+  .hamburger {
+    display: block;
+  }
+
+  .sidebar {
+    position: fixed;
+    left: -220px;
+    top: 0;
+    height: 100%;
+    transition: left 0.3s ease;
+    z-index: 999;
+  }
+
+  .sidebar.active {
+    left: 0;
+  }
+
+  .main-wrapper {
+    padding: 20px;
+  }
+}
+
   </style>
 </head>
 <body>
+<button id="menu-toggle" class="hamburger">&#9776;</button>
 
   <div class="sidebar">
     <img src="assets/logo-yuta.jpg" alt="Logo YUTA">
@@ -115,6 +152,14 @@
       </p>
     </div>
   </div>
+<script>
+  const toggleButton = document.getElementById('menu-toggle');
+  const sidebar = document.querySelector('.sidebar');
+
+  toggleButton.addEventListener('click', () => {
+    sidebar.classList.toggle('active');
+  });
+</script>
 
 </body>
 </html>
