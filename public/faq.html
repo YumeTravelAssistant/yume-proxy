@@ -4,7 +4,7 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>FAQ – YUTA Travel Assistant</title>
-    <link rel="icon" type="image/png" href="favicon.ico" />
+  <link rel="icon" type="image/png" href="favicon.ico" />
   <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;500;700&display=swap" rel="stylesheet" />
   <style>
     body {
@@ -12,79 +12,106 @@
       font-family: 'Outfit', sans-serif;
       background-color: #F4F0E2;
       color: #1C1C1C;
+      display: flex;
     }
 
     .sidebar {
-      position: fixed;
       width: 220px;
-      top: 0;
-      left: 0;
-      height: 100%;
       background-color: #8B2C2B;
-      padding: 20px;
-      box-sizing: border-box;
+      color: white;
+      height: 100vh;
+      padding-top: 20px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
     }
 
     .sidebar img {
-      width: 160px;
+      width: 120px;
       margin-bottom: 10px;
     }
 
     .sidebar h2 {
-      color: white;
-      font-size: 1.4em;
-      margin-bottom: 20px;
+      margin: 5px 0 20px;
+      font-size: 1.5em;
     }
 
     .sidebar a {
-      display: block;
       color: white;
       text-decoration: none;
-      margin: 10px 0;
-      font-weight: 500;
+      padding: 12px 20px;
+      width: 100%;
+      text-align: left;
+      display: block;
+      box-sizing: border-box;
     }
 
     .sidebar a:hover {
-      text-decoration: underline;
+      background-color: #721F1E;
     }
 
-    .content {
-      margin-left: 250px;
+    .main-wrapper {
+      flex-grow: 1;
+      display: flex;
+      justify-content: center;
+      align-items: flex-start;
       padding: 40px 30px;
+    }
+
+    .main-content {
+      background: white;
       max-width: 800px;
+      width: 100%;
+      padding: 40px 35px;
+      border-radius: 16px;
+      box-shadow: 0 6px 20px rgba(0,0,0,0.08);
     }
 
     h1 {
       color: #8B2C2B;
       font-size: 2em;
-      margin-bottom: 20px;
+      margin-bottom: 30px;
     }
 
     .faq-item {
       margin-bottom: 20px;
-      border-bottom: 1px solid #ccc;
     }
 
     .faq-question {
       cursor: pointer;
-      padding: 12px;
+      padding: 12px 20px;
       background-color: #FFF8F4;
       border-radius: 6px;
       font-weight: 600;
       color: #8B2C2B;
+      transition: background 0.3s;
+    }
+
+    .faq-question:hover {
+      background-color: #F2E5E4;
     }
 
     .faq-answer {
       display: none;
-      padding: 10px 12px 16px;
+      padding: 15px 20px 20px;
       color: #1C1C1C;
     }
 
     footer {
-      margin-top: 40px;
       text-align: center;
       color: #8B2C2B;
       font-size: 0.9em;
+      margin-top: 40px;
+    }
+
+    @media (max-width: 768px) {
+      .main-wrapper {
+        padding: 20px;
+      }
+
+      .main-content {
+        padding: 25px 20px;
+      }
     }
   </style>
 </head>
@@ -101,62 +128,64 @@
     <a href="faq.html">FAQ</a>
   </div>
 
-  <div class="content">
-    <h1>Domande frequenti</h1>
+  <div class="main-wrapper">
+    <div class="main-content">
+      <h1>Domande frequenti</h1>
 
-    <div class="faq-item">
-      <div class="faq-question">1. Cos’è YUTA e a cosa serve?</div>
-      <div class="faq-answer">YUTA è il tuo assistente digitale di viaggio progettato da Yume Travel Tech. Ti guida in tempo reale nel tuo itinerario in Giappone, rispondendo alle tue domande e personalizzando i consigli in base al tuo profilo.</div>
+      <div class="faq-item">
+        <div class="faq-question">1. Cos’è YUTA e a cosa serve?</div>
+        <div class="faq-answer">YUTA è il tuo assistente digitale di viaggio progettato da Yume Travel Tech. Ti guida in tempo reale nel tuo itinerario in Giappone, risponde alle tue domande e ti accompagna passo dopo passo.</div>
+      </div>
+
+      <div class="faq-item">
+        <div class="faq-question">2. Posso usare YUTA anche prima di partire?</div>
+        <div class="faq-answer">Sì! YUTA ti accompagna prima, durante e dopo il tuo viaggio. Può aiutarti nella pianificazione, suggerimenti personalizzati e gestione delle aspettative.</div>
+      </div>
+
+      <div class="faq-item">
+        <div class="faq-question">3. Sono celiaco/vegano, YUTA tiene conto della mia dieta?</div>
+        <div class="faq-answer">Sì. YUTA rispetta rigorosamente ogni tua esigenza alimentare (celiachia, dieta vegana, kosher, halal, ecc.) e ti consiglia solo opzioni sicure e adatte.</div>
+      </div>
+
+      <div class="faq-item">
+        <div class="faq-question">4. YUTA è adatto a persone con disabilità o neurodivergenze?</div>
+        <div class="faq-answer">Sì. Propone esperienze compatibili con il tuo profilo sensoriale o motorio, assicurando comfort, accessibilità e adattamento personalizzato.</div>
+      </div>
+
+      <div class="faq-item">
+        <div class="faq-question">5. YUTA può aiutarmi se viaggio con bambini?</div>
+        <div class="faq-answer">Assolutamente sì. YUTA adatta il ritmo, lo stile e le attività anche per gruppi familiari o viaggi con bambini.</div>
+      </div>
+
+      <div class="faq-item">
+        <div class="faq-question">6. Come fa YUTA a sapere dove mi trovo o cosa rispondermi?</div>
+        <div class="faq-answer">YUTA non ti traccia, ma usa il tuo piano viaggio e le preferenze per fornirti risposte su misura. Sa cosa hai già fatto e cosa è previsto dopo.</div>
+      </div>
+
+      <div class="faq-item">
+        <div class="faq-question">7. Posso chiedere a YUTA cosa fare oggi, anche se cambio programma?</div>
+        <div class="faq-answer">Certo! Basta dirgli come ti senti o che cosa ti piacerebbe fare, e ti proporrà alternative in linea con il tuo stile e tempo disponibile.</div>
+      </div>
+
+      <div class="faq-item">
+        <div class="faq-question">8. YUTA può ricordarmi gli orari di check-in, check-out o voli?</div>
+        <div class="faq-answer">Sì. YUTA è in grado di rispondere in linguaggio naturale e darti date e orari aggiornati delle tue tappe.</div>
+      </div>
+
+      <div class="faq-item">
+        <div class="faq-question">9. Serve internet per usare YUTA?</div>
+        <div class="faq-answer">Sì, YUTA funziona tramite cloud. Serve una SIM o connessione Wi-Fi per ricevere le risposte.</div>
+      </div>
+
+      <div class="faq-item">
+        <div class="faq-question">10. YUTA può sostituire una guida turistica?</div>
+        <div class="faq-answer">No, YUTA non sostituisce una guida. Ma ti offre assistenza continua e personalizzata, per sentirti sempre affiancato.</div>
+      </div>
+
+      <footer>
+        YUTA è un software registrato di Yume Travel Tech.
+      </footer>
     </div>
-
-    <div class="faq-item">
-      <div class="faq-question">2. Posso usare YUTA anche prima di partire?</div>
-      <div class="faq-answer">Sì! YUTA ti accompagna prima, durante e dopo il tuo viaggio. Prima della partenza può aiutarti a capire il tuo itinerario, risolvere dubbi e offrirti consigli pratici e personalizzati.</div>
-    </div>
-
-    <div class="faq-item">
-      <div class="faq-question">3. Sono celiaco/vegano, YUTA tiene conto della mia dieta?</div>
-      <div class="faq-answer">Sì. YUTA rispetta rigorosamente ogni tua esigenza alimentare (celiachia, dieta vegana, kosher, halal, ecc.) e ti consiglia solo opzioni sicure e pertinenti.</div>
-    </div>
-
-    <div class="faq-item">
-      <div class="faq-question">4. YUTA è adatto a persone con disabilità o neurodivergenze?</div>
-      <div class="faq-answer">Sì. YUTA propone itinerari e attività compatibili con il tuo profilo sensoriale o motorio, garantendo un’esperienza inclusiva, sicura e piacevole per tutti.</div>
-    </div>
-
-    <div class="faq-item">
-      <div class="faq-question">5. YUTA può aiutarmi se viaggio con bambini?</div>
-      <div class="faq-answer">Assolutamente sì. Se viaggi in famiglia, YUTA adatta ritmo, stile comunicativo e suggerimenti a misura di bambino o di gruppo misto.</div>
-    </div>
-
-    <div class="faq-item">
-      <div class="faq-question">6. Come fa YUTA a sapere dove mi trovo o cosa rispondermi?</div>
-      <div class="faq-answer">YUTA non ti traccia, ma usa il tuo piano di viaggio e le tue preferenze per fornirti risposte su misura. Sa cosa hai già fatto e cosa è adatto a te.</div>
-    </div>
-
-    <div class="faq-item">
-      <div class="faq-question">7. Posso chiedere a YUTA cosa fare oggi, anche se cambio programma?</div>
-      <div class="faq-answer">Certo. YUTA è flessibile: basta dirgli come ti senti o cosa ti piacerebbe fare, e ti darà suggerimenti in linea con il tuo ritmo e le tue preferenze del giorno.</div>
-    </div>
-
-    <div class="faq-item">
-      <div class="faq-question">8. YUTA può ricordarmi gli orari di check-in, check-out o voli?</div>
-      <div class="faq-answer">Sì. Puoi scrivere ad esempio: “Quando ho il check-in a Kyoto?” e YUTA ti risponderà con data e orario esatto, senza che tu debba cercare nei documenti.</div>
-    </div>
-
-    <div class="faq-item">
-      <div class="faq-question">9. Serve internet per usare YUTA?</div>
-      <div class="faq-answer">Sì, YUTA è un assistente cloud-based. Ti consigliamo di avere una SIM locale o accesso Wi-Fi per sfruttarlo al meglio durante il viaggio.</div>
-    </div>
-
-    <div class="faq-item">
-      <div class="faq-question">10. YUTA può sostituire una guida turistica?</div>
-      <div class="faq-answer">No. YUTA non sostituisce una guida, ma la affianca. È pensato per viaggiatori autonomi o gruppi che desiderano libertà e supporto continuo nel viaggio.</div>
-    </div>
-
-    <footer>
-      YUTA è un software registrato di Yume Travel Tech.
-    </footer>
   </div>
 
   <script>
