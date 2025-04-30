@@ -6,7 +6,7 @@
       "direction": "in",
       "name": "req",
       "methods": ["post"],
-      "route": "invioprofilo"
+      "route": "invioprofilo2"
     },
     {
       "type": "http",
