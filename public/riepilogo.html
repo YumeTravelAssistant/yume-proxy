@@ -126,11 +126,11 @@
   contenitore.innerHTML = html;
 
   async function inviaProfiloCompleto() {
-    const response = await fetch("https://script.google.com/macros/s/AKfycbz2hVaNUSMzNzpgQjghkCk3Ov21G0Kuo_z6qq3j_3cRHLt6uFGpzp-bGzlOFdp4Wdwn/exec", {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify(datiFinali)
-    });
+const response = await fetch("https://yuta-travel.com/api/proxy", {
+  method: 'POST',
+  headers: { 'Content-Type': 'application/json' },
+  body: JSON.stringify(datiFinali)
+});
 
     const result = await response.json();
 
