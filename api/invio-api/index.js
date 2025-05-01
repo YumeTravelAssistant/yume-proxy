@@ -4,7 +4,7 @@ module.exports = async function (context, req) {
   try {
     const dati = req.body;
 
-    const GAS_URL = "https://script.googleusercontent.com/macros/echo?user_content_key=...&lib=...";
+    const GAS_URL = "https://script.google.com/macros/s/AKfycbxSxeFqQc36ZHAXF-ktSL8KFpb74QVZ4jqHesr25sq2XvE8TxQXRY7n93jJCnBo7IdI/exec";
 
     const response = await fetch(GAS_URL, {
       method: 'POST',
@@ -12,7 +12,7 @@ module.exports = async function (context, req) {
       body: JSON.stringify(dati),
     });
 
-    const result = await response.text(); // <-- .text() per evitare crash su non-JSON
+    const result = await response.text();
 
     let parsed;
     try {
