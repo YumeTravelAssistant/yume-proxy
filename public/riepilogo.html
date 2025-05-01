@@ -126,7 +126,7 @@
   contenitore.innerHTML = html;
 
   async function inviaProfiloCompleto() {
-const response = await fetch("https://yuta-invio-profilo.azurewebsites.net/api/invioprofilo", {
+const response = await fetch("https://yuta-invio-profilo.azurewebsites.net/api", {
   method: 'POST',
   headers: { 'Content-Type': 'application/json' },
   body: JSON.stringify(datiFinali)
