@@ -4,7 +4,7 @@ module.exports = async function (context, req) {
   try {
     const dati = req.body;
 
-    const GAS_URL = "https://script.google.com/macros/s/AKfycbxSxeFqQc36ZHAXF-ktSL8KFpb74QVZ4jqHesr25sq2XvE8TxQXRY7n93jJCnBo7IdI/exec";
+    const GAS_URL = "https://script.google.com/macros/s/AKfycbwd351JhRTUmtNtnvquM0dD435qwmwnmE4GK6jtEMKnUe7Ospt-mZiu8X7d2ARvB3hlMg/exec";
 
     const response = await fetch(GAS_URL, {
       method: 'POST',
