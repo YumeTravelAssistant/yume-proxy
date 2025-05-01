@@ -1,26 +1,36 @@
 module.exports = async function (context, req) {
-  const data = req.body || {};
-
   try {
-    const response = await fetch("https://script.google.com/macros/s/AKfycbwNSo8z_0LIXi8jEJrgPhdxI239Skv0PqbovYXL2eRsQ6i88PvHUxFxlRxINIEHXeLB/exec", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify(data)
-    });
+    const datiRicevuti = req.body;
 
-    const result = await response.json();
+    if (!datiRicevuti || typeof datiRicevuti !== 'object') {
+      context.res = {
+        status: 400,
+        body: { status: "error", message: "Nessun dato ricevuto o formato errato" }
+      };
+      return;
+    }
+
+    // Puoi eventualmente loggare qui se vuoi controllare nel monitor di Azure:
+    context.log("Dati ricevuti:", JSON.stringify(datiRicevuti, null, 2));
+
+    // ✅ Simula una risposta con codice cliente
     context.res = {
       status: 200,
-      body: result
+      headers: { "Content-Type": "application/json" },
+      body: {
+        status: "success",
+        codice: "cliente-temporaneo"
+      }
     };
-
   } catch (error) {
+    context.log("Errore nella funzione invio-api:", error);
+
     context.res = {
-      status: 502,
+      status: 500,
+      headers: { "Content-Type": "application/json" },
       body: {
         status: "error",
-        message: "Errore durante la ricezione della risposta da GAS",
-        dettaglio: error.toString()
+        message: error.message || "Errore interno"
       }
     };
   }
