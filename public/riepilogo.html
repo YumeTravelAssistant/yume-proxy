@@ -63,7 +63,7 @@
       margin-bottom: 12px;
     }
     .riepilogo-item strong {
-      color: #8B2C2B;
+     color: #8B2C2B;
     }
     .button-group {
       display: flex;
@@ -107,38 +107,51 @@
     </div>
   </div>
 
-<script>
-  async function inviaProfiloCompleto() {
+  <script>
+    // Mostra il riepilogo dei dati raccolti
     const profilo = JSON.parse(localStorage.getItem('profiloClienteYUTA') || '{}');
     const approfondimenti = JSON.parse(localStorage.getItem('approfondimentiClienteYUTA') || '{}');
     const datiFinali = { ...profilo, ...approfondimenti };
 
-    try {
-const response = await fetch("https://yuta-invio-profilo.azurewebsites.net/api/invio-api", {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(datiFinali)
-      });
+    const contenitore = document.getElementById('riepilogoDati');
+    let html = "";
+    Object.entries(datiFinali).forEach(([key, value]) => {
+      html += `
+        <div class="riepilogo-item">
+          <strong>${key}:</strong> ${Array.isArray(value) ? value.join(', ') : value}
+        </div>
+      `;
+    });
+    contenitore.innerHTML = html;
 
-      const result = await response.json();
+    // Invia i dati al backend (Azure Function collegata a GAS)
+    async function inviaProfiloCompleto() {
+      try {
+        const response = await fetch("https://yuta-invio-profilo.azurewebsites.net/api/invio-api", {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(datiFinali)
+        });
 
-      if (result.status === 'success') {
-        document.querySelector('.main-content').innerHTML = `
-          <h1>Grazie per aver inviato il tuo profilo!</h1>
-          <p style="font-size: 1.2em; margin-top: 20px;">Il tuo codice cliente è:</p>
-          <div style="font-size: 1.5em; font-weight: bold; color: #8B2C2B; margin: 15px 0;">${result.codice}</div>
-          <p style="color: #555;">Ti consigliamo di salvarlo per richieste future o per ricevere assistenza personalizzata.</p>
-          <button onclick="window.location.href='home.html'" style="margin-top: 30px;">Torna alla Home</button>
-        `;
-      } else {
-        alert("Errore durante l'invio. Riprova più tardi.");
+        const result = await response.json();
+
+        if (result.status === 'success') {
+          document.querySelector('.main-content').innerHTML = `
+            <h1>Grazie per aver inviato il tuo profilo!</h1>
+            <p style="font-size: 1.2em; margin-top: 20px;">Il tuo codice cliente è:</p>
+            <div style="font-size: 1.5em; font-weight: bold; color: #8B2C2B; margin: 15px 0;">${result.codice}</div>
+            <p style="color: #555;">Ti consigliamo di salvarlo per richieste future o per ricevere assistenza personalizzata.</p>
+            <button onclick="window.location.href='home.html'" style="margin-top: 30px;">Torna alla Home</button>
+          `;
+        } else {
+          alert("Errore durante l'invio. Riprova più tardi.");
+        }
+      } catch (errore) {
+        console.error("Errore:", errore);
+        alert("Errore durante l'invio. Controlla la connessione o riprova.");
       }
-    } catch (errore) {
-      console.error("Errore:", errore);
-      alert("Errore durante l'invio. Controlla la connessione o riprova.");
     }
-  }
-</script>
+  </script>
 </body>
 </html>
 
