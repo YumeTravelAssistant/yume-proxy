@@ -1,29 +1,25 @@
-const fetch = require('node-fetch');
-
 module.exports = async function (context, req) {
-  const datiProfilo = req.body;
+  const data = req.body || {};
 
-  const GAS_URL = "https://script.google.com/macros/s/AKfycbwNSo8z_0LIXi8jEJrgPhdxI239Skv0PqbovYXL2eRsQ6i88PvHUxFxlRxINIEHXeLB/exec";
+  const response = await fetch("https://script.google.com/macros/s/AKfycbwNSo8z_0LIXi8jEJrgPhdxI239Skv0PqbovYXL2eRsQ6i88PvHUxFxlRxINIEHXeLB/exec", {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify(data)
+  });
 
   try {
-    const response = await fetch(GAS_URL, {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify(datiProfilo)
-    });
-
-    const data = await response.json();
-
+    const result = await response.json();
     context.res = {
       status: 200,
-      body: data
+      body: result
     };
   } catch (error) {
     context.res = {
-      status: 500,
+      status: 502,
       body: {
-        errore: "Errore durante l'invio al GAS",
-        dettaglio: error.message
+        status: "error",
+        message: "Errore durante la ricezione della risposta da GAS",
+        dettaglio: error.toString()
       }
     };
   }
