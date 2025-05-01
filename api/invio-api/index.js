@@ -1,36 +1,46 @@
+const fetch = require("node-fetch");
+
 module.exports = async function (context, req) {
   try {
-    const datiRicevuti = req.body;
+    const body = req.body || {};
 
-    if (!datiRicevuti || typeof datiRicevuti !== 'object') {
+    if (!body.nome || !body.email || !body.nazionalita) {
       context.res = {
         status: 400,
-        body: { status: "error", message: "Nessun dato ricevuto o formato errato" }
+        body: {
+          status: "error",
+          message: "Campi obbligatori mancanti (nome, email, nazionalità)"
+        }
       };
       return;
     }
 
-    // Puoi eventualmente loggare qui se vuoi controllare nel monitor di Azure:
-    context.log("Dati ricevuti:", JSON.stringify(datiRicevuti, null, 2));
+    // Chiamata al tuo Google Apps Script
+    const responseGAS = await fetch("https://script.google.com/macros/s/AKfycbwNSo8z_0LIXi8jEJrgPhdxI239Skv0PqbovYXL2eRsQ6i88PvHUxFxlRxINIEHXeLB/exec", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(body)
+    });
 
-    // ✅ Simula una risposta con codice cliente
+    const result = await responseGAS.json();
+
     context.res = {
       status: 200,
       headers: { "Content-Type": "application/json" },
       body: {
         status: "success",
-        codice: "cliente-temporaneo"
+        codice: result.codice || "non specificato"
       }
     };
-  } catch (error) {
-    context.log("Errore nella funzione invio-api:", error);
 
+  } catch (error) {
     context.res = {
       status: 500,
       headers: { "Content-Type": "application/json" },
       body: {
         status: "error",
-        message: error.message || "Errore interno"
+        message: "Errore durante l'invio al GAS",
+        dettaglio: error.message
       }
     };
   }
