@@ -23,12 +23,25 @@ module.exports = async function (context, req) {
 
     context.res = {
       status: 200,
+      headers: {
+        "Access-Control-Allow-Origin": "https://yuta-travel.com",
+        "Access-Control-Allow-Methods": "POST, OPTIONS",
+        "Access-Control-Allow-Headers": "Content-Type"
+      },
       body: parsed
     };
   } catch (error) {
     context.res = {
       status: 500,
-      body: { error: "Errore interno nel proxy", details: error.message }
+      headers: {
+        "Access-Control-Allow-Origin": "https://yuta-travel.com",
+        "Access-Control-Allow-Methods": "POST, OPTIONS",
+        "Access-Control-Allow-Headers": "Content-Type"
+      },
+      body: {
+        error: "Errore interno nel proxy",
+        details: error.message
+      }
     };
   }
 };
