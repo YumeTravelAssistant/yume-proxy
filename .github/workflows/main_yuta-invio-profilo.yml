@@ -7,7 +7,7 @@ on:
   workflow_dispatch:
 
 env:
-  AZURE_FUNCTIONAPP_PACKAGE_PATH: 'api/inviaDati'
+  AZURE_FUNCTIONAPP_PACKAGE_PATH: 'api/invio-api'
   NODE_VERSION: '20.x'
 
 jobs:
