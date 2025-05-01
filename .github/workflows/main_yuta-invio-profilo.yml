@@ -28,14 +28,9 @@ jobs:
         with:
           node-version: ${{ env.NODE_VERSION }}
 
-      - name: 'Resolve Project Dependencies Using Npm'
-        shell: pwsh
-        run: |
-          pushd './${{ env.AZURE_FUNCTIONAPP_PACKAGE_PATH }}'
-          npm install
-          npm run build --if-present
-          npm run test --if-present
-          popd
+     - name: 'Skip NPM steps (no package.json needed)'
+  run: echo "Skipping NPM install for function-only project"
+
 
       - name: Upload artifact for deployment job
         uses: actions/upload-artifact@v4
