@@ -322,31 +322,6 @@
     }
     riepilogoDiv.innerHTML = riepilogoHTML;
 
-    // Invio dati pagina 1 + pagina 2
-    const form = document.getElementById('approfondimentiForm');
-    form.addEventListener('submit', async function (e) {
-      e.preventDefault();
-      const approfondimenti = {};
-      Array.from(form.elements).forEach(el => {
-        if (!el.name) return;
-        if (el.multiple) {
-          approfondimenti[el.name] = Array.from(el.selectedOptions).map(opt => opt.value);
-        } else {
-          approfondimenti[el.name] = el.value;
-        }
-      });
-
-      const datiCompleti = { ...profilo, ...approfondimenti };
-
-      const response = await fetch("https://script.google.com/macros/s/AKfycbz2hVaNUSMzNzpgQjghkCk3Ov21G0Kuo_z6qq3j_3cRHLt6uFGpzp-bGzlOFdp4Wdwn/exec", {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(datiCompleti)
-      });
-
-      const result = await response.json();
-      alert(result.status === 'success' ? "Profilo inviato correttamente!" : "Errore durante l'invio.");
-    });
   </script>
 </body>
 </html>
