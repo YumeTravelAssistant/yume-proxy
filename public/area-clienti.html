@@ -209,6 +209,36 @@ const CAMPI_DEFINITI = {
     opzioni: ["1", "2", "3", "4", "5", "6"]
   }
 };
+const MAPPATURA_CAMPI = {
+  "Nome": "nome",
+  "Nazionalità": "nazionalita",
+  "Email": "email",
+  "Numero viaggiatori": "numero_viaggiatori",
+  "Stile di Comunicazione": "stile_comunicativo",
+  "Tipologia gruppo": "tipologia_viaggio",
+  "Comfort desiderato": "comfort",
+  "Livello autonomia": "autonomia",
+  "Ritmo": "ritmo",
+  "Preferenze": "preferenze",
+  "Esigenze Speciali": "esigenze_speciali",
+  "Restrizioni alimentari dettagliate": "restrizioni_alimentari",
+  "Approccio al cibo": "approccio_cibo",
+  "Tatuaggi": "tatuaggi",
+  "Maggiorenne": "maggiorenne",
+  "Fumatore": "fumatore",
+  "Acrofobia": "acrofobia",
+  "Claustrofobia": "claustrofobia",
+  "Cinetosi": "cinetosi",
+  "Budget stimato al giorno": "budget",
+  "Occasione": "occasione",
+  "Fascia oraria escursioni": "fascia_oraria_escursioni",  // opzionale
+  "Lingua parlata": "lingue_parlate",
+  "Data Partenza": "data_partenza",
+  "Primo giorno in Giappone": "primo_giappone",
+  "Ultimo giorno in Giappone": "ultimo_giappone",
+  "Data Ritorno": "data_ritorno",
+  "Password_Hash": "password_hash"
+};
 
 async function caricaDatiCliente() {
   const codiceCliente = localStorage.getItem("codiceClienteYUTA");
@@ -222,9 +252,10 @@ async function caricaDatiCliente() {
   const dati = await response.json();
   const form = document.getElementById("modificaForm");
 
-  Object.entries(dati).forEach(([key, value]) => {
-    const campo = CAMPI_DEFINITI[key];
-    if (!campo) return;
+Object.entries(dati).forEach(([keyRaw, value]) => {
+  const key = MAPPATURA_CAMPI[keyRaw];
+  const campo = CAMPI_DEFINITI[key];
+  if (!campo) return;
 
     const label = document.createElement("label");
     label.textContent = campo.label || key;
