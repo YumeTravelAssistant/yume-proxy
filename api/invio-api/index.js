@@ -43,11 +43,16 @@ module.exports = async function (context, req) {
     });
 
 let parsed;
+let resultText;
 try {
-  parsed = await response.json(); // ✅ prova a leggere direttamente come JSON
+  parsed = await response.json(); // ✅ più sicuro
 } catch {
-  const resultText = await response.text(); // fallback in caso di errore
-  parsed = { status: "raw", response: resultText };
+  resultText = await response.text();
+  try {
+    parsed = JSON.parse(resultText); // 🔁 tenta di parsare comunque
+  } catch {
+    parsed = { status: "raw", response: resultText };
+  }
 }
 
     context.res = {
