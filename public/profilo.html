@@ -111,19 +111,77 @@
     button:hover {
       background-color: #721F1E;
     }
+.hamburger {
+  display: none;
+  font-size: 24px;
+  background: none;
+  border: none;
+  color: #8B2C2B;
+  position: absolute;
+  top: 1rem;
+  left: 1rem;
+  z-index: 1000;
+}
+.sidebar ul {
+  list-style: none;
+  padding-left: 0;
+  margin-top: 10px;
+  width: 100%;
+}
+.sidebar .submenu {
+  padding-left: 20px;
+}
+.sidebar .submenu li a {
+  padding-left: 40px;
+  font-size: 0.95em;
+  background-color: #a03b3a;
+}
+.sidebar .submenu li a:hover {
+  background-color: #721F1E;
+}
+@media (max-width: 768px) {
+  .hamburger {
+    display: block;
+  }
+  .sidebar {
+    display: none;
+  }
+  .sidebar.active {
+    display: flex;
+    position: absolute;
+    background-color: #8B2C2B;
+    width: 220px;
+    height: 100%;
+    top: 0;
+    left: 0;
+    z-index: 999;
+    flex-direction: column;
+    padding-top: 20px;
+  }
+  .main-wrapper {
+    padding-top: 80px;
+  }
+}
+
   </style>
 </head>
 <body>
-  <div class="sidebar">
-    <img src="assets/logo-yuta.jpg" alt="Logo YUTA">
-    <h2>YUTA</h2>
-    <a href="home.html">Home</a>
-    <a href="index.html">YUTA</a>
-    <a href="yuta.html">Cos'è YUTA</a>
-    <a href="chi-siamo.html">Chi siamo</a>
-    <a href="contatti.html">Contatti</a>
-    <a href="faq.html">FAQ</a>
-  </div>
+<!-- Pulsante hamburger per mobile -->
+<button class="hamburger" onclick="toggleSidebar()">☰</button>
+
+<!-- Sidebar -->
+<div class="sidebar">
+  <img src="assets/logo-yuta.jpg" alt="Logo YUTA">
+  <h2>YUTA</h2>
+  <a href="home.html">Home</a>
+  <a href="index.html">YUTA</a>
+  <a href="yuta.html">Cos'è YUTA</a>
+  <a href="chi-siamo.html">Chi siamo</a>
+  <a href="contatti.html">Contatti</a>
+  <a href="faq.html">FAQ</a>
+  <a href="profilo.html">Registrazione</a>
+</div>
+
 
   <div class="main-wrapper">
     <div class="main-content">
@@ -218,13 +276,13 @@
   <button type="button" onclick="salvaEDirigi()">Avanti</button>
 </form>
 <script>
+  // Salva dati nel localStorage e vai alla pagina successiva
   function salvaEDirigi() {
     const form = document.getElementById('profiloForm');
     const data = {};
 
     Array.from(form.elements).forEach(el => {
       if (!el.name) return;
-
       if (el.multiple) {
         data[el.name] = Array.from(el.selectedOptions).map(opt => opt.value);
       } else {
@@ -236,18 +294,26 @@
     window.location.href = 'approfondimenti.html';
   }
 
-  // Mostra campo “Altro” se selezionato
+  // Mostra campo “Altro” per preferenze
   const preferenzeSelect = document.querySelector('select[name="preferenze"]');
   const preferenzeAltro = document.getElementById('preferenze_altro');
   preferenzeSelect.addEventListener('change', () => {
-    preferenzeAltro.classList.toggle('hidden', ![...preferenzeSelect.selectedOptions].some(opt => opt.value === 'Altro'));
+    const showAltro = [...preferenzeSelect.selectedOptions].some(opt => opt.value === 'Altro');
+    preferenzeAltro.classList.toggle('hidden', !showAltro);
   });
 
+  // Mostra campo “Altro” per esigenze speciali
   const esigenzeSelect = document.querySelector('select[name="esigenze_speciali"]');
   const esigenzeAltro = document.getElementById('esigenze_speciali_altro');
   esigenzeSelect.addEventListener('change', () => {
-    esigenzeAltro.classList.toggle('hidden', ![...esigenzeSelect.selectedOptions].some(opt => opt.value === 'Altro'));
+    const showAltro = [...esigenzeSelect.selectedOptions].some(opt => opt.value === 'Altro');
+    esigenzeAltro.classList.toggle('hidden', !showAltro);
   });
+
+  // Mostra/nasconde sidebar mobile
+  function toggleSidebar() {
+    document.querySelector('.sidebar').classList.toggle('active');
+  }
 </script>
 
 
