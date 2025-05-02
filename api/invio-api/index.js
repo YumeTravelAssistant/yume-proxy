@@ -3,8 +3,23 @@ const fetch = require('node-fetch');
 module.exports = async function (context, req) {
   try {
     const dati = req.body;
+    const path = req.url || req.originalUrl || "";
 
+    // 🔗 URL del tuo relay.gs
     const GAS_URL = "https://script.google.com/macros/s/AKfycbwd351JhRTUmtNtnvquM0dD435qwmwnmE4GK6jtEMKnUe7Ospt-mZiu8X7d2ARvB3hlMg/exec";
+
+    // 🧠 Imposta tipoRichiesta solo se non è già presente
+    if (!dati.tipoRichiesta) {
+      if (path.includes("/verify-login")) {
+        dati.tipoRichiesta = "login";
+      } else if (path.includes("/get-cliente")) {
+        dati.tipoRichiesta = "get";
+      } else if (path.includes("/update-cliente")) {
+        dati.tipoRichiesta = "update";
+      } else {
+        dati.tipoRichiesta = "profilo"; // fallback default
+      }
+    }
 
     const response = await fetch(GAS_URL, {
       method: 'POST',
