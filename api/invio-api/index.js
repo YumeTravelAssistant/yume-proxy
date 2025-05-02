@@ -42,14 +42,13 @@ module.exports = async function (context, req) {
       body: JSON.stringify(dati),
     });
 
-    const resultText = await response.text();
-    let parsed;
-
-    try {
-      parsed = JSON.parse(resultText);
-    } catch {
-      parsed = { status: "raw", response: resultText };
-    }
+let parsed;
+try {
+  parsed = await response.json(); // ✅ prova a leggere direttamente come JSON
+} catch {
+  const resultText = await response.text(); // fallback in caso di errore
+  parsed = { status: "raw", response: resultText };
+}
 
     context.res = {
       status: 200,
