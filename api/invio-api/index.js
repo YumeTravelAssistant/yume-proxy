@@ -23,7 +23,6 @@ module.exports = async function (context, req) {
 
     // 🔗 URL del relay.gs
     const GAS_URL = "https://script.google.com/macros/s/AKfycbwd351JhRTUmtNtnvquM0dD435qwmwnmE4GK6jtEMKnUe7Ospt-mZiu8X7d2ARvB3hlMg/exec";
-
     // 🧠 Routing dinamico solo se tipoRichiesta non presente
     if (!dati.tipoRichiesta) {
       if (path.includes("/verify-login")) {
