@@ -104,6 +104,14 @@
   left: 1rem;
   z-index: 1000;
 }
+.hamburger:focus,
+.hamburger:active {
+  outline: none;
+  box-shadow: none;
+  background: none;
+  color: white;
+}
+
     @media (max-width: 768px) {
       .hamburger {
         display: block;
@@ -123,8 +131,10 @@
         flex-direction: column;
         padding-top: 20px;
       }
-      .main-wrapper {
-        padding-top: 80px;
+.main-wrapper {
+  padding-top: 80px;
+  align-items: flex-start;
+}
       }
     }
   </style>
