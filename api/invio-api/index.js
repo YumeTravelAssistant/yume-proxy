@@ -43,19 +43,18 @@ module.exports = async function (context, req) {
       body: JSON.stringify(dati),
     });
 
-    let parsed;
-    let resultText;
+const rawText = await response.text();
 
-    try {
-      parsed = await response.json();
-    } catch {
-      resultText = await response.text();
-      try {
-        parsed = JSON.parse(resultText);
-      } catch {
-        parsed = { status: "raw", response: resultText };
-      }
-    }
+let parsed;
+try {
+  parsed = JSON.parse(rawText);
+} catch {
+  parsed = {
+    status: "error",
+    message: "Risposta non in formato JSON",
+    raw: rawText
+  };
+}
 
     context.res = {
       status: 200,
