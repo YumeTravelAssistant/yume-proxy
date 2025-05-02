@@ -190,8 +190,18 @@
   <label>Nome e Cognome</label>
   <input type="text" name="nome" required>
 
-  <label>Email</label>
-  <input type="email" name="email">
+<label>Email</label>
+<input type="email" name="email" id="email" required>
+
+<label>Conferma email</label>
+<input type="email" id="conferma_email" required>
+
+<label>Crea una password</label>
+<input type="password" id="password" required>
+
+<label>Conferma password</label>
+<input type="password" id="conferma_password" required>
+
 
   <label>Nazionalità</label>
   <input type="text" name="nazionalita">
@@ -277,7 +287,30 @@
 </form>
 <script>
   // Salva dati nel localStorage e vai alla pagina successiva
-  function salvaEDirigi() {
+<script>
+  async function salvaEDirigi() {
+    const email = document.getElementById('email').value.trim();
+    const confermaEmail = document.getElementById('conferma_email').value.trim();
+    const password = document.getElementById('password').value;
+    const confermaPassword = document.getElementById('conferma_password').value;
+
+    if (!email || email !== confermaEmail) {
+      alert("Le email non coincidono o sono vuote.");
+      return;
+    }
+
+    if (!password || password !== confermaPassword) {
+      alert("Le password non coincidono o sono vuote.");
+      return;
+    }
+
+    // Calcolo SHA-256 della password
+    const encoder = new TextEncoder();
+    const dataEncoded = encoder.encode(password);
+    const buffer = await crypto.subtle.digest("SHA-256", dataEncoded);
+    const hashArray = Array.from(new Uint8Array(buffer));
+    const passwordHash = hashArray.map(b => b.toString(16).padStart(2, '0')).join('');
+
     const form = document.getElementById('profiloForm');
     const data = {};
 
@@ -290,9 +323,12 @@
       }
     });
 
+    data.password_hash = passwordHash;
+
     localStorage.setItem('profiloClienteYUTA', JSON.stringify(data));
     window.location.href = 'approfondimenti.html';
   }
+</script>
 
   // Mostra campo “Altro” per preferenze
   const preferenzeSelect = document.querySelector('select[name="preferenze"]');
