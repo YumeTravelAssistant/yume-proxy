@@ -145,6 +145,64 @@
 function toggleSidebar() {
   document.querySelector('.sidebar').classList.toggle('active');
 }
+const CAMPI_DEFINITI = {
+  preferenze: {
+    tipo: "select-multipla",
+    opzioni: ["Cucina locale", "Autenticità", "Artigianato", "Shopping", "Cultura", "Folclore", "Mercati", "Natura e paesaggi", "Tradizione", "Altro"]
+  },
+  esigenze_speciali: {
+    tipo: "select-multipla",
+    opzioni: ["Allergie stagionali", "Allergie alimentari", "Sedia a rotelle", "Ipovedente", "Problemi uditivi", "Ansia sociale", "Diabete", "Autismo", "Neurodivergenza", "Halal", "Kosher", "Dieta vegana", "Dieta vegetariana", "Celiachia", "Altro"]
+  },
+  lingue_parlate: {
+    tipo: "select-multipla",
+    opzioni: ["Italiano", "Inglese", "Francese", "Spagnolo", "Tedesco", "Portoghese", "Russo", "Giapponese", "Cinese", "Coreano"]
+  },
+  tatuaggi: { tipo: "select-singola", opzioni: ["Sì", "No"] },
+  maggiorenne: { tipo: "select-singola", opzioni: ["Sì", "No"] },
+  fumatore: { tipo: "select-singola", opzioni: ["Sì", "No"] },
+  claustrofobia: { tipo: "select-singola", opzioni: ["Sì", "No"] },
+  acrofobia: { tipo: "select-singola", opzioni: ["Sì", "No"] },
+  cinetosi: { tipo: "select-singola", opzioni: ["Sì", "No"] },
+  stile_comunicativo: {
+    tipo: "select-singola",
+    opzioni: ["curioso", "rassicurante", "accogliente", "empatico", "stimolante ma chiaro", "tranquillo", "coinvolgente", "familiare", "consapevole", "sereno"]
+  },
+  approccio_cibo: {
+    tipo: "select-singola",
+    opzioni: ["Aperto a provare", "Tradizionale", "Internazionale", "Cauto/Selettivo", "Veg/Vegano consapevole"]
+  },
+  comfort: {
+    tipo: "select-singola",
+    opzioni: ["Spartano", "Standard", "Premium", "Lusso"]
+  },
+  autonomia: {
+    tipo: "select-singola",
+    opzioni: ["Autonomo", "Da accompagnare", "Da guidare passo passo"]
+  },
+  tipologia_viaggio: {
+    tipo: "select-singola",
+    opzioni: ["Singolo", "Famiglia", "Amici", "Colleghi", "Gruppo misto"]
+  },
+  ritmo: {
+    tipo: "select-singola",
+    opzioni: ["Lento", "Normale", "Veloce"]
+  },
+  budget: {
+    tipo: "select-singola",
+    opzioni: ["Ridotto", "Medio", "Alto", "Illimitato"]
+  },
+  occasione: {
+    tipo: "select-singola",
+    opzioni: ["Nessuno", "Compleanno", "Viaggio di nozze", "Laurea", "Anniversario", "Addio al nubilato/celibato", "Vacanza", "Romantico", "Altro"]
+  },
+  numero_viaggiatori: {
+    tipo: "select-singola",
+    opzioni: ["1", "2", "3", "4", "5", "6"]
+  }
+};
+
+let numeroComponenti = 1;
 
 async function caricaDatiCliente() {
   const codiceCliente = localStorage.getItem("codiceClienteYUTA");
@@ -152,54 +210,108 @@ async function caricaDatiCliente() {
   const response = await fetch("https://yuta-invio-profilo.azurewebsites.net/api/invio-api", {
     method: "POST",
     headers: { "Content-Type": "application/json" },
-    body: JSON.stringify({
-      tipoRichiesta: "get",
-      codice: codiceCliente
-    })
+    body: JSON.stringify({ tipoRichiesta: "get", codice: codiceCliente })
   });
 
   const dati = await response.json();
   const form = document.getElementById("modificaForm");
 
   Object.entries(dati).forEach(([key, value]) => {
+    if (!CAMPI_DEFINITI[key]) return;
+
     const label = document.createElement("label");
     label.textContent = key;
+    label.htmlFor = `campo-${key}`;
 
     let input;
-    if (["preferenze", "esigenze_speciali", "lingue_parlate"].includes(key)) {
+    const campo = CAMPI_DEFINITI[key];
+
+    if (campo.tipo === "select-multipla") {
       input = document.createElement("select");
       input.name = key;
+      input.id = `campo-${key}`;
       input.multiple = true;
 
-      const opzioni = (typeof value === "string" ? value.split(",") : value);
-      opzioni.forEach(opt => {
-        const option = document.createElement("option");
-        option.value = opt.trim();
-        option.textContent = opt.trim();
-        option.selected = true;
-        input.appendChild(option);
-      });
+      const selezionati = Array.isArray(value)
+        ? value
+        : typeof value === "string"
+          ? value.split(",").map(v => v.trim())
+          : [];
 
-    } else if (["maggiorenne", "fumatore", "claustrofobia", "acrofobia", "cinetosi", "tatuaggi"].includes(key)) {
-      input = document.createElement("select");
-      input.name = key;
-      ["Sì", "No"].forEach(opt => {
+      campo.opzioni.forEach(opt => {
         const option = document.createElement("option");
         option.value = opt;
         option.textContent = opt;
-        if (value === opt) option.selected = true;
+        if (selezionati.includes(opt)) option.selected = true;
         input.appendChild(option);
       });
 
-    } else {
-      input = document.createElement("input");
+    } else if (campo.tipo === "select-singola") {
+      input = document.createElement("select");
       input.name = key;
-      input.value = value || "";
+      input.id = `campo-${key}`;
+      campo.opzioni.forEach(opt => {
+        const option = document.createElement("option");
+        option.value = opt;
+        option.textContent = opt;
+        if (String(value).trim() === opt) option.selected = true;
+        input.appendChild(option);
+      });
     }
 
     form.appendChild(label);
     form.appendChild(input);
   });
+
+  // ✅ Sezione modifica password
+  const sezionePassword = document.createElement("div");
+  sezionePassword.innerHTML = `
+    <h2>Modifica password</h2>
+    <label for="password_attuale">Password attuale</label>
+    <input type="password" id="password_attuale" name="password_attuale" />
+    <label for="nuova_password">Nuova password</label>
+    <input type="password" id="nuova_password" name="nuova_password" />
+    <label for="conferma_password">Conferma nuova password</label>
+    <input type="password" id="conferma_password" name="conferma_password" />
+  `;
+  form.appendChild(sezionePassword);
+
+  // ✅ Sezione componenti gruppo
+  const sezioneComponenti = document.createElement("div");
+  sezioneComponenti.id = "sezioneComponenti";
+  sezioneComponenti.innerHTML = `
+    <h2>Componenti del gruppo</h2>
+    <div id="containerComponenti">
+      <label for="comp-1">Codice cliente</label>
+      <input type="text" name="componenti_gruppo" class="input-componente" id="comp-1" />
+    </div>
+    <button type="button" onclick="aggiungiComponente()">Aggiungi altro componente</button>
+  `;
+  form.appendChild(sezioneComponenti);
+}
+
+
+function aggiungiComponente() {
+  if (numeroComponenti >= 3) {
+    alert("Puoi aggiungere al massimo 3 componenti.");
+    return;
+  }
+
+  numeroComponenti++;
+  const container = document.getElementById("containerComponenti");
+
+  const label = document.createElement("label");
+  label.textContent = "Codice cliente";
+  label.setAttribute("for", `comp-${numeroComponenti}`);
+
+  const input = document.createElement("input");
+  input.type = "text";
+  input.name = "componenti_gruppo";
+  input.classList.add("input-componente");
+  input.id = `comp-${numeroComponenti}`;
+
+  container.appendChild(label);
+  container.appendChild(input);
 }
 
 async function salvaModifiche() {
@@ -207,13 +319,44 @@ async function salvaModifiche() {
   const formData = {};
 
   Array.from(form.elements).forEach(el => {
-    if (!el.name) return;
+    if (!el.name || el.name.startsWith("password_") || el.name === "componenti_gruppo") return;
     if (el.multiple) {
       formData[el.name] = Array.from(el.selectedOptions).map(o => o.value);
     } else {
       formData[el.name] = el.value;
     }
   });
+
+  // Recupero componenti gruppo
+  const componenti = Array.from(document.querySelectorAll(".input-componente"))
+    .map(input => input.value.trim())
+    .filter(val => val !== "");
+
+  if (componenti.length > 0) {
+    formData["Componenti Gruppo"] = componenti.join(", ");
+  }
+
+  // Gestione password
+  const nuovaPass = form.querySelector("#nuova_password").value.trim();
+  const confermaPass = form.querySelector("#conferma_password").value.trim();
+  const attualePass = form.querySelector("#password_attuale").value.trim();
+
+  if (nuovaPass || confermaPass || attualePass) {
+    if (!attualePass || !nuovaPass || !confermaPass) {
+      alert("Compila tutti i campi per modificare la password.");
+      return;
+    }
+    if (nuovaPass !== confermaPass) {
+      alert("La nuova password e la conferma non coincidono.");
+      return;
+    }
+
+    const encoder = new TextEncoder();
+    const hashBuffer = await crypto.subtle.digest("SHA-256", encoder.encode(nuovaPass));
+    const hashArray = Array.from(new Uint8Array(hashBuffer));
+    const hash = hashArray.map(b => b.toString(16).padStart(2, '0')).join('');
+    formData.password_hash = hash;
+  }
 
   formData.codice = localStorage.getItem("codiceClienteYUTA");
   formData.tipoRichiesta = "update";
@@ -229,7 +372,7 @@ async function salvaModifiche() {
 }
 
 caricaDatiCliente();
-</script>
+
+  </script>
 </body>
 </html>
-

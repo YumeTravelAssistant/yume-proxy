@@ -152,6 +152,8 @@
         <input type="password" id="password" name="password" required />
 
         <button onclick="verificaAccesso()">Accedi</button>
+        <div id="spinnerLogin" style="display:none; margin-top: 15px;">⌛ Verifica in corso...</div>
+
         <div class="error" id="erroreLogin"></div>
       </div>
     </div>
@@ -165,45 +167,64 @@ async function verificaAccesso() {
   const codice = document.getElementById('codiceCliente').value.trim();
   const password = document.getElementById('password').value.trim();
   const erroreDiv = document.getElementById('erroreLogin');
+  const btn = document.getElementById('loginBtn');
+  const spinner = document.getElementById('spinnerLogin');
 
   if (!codice || !password) {
     erroreDiv.textContent = "Inserisci codice cliente e password.";
     return;
   }
 
-  try {
-    // Calcolo hash SHA-256
-    const hash = await crypto.subtle.digest("SHA-256", new TextEncoder().encode(password));
-    const passwordHash = Array.from(new Uint8Array(hash)).map(b => b.toString(16).padStart(2, '0')).join('');
+  btn.disabled = true;
+  spinner.style.display = "block";
+  erroreDiv.textContent = "";
 
-const response = await fetch("https://yuta-invio-profilo.azurewebsites.net/api/invio-api", {
+  try {
+    const encoder = new TextEncoder();
+    const dataEncoded = encoder.encode(password);
+    const buffer = await crypto.subtle.digest("SHA-256", dataEncoded);
+    const hashArray = Array.from(new Uint8Array(buffer));
+    const passwordHash = hashArray.map(b => b.toString(16).padStart(2, '0')).join('');
+
+    const response = await fetch("https://yuta-invio-profilo.azurewebsites.net/api/invio-api", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({
+        tipoRichiesta: "login",
         codiceCliente: codice,
-        passwordHash,
-        tipoRichiesta: "login"
+        passwordHash: passwordHash
       })
     });
 
-    const text = await response.text();
-    let result;
-    try {
-      result = JSON.parse(text);
-    } catch {
-      result = { status: "error", message: "Risposta non valida dal server." };
-    }
+    const result = await response.json();
 
     if (result.status === "success") {
       localStorage.setItem("codiceClienteYUTA", codice);
       window.location.href = "area-clienti.html";
     } else {
       erroreDiv.textContent = result.message || "Accesso negato.";
+      btn.disabled = false;
+      spinner.style.display = "none";
     }
+
   } catch (error) {
-    erroreDiv.textContent = "Errore di connessione. Riprova più tardi.";
+    console.error("Errore:", error);
+    erroreDiv.textContent = "Errore durante il login. Riprova.";
+    btn.disabled = false;
+    spinner.style.display = "none";
   }
 }
+
+document.addEventListener("DOMContentLoaded", () => {
+  const form = document.getElementById("loginForm");
+  form.addEventListener("keydown", function(e) {
+    if (e.key === "Enter") {
+      e.preventDefault();
+      verificaAccesso();
+    }
+  });
+});
+
   </script>
 </body>
 </html>
