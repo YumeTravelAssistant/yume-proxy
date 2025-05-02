@@ -5,8 +5,8 @@
       "type": "httpTrigger",
       "direction": "in",
       "name": "req",
-      "methods": ["post"],
-      "route": "invio-api"
+      "methods": ["post", "options"],
+      "route": "invio-api/{*path}"
     },
     {
       "type": "http",
