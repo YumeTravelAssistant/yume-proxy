@@ -32,4 +32,3 @@ function togglePassword(inputId, btnElement) {
   input.type = isVisible ? 'password' : 'text';
   btnElement.textContent = isVisible ? 'Mostra password' : 'Nascondi password';
 }
-
