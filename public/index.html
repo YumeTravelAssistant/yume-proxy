@@ -120,11 +120,18 @@ function nuovaDomanda() {
 <script>
   function toggleSidebar() {
     const sidebar = document.getElementById("sidebar");
-    if (sidebar.style.width === "250px") {
-      sidebar.style.width = "0";
-    } else {
-      sidebar.style.width = "250px";
-    }
+    const hamburger = document.querySelector(".hamburger");
+    sidebar.style.width = "250px";
+    hamburger.style.display = "none";
+
+    // Chiude sidebar al click esterno
+    document.addEventListener("click", function handleClickOutside(event) {
+      if (!sidebar.contains(event.target) && !hamburger.contains(event.target)) {
+        sidebar.style.width = "0";
+        hamburger.style.display = "block";
+        document.removeEventListener("click", handleClickOutside);
+      }
+    });
   }
 </script>
 
