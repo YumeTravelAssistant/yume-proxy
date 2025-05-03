@@ -140,7 +140,15 @@ async function caricaDatiCliente() {
   });
 
   const dati = await response.json();
-  const form = document.getElementById("modificaForm");
+const form = document.getElementById("modificaForm");
+if (!form) {
+  console.error("Form non trovato!");
+  return;
+}
+if (!dati || typeof dati !== "object") {
+  console.error("Dati non validi:", dati);
+  return;
+}
 
 Object.entries(dati).forEach(([keyRaw, value]) => {
   const key = MAPPATURA_CAMPI[keyRaw];
@@ -205,12 +213,13 @@ Object.entries(dati).forEach(([keyRaw, value]) => {
     form.appendChild(label);
     form.appendChild(input);
   });
-
+}
   // ✅ Sezione modifica password
-// ✅ Sezione modifica password separata
+const sezionePassword = document.createElement("div");
+sezionePassword.id = "sezionePassword";
 sezionePassword.innerHTML = `
   <h2>Modifica password</h2>
-  <form id="formPassword" style="margin-top: 20px;">
+  <div id="formPassword" style="margin-top: 20px;">
     <label for="password_attuale">Password attuale</label>
     <input type="password" id="password_attuale" name="password_attuale" required />
     <button type="button" class="toggle-password-text" onclick="togglePassword('password_attuale', this)">Mostra password</button>
@@ -224,9 +233,11 @@ sezionePassword.innerHTML = `
     <button type="button" class="toggle-password-text" onclick="togglePassword('conferma_password', this)">Mostra password</button>
 
     <button type="button" onclick="modificaPassword()">Aggiorna password</button>
-  </form>
+  </div>
 `;
 
+const separatore = document.createElement("hr");
+form.appendChild(separatore);
 form.appendChild(sezionePassword);
 
   // ✅ Sezione componenti gruppo
@@ -240,9 +251,11 @@ form.appendChild(sezionePassword);
     </div>
     <button type="button" onclick="aggiungiComponente()">Aggiungi altro componente</button>
   `;
-  form.appendChild(sezioneComponenti);
-}
+const separatore2 = document.createElement("hr");
+form.appendChild(separatore2);
+form.appendChild(sezioneComponenti);
 
+let numeroComponenti = 1;
 
 function aggiungiComponente() {
   if (numeroComponenti >= 3) {
@@ -346,7 +359,9 @@ const bufferNuova = await crypto.subtle.digest("SHA-256", encoder.encode(nuova))
   }
 }
 
-caricaDatiCliente();
+window.addEventListener("DOMContentLoaded", () => {
+  caricaDatiCliente();
+});
 
   </script>
 <script src="assets/script.js"></script>
