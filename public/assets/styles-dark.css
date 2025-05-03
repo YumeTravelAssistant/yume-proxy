@@ -221,3 +221,12 @@ button:hover {
   user-select: none;
 }
 
+.team-photo {
+  width: 80%; /* ridotta al 80% del contenitore */
+  max-width: 400px; /* limite massimo */
+  display: block;
+  margin: 60px auto 0; /* ↑ distacco maggiore sopra */
+  border-radius: 12px;
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.08);
+}
+
