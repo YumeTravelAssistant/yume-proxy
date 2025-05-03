@@ -234,15 +234,14 @@ button:hover {
   position: relative;
 }
 
-.toggle-password {
-  position: absolute;
-  top: 50%;
-  right: 14px;
-  transform: translateY(-50%);
+.toggle-password-text {
+  margin-top: 8px;
   background: none;
   border: none;
-  font-size: 1.1em;
-  cursor: pointer;
+  font-size: 0.95em;
   color: #8B2C2B;
+  cursor: pointer;
+  text-decoration: underline;
+  display: inline-block;
 }
 
