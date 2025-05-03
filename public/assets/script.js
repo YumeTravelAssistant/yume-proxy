@@ -32,3 +32,24 @@ function togglePassword(inputId, btnElement) {
   input.type = isVisible ? 'password' : 'text';
   btnElement.textContent = isVisible ? 'Mostra password' : 'Nascondi password';
 }
+$(document).ready(function () {
+  $('#nazionalita').select2({
+    placeholder: "Seleziona una nazionalità...",
+    allowClear: true,
+    width: '100%'
+  });
+});
+
+$(document).ready(function () {
+  // Applica Select2 solo se il campo esiste (es. profilo o area-clienti)
+  setTimeout(() => {
+    if ($('#campo-nazionalita').length > 0) {
+      $('#campo-nazionalita').select2({
+        placeholder: "Seleziona la tua nazionalità",
+        allowClear: true,
+        width: '100%'
+      });
+    }
+  }, 300); // Ritardo per garantire che il DOM sia caricato
+});
+
