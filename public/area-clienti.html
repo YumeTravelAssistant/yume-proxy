@@ -213,34 +213,32 @@ Object.entries(dati).forEach(([keyRaw, value]) => {
     form.appendChild(label);
     form.appendChild(input);
   });
-}
   // ✅ Sezione modifica password
-const sezionePassword = document.createElement("div");
-sezionePassword.id = "sezionePassword";
-sezionePassword.innerHTML = `
-  <h2>Modifica password</h2>
-  <div id="formPassword" style="margin-top: 20px;">
-    <label for="password_attuale">Password attuale</label>
-    <input type="password" id="password_attuale" name="password_attuale" required />
-    <button type="button" class="toggle-password-text" onclick="togglePassword('password_attuale', this)">Mostra password</button>
+  const separatore = document.createElement("hr");
 
-    <label for="nuova_password">Nuova password</label>
-    <input type="password" id="nuova_password" name="nuova_password" required />
-    <button type="button" class="toggle-password-text" onclick="togglePassword('nuova_password', this)">Mostra password</button>
+  const sezionePassword = document.createElement("div");
+  sezionePassword.id = "sezionePassword";
+  sezionePassword.innerHTML = `
+    <h2>Modifica password</h2>
+    <div id="formPassword" style="margin-top: 20px;">
+      <label for="password_attuale">Password attuale</label>
+      <input type="password" id="password_attuale" name="password_attuale" required />
+      <button type="button" class="toggle-password-text" onclick="togglePassword('password_attuale', this)">Mostra password</button>
 
-    <label for="conferma_password">Conferma nuova password</label>
-    <input type="password" id="conferma_password" name="conferma_password" required />
-    <button type="button" class="toggle-password-text" onclick="togglePassword('conferma_password', this)">Mostra password</button>
+      <label for="nuova_password">Nuova password</label>
+      <input type="password" id="nuova_password" name="nuova_password" required />
+      <button type="button" class="toggle-password-text" onclick="togglePassword('nuova_password', this)">Mostra password</button>
 
-    <button type="button" onclick="modificaPassword()">Aggiorna password</button>
-  </div>
-`;
+      <label for="conferma_password">Conferma nuova password</label>
+      <input type="password" id="conferma_password" name="conferma_password" required />
+      <button type="button" class="toggle-password-text" onclick="togglePassword('conferma_password', this)">Mostra password</button>
 
-const separatore = document.createElement("hr");
-form.appendChild(separatore);
-form.appendChild(sezionePassword);
+      <button type="button" onclick="modificaPassword()">Aggiorna password</button>
+    </div>
+  `;
 
-  // ✅ Sezione componenti gruppo
+  const separatore2 = document.createElement("hr");
+
   const sezioneComponenti = document.createElement("div");
   sezioneComponenti.id = "sezioneComponenti";
   sezioneComponenti.innerHTML = `
@@ -251,120 +249,9 @@ form.appendChild(sezionePassword);
     </div>
     <button type="button" onclick="aggiungiComponente()">Aggiungi altro componente</button>
   `;
-const separatore2 = document.createElement("hr");
-form.appendChild(separatore2);
-form.appendChild(sezioneComponenti);
 
-let numeroComponenti = 1;
-
-function aggiungiComponente() {
-  if (numeroComponenti >= 3) {
-    alert("Puoi aggiungere al massimo 3 componenti.");
-    return;
-  }
-
-  numeroComponenti++;
-  const container = document.getElementById("containerComponenti");
-
-  const label = document.createElement("label");
-  label.textContent = "Codice cliente";
-  label.setAttribute("for", `comp-${numeroComponenti}`);
-
-  const input = document.createElement("input");
-  input.type = "text";
-  input.name = "componenti_gruppo";
-  input.classList.add("input-componente");
-  input.id = `comp-${numeroComponenti}`;
-
-  container.appendChild(label);
-  container.appendChild(input);
+  form.appendChild(separatore);
+  form.appendChild(sezionePassword);
+  form.appendChild(separatore2);
+  form.appendChild(sezioneComponenti);
 }
-
-async function salvaModifiche() {
-  const form = document.getElementById("modificaForm");
-  const formData = {};
-
-  Array.from(form.elements).forEach(el => {
-    if (!el.name || el.name.startsWith("password_") || el.name === "componenti_gruppo") return;
-    if (el.multiple) {
-      formData[el.name] = Array.from(el.selectedOptions).map(o => o.value);
-    } else {
-      formData[el.name] = el.value;
-    }
-  });
-
-  // Recupero componenti gruppo
-  const componenti = Array.from(document.querySelectorAll(".input-componente"))
-    .map(input => input.value.trim())
-    .filter(val => val !== "");
-
-  if (componenti.length > 0) {
-    formData["Componenti Gruppo"] = componenti.join(", ");
-  }
-
-  formData.codice = localStorage.getItem("codiceClienteYUTA");
-  formData.tipoRichiesta = "update";
-
-  const response = await fetch("https://yuta-invio-profilo.azurewebsites.net/api/invio-api", {
-    method: "POST",
-    headers: { "Content-Type": "application/json" },
-    body: JSON.stringify(formData)
-  });
-
-  const result = await response.json();
-  alert(result.message || "Modifiche salvate");
-}
-async function modificaPassword() {
-  const codice = localStorage.getItem("codiceClienteYUTA");
-  const attuale = document.getElementById("password_attuale").value.trim();
-  const nuova = document.getElementById("nuova_password").value.trim();
-  const conferma = document.getElementById("conferma_password").value.trim();
-
-  if (!attuale || !nuova || !conferma) {
-    alert("Compila tutti i campi della password.");
-    return;
-  }
-
-  if (nuova !== conferma) {
-    alert("La nuova password e la conferma non coincidono.");
-    return;
-  }
-
-  const encoder = new TextEncoder();
-
-  const bufferAttuale = await crypto.subtle.digest("SHA-256", encoder.encode(attuale));
-const hashAttuale = Array.from(new Uint8Array(bufferAttuale)).map(b => b.toString(16).padStart(2, '0')).join('');
-  
-const bufferNuova = await crypto.subtle.digest("SHA-256", encoder.encode(nuova));
-  const hashNuova = Array.from(new Uint8Array(bufferNuova)).map(b => b.toString(16).padStart(2, '0')).join('');
-
-  const response = await fetch("https://yuta-invio-profilo.azurewebsites.net/api/invio-api", {
-    method: "POST",
-    headers: { "Content-Type": "application/json" },
-    body: JSON.stringify({
-      tipoRichiesta: "update",
-      codice: codice,
-      password_attuale_hash: hashAttuale,
-      password_hash: hashNuova
-    })
-  });
-
-  const result = await response.json();
-
-  if (result.status === "success") {
-    alert("Password aggiornata con successo.");
-    document.getElementById("formPassword").reset();
-  } else {
-    alert(result.message || "Errore durante l'aggiornamento della password.");
-  }
-}
-
-window.addEventListener("DOMContentLoaded", () => {
-  caricaDatiCliente();
-});
-
-  </script>
-<script src="assets/script.js"></script>
-
-</body>
-</html>
