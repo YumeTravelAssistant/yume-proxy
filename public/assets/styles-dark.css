@@ -230,3 +230,19 @@ button:hover {
   box-shadow: 0 4px 16px rgba(0, 0, 0, 0.08);
 }
 
+.password-wrapper {
+  position: relative;
+}
+
+.toggle-password {
+  position: absolute;
+  top: 50%;
+  right: 14px;
+  transform: translateY(-50%);
+  background: none;
+  border: none;
+  font-size: 1.1em;
+  cursor: pointer;
+  color: #8B2C2B;
+}
+

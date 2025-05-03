@@ -41,11 +41,17 @@
 <label>Conferma email</label>
 <input type="email" id="conferma_email" required>
 
-<label>Crea una password</label>
-<input type="password" id="password" required>
+<label for="password">Crea una password</label>
+<div class="password-wrapper">
+  <input type="password" id="password" required />
+  <button type="button" class="toggle-password" onclick="togglePassword('password', this)">👁</button>
+</div>
 
-<label>Conferma password</label>
-<input type="password" id="conferma_password" required>
+<label for="conferma_password">Conferma password</label>
+<div class="password-wrapper">
+  <input type="password" id="conferma_password" required />
+  <button type="button" class="toggle-password" onclick="togglePassword('conferma_password', this)">👁</button>
+</div>
 
 
   <label>Nazionalità</label>

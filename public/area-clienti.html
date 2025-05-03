@@ -208,22 +208,31 @@ Object.entries(dati).forEach(([keyRaw, value]) => {
 
   // ✅ Sezione modifica password
 // ✅ Sezione modifica password separata
-const sezionePassword = document.createElement("div");
 sezionePassword.innerHTML = `
   <h2>Modifica password</h2>
   <form id="formPassword" style="margin-top: 20px;">
     <label for="password_attuale">Password attuale</label>
-    <input type="password" id="password_attuale" name="password_attuale" required />
+    <div class="password-wrapper">
+      <input type="password" id="password_attuale" name="password_attuale" required />
+      <button type="button" class="toggle-password" onclick="togglePassword('password_attuale', this)">👁</button>
+    </div>
 
     <label for="nuova_password">Nuova password</label>
-    <input type="password" id="nuova_password" name="nuova_password" required />
+    <div class="password-wrapper">
+      <input type="password" id="nuova_password" name="nuova_password" required />
+      <button type="button" class="toggle-password" onclick="togglePassword('nuova_password', this)">👁</button>
+    </div>
 
     <label for="conferma_password">Conferma nuova password</label>
-    <input type="password" id="conferma_password" name="conferma_password" required />
+    <div class="password-wrapper">
+      <input type="password" id="conferma_password" name="conferma_password" required />
+      <button type="button" class="toggle-password" onclick="togglePassword('conferma_password', this)">👁</button>
+    </div>
 
     <button type="button" onclick="modificaPassword()">Aggiorna password</button>
   </form>
 `;
+
 form.appendChild(sezionePassword);
 
   // ✅ Sezione componenti gruppo

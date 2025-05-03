@@ -25,3 +25,12 @@ function toggleSidebar() {
   });
 }
 
+function togglePassword(idCampo, idBottone) {
+  const input = document.getElementById(idCampo);
+  const btn = document.getElementById(idBottone);
+  const isVisible = input.type === 'text';
+
+  input.type = isVisible ? 'password' : 'text';
+  btn.textContent = isVisible ? '👁' : '🙈';
+}
+

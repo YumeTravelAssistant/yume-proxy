@@ -29,8 +29,11 @@
         <label for="codiceCliente">Codice Cliente</label>
         <input type="text" id="codiceCliente" name="codiceCliente" required />
 
-        <label for="password">Password</label>
-        <input type="password" id="password" name="password" required />
+<label for="password">Password</label>
+<div class="password-wrapper">
+  <input type="password" id="password" name="password" required />
+<button type="button" class="toggle-password" onclick="togglePassword('password', this)">👁</button>
+</div>
 
         <button id="loginBtn" onclick="verificaAccesso()">Accedi</button>
         <div id="spinnerLogin" style="display:none; margin-top: 15px;">⌛ Verifica in corso...</div>
