@@ -32,26 +32,30 @@ function togglePassword(inputId, btnElement) {
   input.type = isVisible ? 'password' : 'text';
   btnElement.textContent = isVisible ? 'Mostra password' : 'Nascondi password';
 }
-$(document).ready(function () {
-  $('#nazionalita').select2({
-    placeholder: "Seleziona una nazionalità...",
-    allowClear: true,
-    width: '100%'
-  });
-});
-
-$(document).ready(function () {
-  // Applica Select2 solo se il campo esiste (es. profilo o area-clienti)
-  setTimeout(() => {
-    if ($('#campo-nazionalita').length > 0) {
-      $('#campo-nazionalita').select2({
-        placeholder: "Seleziona la tua nazionalità",
+// ✅ Protezione completa: attiva Select2 solo se jQuery è presente
+if (typeof $ !== "undefined" && typeof $.fn.select2 !== "undefined") {
+  $(function () {
+    // Campo statico (profilo)
+    if ($('#nazionalita').length > 0) {
+      $('#nazionalita').select2({
+        placeholder: "Seleziona una nazionalità...",
         allowClear: true,
         width: '100%'
       });
     }
-  }, 300); // Ritardo per garantire che il DOM sia caricato
-});
+
+    // Campo dinamico (area-clienti)
+    if ($('#campo-nazionalita').length > 0) {
+      setTimeout(() => {
+        $('#campo-nazionalita').select2({
+          placeholder: "Seleziona la tua nazionalità",
+          allowClear: true,
+          width: '100%'
+        });
+      }, 300);
+    }
+  });
+}
 
 function salvaModifiche() {
   const form = document.getElementById("modificaForm");
