@@ -92,6 +92,7 @@ function salvaModifiche() {
     }
   });
 
+dati.codice = codiceCliente;
 dati["Codice Cliente"] = codiceCliente;
 
 fetch("https://yuta-invio-profilo.azurewebsites.net/api/invio-api", {
