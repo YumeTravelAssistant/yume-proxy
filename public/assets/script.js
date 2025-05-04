@@ -92,13 +92,16 @@ function salvaModifiche() {
     }
   });
 
-  dati.codice = codiceCliente;
+dati["Codice Cliente"] = codiceCliente;
 
-  fetch("https://yuta-invio-profilo.azurewebsites.net/api/invio-api", {
-    method: "POST",
-    headers: { "Content-Type": "application/json" },
-    body: JSON.stringify(dati)
+fetch("https://yuta-invio-profilo.azurewebsites.net/api/invio-api", {
+  method: "POST",
+  headers: { "Content-Type": "application/json" },
+  body: JSON.stringify({
+    tipoRichiesta: "update",
+    ...dati
   })
+})
     .then(response => {
       if (!response.ok) throw new Error("Errore nella risposta");
       return response.json();
