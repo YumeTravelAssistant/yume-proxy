@@ -53,3 +53,66 @@ $(document).ready(function () {
   }, 300); // Ritardo per garantire che il DOM sia caricato
 });
 
+function salvaModifiche() {
+  const form = document.getElementById("modificaForm");
+  const btn = document.getElementById("salvaBtn");
+  const spinner = document.getElementById("spinnerSalvataggio");
+
+  if (!form || !btn || !spinner) {
+    alert("Errore nel caricamento della pagina.");
+    return;
+  }
+
+  const codiceCliente = localStorage.getItem("codiceClienteYUTA");
+  if (!codiceCliente) {
+    alert("Codice cliente non disponibile. Effettua il login.");
+    return;
+  }
+
+  // Disattiva bottone e mostra clessidra
+  btn.disabled = true;
+  spinner.style.display = "block";
+
+  const dati = {};
+  const inputs = form.querySelectorAll("input, select, textarea");
+
+  inputs.forEach(input => {
+    const key = input.name;
+    if (!key) return;
+
+    if (input.type === "select-multiple") {
+      const values = Array.from(input.selectedOptions).map(opt => opt.value.trim());
+      dati[key] = values;
+    } else {
+      dati[key] = input.value.trim();
+    }
+  });
+
+  dati.codice = codiceCliente;
+
+  fetch("https://yuta-invio-profilo.azurewebsites.net/api/invio-api", {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify(dati)
+  })
+    .then(response => {
+      if (!response.ok) throw new Error("Errore nella risposta");
+      return response.json();
+    })
+    .then(result => {
+      if (result.status === 'success' || result.codice) {
+        alert("Modifiche salvate con successo!");
+      } else {
+        alert("Salvataggio completato, ma senza conferma esplicita.");
+      }
+    })
+    .catch(error => {
+      console.error("Errore durante il salvataggio:", error);
+      alert("Si è verificato un errore durante il salvataggio.");
+    })
+    .finally(() => {
+      btn.disabled = false;
+      spinner.style.display = "none";
+    });
+}
+

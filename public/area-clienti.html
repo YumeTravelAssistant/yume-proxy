@@ -30,7 +30,8 @@
     <form id="modificaForm">
       <!-- Qui inseriremo dinamicamente i campi dal JS -->
     </form>
-    <button onclick="salvaModifiche()">Salva modifiche</button>
+<button id="salvaBtn" onclick="salvaModifiche()">Salva modifiche</button>
+<div id="spinnerSalvataggio" style="display:none; margin-top: 15px;">⌛ Salvataggio in corso...</div>
   </div>
 </div>
 <script>
@@ -298,6 +299,11 @@ nazionalita: {
     tipo: "select-singola",
     opzioni: ["Nessuno", "Compleanno", "Viaggio di nozze", "Laurea", "Anniversario", "Addio al nubilato/celibato", "Vacanza", "Romantico", "Altro"]
   },
+restrizioni_alimentari: {
+  tipo: "textarea",
+  label: "Restrizioni alimentari dettagliate"
+},
+
   numero_viaggiatori: {
     tipo: "select-singola",
     opzioni: ["1", "2", "3", "4", "5", "6"]
@@ -394,17 +400,6 @@ Object.entries(dati).forEach(([keyRaw, value]) => {
         input.appendChild(option);
       });
 
-  // ✅ Applica Select2 se il campo è "nazionalita"
-  if (key === "nazionalita") {
-    setTimeout(() => {
-      $(`#campo-${key}`).select2({
-        placeholder: "Seleziona la tua nazionalità",
-        allowClear: true,
-        width: "100%"
-      });
-    }, 0);
-  }
-}
 
     } else if (campo.tipo === "text" || campo.tipo === "email") {
       input = document.createElement("input");
@@ -412,6 +407,14 @@ Object.entries(dati).forEach(([keyRaw, value]) => {
       input.name = key;
       input.id = `campo-${key}`;
       input.value = value || "";
+
+}else if (campo.tipo === "textarea") {
+  input = document.createElement("textarea");
+  input.name = key;
+  input.id = `campo-${key}`;
+  input.value = value || "";
+}
+
 
     } else if (campo.tipo === "date") {
       input = document.createElement("input");
@@ -428,6 +431,17 @@ Object.entries(dati).forEach(([keyRaw, value]) => {
 
     form.appendChild(label);
     form.appendChild(input);
+
+  if (key === "nazionalita") {
+    setTimeout(() => {
+      $(`#campo-${key}`).select2({
+        placeholder: "Seleziona la tua nazionalità",
+        allowClear: true,
+        width: "100%"
+      });
+    }, 0);
+  }
+
   });
   // ✅ Sezione modifica password
   const separatore = document.createElement("hr");
@@ -471,9 +485,7 @@ Object.entries(dati).forEach(([keyRaw, value]) => {
   form.appendChild(separatore2);
   form.appendChild(sezioneComponenti);
 }
-</script>
-<script>
-  window.addEventListener("DOMContentLoaded", caricaDatiCliente);
+window.addEventListener("DOMContentLoaded", caricaDatiCliente);
 </script>
 
 <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
