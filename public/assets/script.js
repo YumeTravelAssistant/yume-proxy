@@ -84,10 +84,12 @@ function salvaModifiche() {
     const key = input.name;
     if (!key) return;
 
-    if (input.type === "select-multiple") {
-      const values = Array.from(input.selectedOptions).map(opt => opt.value.trim());
-      dati[key] = values;
-    } else {
+if (input.type === "select-multiple") {
+  const values = Array.from(input.selectedOptions).map(opt => opt.value.trim());
+  if (values.length > 0) {
+    dati[key] = values;
+  }
+} else {
       dati[key] = input.value.trim();
     }
   });
