@@ -137,3 +137,19 @@ fetch("https://yuta-invio-profilo.azurewebsites.net/api/invio-api", {
     });
 }
 
+function sbloccaBadge(id, nomeImg) {
+  const badge = document.getElementById(id);
+  if (badge) {
+    badge.classList.remove("locked");
+    const img = badge.querySelector("img");
+    img.src = `assets/badges/${nomeImg}.png`;
+  }
+}
+
+// Esempio test temporaneo
+document.addEventListener("DOMContentLoaded", () => {
+  // Simulazione: questi due badge sono "sbloccati"
+  sbloccaBadge("badge-curry", "curry");
+  sbloccaBadge("badge-shibuya", "shibuya");
+});
+

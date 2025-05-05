@@ -657,6 +657,55 @@ if (!document.getElementById("containerComponenti")) {
   }
 }
 
+// === Sezione Bacheca Trofei ===
+if (!document.getElementById("bacheca-trofei")) {
+  const sezione = document.createElement("div");
+  sezione.className = "sezione-form";
+  sezione.dataset.sezione = "trofei";
+  sezione.id = "bacheca-trofei";
+
+  const titolo = document.createElement("h2");
+  titolo.textContent = "Bacheca Trofei";
+  sezione.appendChild(titolo);
+
+  const griglia = document.createElement("div");
+  griglia.className = "griglia-trofei";
+
+  const trofei = [
+    { id: "badge-curry", nome: "Primo Curry Giapponese", descrizione: "Visita un ristorante di curry", img: "curry" },
+    { id: "badge-izakaya", nome: "Primo Izakaya", descrizione: "Cena in un izakaya", img: "izakaya" },
+    { id: "badge-shibuya", nome: "Traversata a Shibuya", descrizione: "Attraversa lo scramble crossing", img: "shibuya" },
+    { id: "badge-tempio", nome: "Primo Tempio Visitato", descrizione: "Visita un tempio tradizionale", img: "tempio" },
+    { id: "badge-ramen", nome: "Prima Ramen Experience", descrizione: "Prova un ramen giapponese", img: "ramen" }
+  ];
+
+  trofei.forEach(trofeo => {
+    const div = document.createElement("div");
+    div.className = "trofeo locked";
+    div.id = trofeo.id;
+
+    const img = document.createElement("img");
+    img.className = "badge-icon";
+    img.src = `assets/badges/${trofeo.img}-locked.png`;
+    img.alt = trofeo.nome;
+
+    const nome = document.createElement("h3");
+    nome.textContent = trofeo.nome;
+
+    const desc = document.createElement("p");
+    desc.textContent = trofeo.descrizione;
+
+    div.appendChild(img);
+    div.appendChild(nome);
+    div.appendChild(desc);
+    griglia.appendChild(div);
+  });
+
+  sezione.appendChild(griglia);
+  contenitore.appendChild(sezione);
+}
+
+
 // === Sezione modifica password === (con controllo per evitare duplicati)
 if (!document.getElementById("formPassword")) {
   const separatore = document.createElement("hr");
