@@ -33,7 +33,9 @@
      <button data-sezione="gruppo">Gestione Gruppo</button>
      <button data-sezione="trofei">Bacheca Trofei</button>
 </div>
-   <div id="contenitore-sezioni"></div>   
+<form id="modificaForm" onsubmit="return false;">
+  <div id="contenitore-sezioni"></div>
+</form>
 <button id="salvaBtn" onclick="salvaModifiche()">Salva modifiche</button>
 <div id="spinnerSalvataggio" style="display:none; margin-top: 15px;">⌛ Salvataggio in corso...</div>
   </div>
@@ -56,7 +58,7 @@ const CAMPI_DEFINITI = {
 
  componenti_gruppo: {
    tipo: "componenti", // tipo custom che gestirai a parte
-   label: "Componenti del gruppo",
+   label: "Inserisci Codice cliente"
    section: "gruppo"
  },
 
