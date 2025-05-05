@@ -87,7 +87,6 @@ if (result.status === "success") {
   localStorage.setItem("codiceClienteYUTA", codice);
   localStorage.setItem("trofeiYUTA", JSON.stringify(result.trofeiSbloccati || []));
   window.location.href = "area-clienti.html";
-}
     } else {
       erroreDiv.textContent = result.message || "Accesso negato.";
       btn.disabled = false;
