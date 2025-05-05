@@ -496,6 +496,7 @@ async function caricaDatiCliente() {
     const keyNorm = keyRaw.trim().toLowerCase().replace(/\s+/g, "_");
 const key = MAPPATURA_CAMPI[keyRaw] || keyNorm; // fallback
 let campo = CAMPI_DEFINITI[key];
+if (document.getElementById(`campo-${key}`)) return;
     if (!campo || ["password_attuale", "nuova_password", "conferma_password"].includes(key)) return;
 
 if (campo.tipo === "componenti") {
