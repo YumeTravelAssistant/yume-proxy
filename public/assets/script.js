@@ -78,21 +78,32 @@ function salvaModifiche() {
   spinner.style.display = "block";
 
   const dati = {};
-  const inputs = form.querySelectorAll("input, select, textarea");
+const gruppi = [];
+const inputs = form.querySelectorAll("input, select, textarea");
 
-  inputs.forEach(input => {
-    const key = input.name;
-    if (!key) return;
+inputs.forEach(input => {
+  const key = input.name;
+  if (!key) return;
 
-if (input.type === "select-multiple") {
-  const values = Array.from(input.selectedOptions).map(opt => opt.value.trim());
-  if (values.length > 0) {
-    dati[key] = values;
+  if (key === "componenti_gruppo") {
+    const val = input.value.trim();
+    if (val) gruppi.push(val);
+    return;
   }
-} else {
-      dati[key] = input.value.trim();
+
+  if (input.type === "select-multiple") {
+    const values = Array.from(input.selectedOptions).map(opt => opt.value.trim());
+    if (values.length > 0) {
+      dati[key] = values;
     }
-  });
+  } else {
+    dati[key] = input.value.trim();
+  }
+});
+
+if (gruppi.length > 0) {
+  dati["componenti_gruppo"] = gruppi;
+}
 
 dati.codice = codiceCliente;
 dati["Codice Cliente"] = codiceCliente;

@@ -27,9 +27,13 @@
 <div class="main-wrapper">
   <div class="main-content">
     <h1>Area Clienti</h1>
-    <form id="modificaForm">
-      <!-- Qui inseriremo dinamicamente i campi dal JS -->
-    </form>
+    <div id="selettore-sezioni">
+     <button data-sezione="profilo">Profilo Utente</button>
+     <button data-sezione="viaggio">Profilo Viaggio</button>
+     <button data-sezione="gruppo">Gestione Gruppo</button>
+     <button data-sezione="trofei">Bacheca Trofei</button>
+</div>
+   <div id="contenitore-sezioni"></div>   
 <button id="salvaBtn" onclick="salvaModifiche()">Salva modifiche</button>
 <div id="spinnerSalvataggio" style="display:none; margin-top: 15px;">⌛ Salvataggio in corso...</div>
   </div>
@@ -39,12 +43,27 @@ function toggleSidebar() {
   document.querySelector('.sidebar').classList.toggle('active');
 }
 const CAMPI_DEFINITI = {
-  nome: { tipo: "text", label: "Nome e Cognome" },
-  email: { tipo: "email", label: "Email" },
+ nome: {
+   tipo: "text",
+   label: "Nome e Cognome",
+   section: "profilo"
+ },
+ email: {
+   tipo: "email",
+   label: "Email",
+   section: "profilo"
+ },
 
-nazionalita: {
-  tipo: "select-singola",
-  opzioni: [
+ componenti_gruppo: {
+   tipo: "componenti", // tipo custom che gestirai a parte
+   label: "Componenti del gruppo",
+   section: "gruppo"
+ },
+
+ nazionalita: {
+   tipo: "select-singola",
+   label: "Nazionalità"
+   opzioni: [
     "Italia",
     "Afghanistan",
     "Albania",
@@ -241,73 +260,165 @@ nazionalita: {
     "Yemen",
     "Zambia",
     "Zimbabwe"
-  ]
+  ],
+   section: "profilo"
 },
 
-  data_partenza: { tipo: "date", label: "Data Partenza" },
-  primo_giappone: { tipo: "date", label: "Primo giorno in Giappone" },
-  ultimo_giappone: { tipo: "date", label: "Ultimo giorno in Giappone" },
-  data_ritorno: { tipo: "date", label: "Data Ritorno" },
+ data_partenza: { 
+   tipo: "date", 
+   label: "Data Partenza",
+   section: "viaggio"
+ },
+  
+ primo_giappone: {
+   tipo: "date",
+   label: "Primo giorno in Giappone",
+   section: "viaggio"
+ },
+ 
+ ultimo_giappone: { 
+   tipo: "date", 
+   label: "Ultimo giorno in Giappone",
+   section: "viaggio"
+ },
+  
+ data_ritorno: {
+   tipo: "date",
+   label: "Data Ritorno",
+   section: "viaggio"
+ },
 
-  preferenze: {
-    tipo: "select-multipla",
-    opzioni: ["Cucina locale", "Autenticità", "Artigianato", "Shopping", "Cultura", "Folclore", "Mercati", "Natura e paesaggi", "Tradizione", "Altro"]
-  },
-  esigenze_speciali: {
-    tipo: "select-multipla",
-    opzioni: ["Allergie stagionali", "Allergie alimentari", "Sedia a rotelle", "Ipovedente", "Problemi uditivi", "Ansia sociale", "Diabete", "Autismo", "Neurodivergenza", "Halal", "Kosher", "Dieta vegana", "Dieta vegetariana", "Celiachia", "Altro"]
-  },
-  lingue_parlate: {
-    tipo: "select-multipla",
-    opzioni: ["Italiano", "Inglese", "Francese", "Spagnolo", "Tedesco", "Portoghese", "Russo", "Giapponese", "Cinese", "Coreano"]
-  },
-  tatuaggi: { tipo: "select-singola", opzioni: ["Sì", "No"] },
-  maggiorenne: { tipo: "select-singola", opzioni: ["Sì", "No"] },
-  fumatore: { tipo: "select-singola", opzioni: ["Sì", "No"] },
-  claustrofobia: { tipo: "select-singola", opzioni: ["Sì", "No"] },
-  acrofobia: { tipo: "select-singola", opzioni: ["Sì", "No"] },
-  cinetosi: { tipo: "select-singola", opzioni: ["Sì", "No"] },
-  stile_comunicativo: {
-    tipo: "select-singola",
-    opzioni: ["curioso", "rassicurante", "accogliente", "empatico", "stimolante ma chiaro", "tranquillo", "coinvolgente", "familiare", "consapevole", "sereno"]
-  },
-  approccio_cibo: {
-    tipo: "select-singola",
-    opzioni: ["Aperto a provare", "Tradizionale", "Internazionale", "Cauto/Selettivo", "Veg/Vegano consapevole"]
-  },
-  comfort: {
-    tipo: "select-singola",
-    opzioni: ["Spartano", "Standard", "Premium", "Lusso"]
-  },
-  autonomia: {
-    tipo: "select-singola",
-    opzioni: ["Autonomo", "Da accompagnare", "Da guidare passo passo"]
-  },
-  tipologia_viaggio: {
-    tipo: "select-singola",
-    opzioni: ["Singolo", "Famiglia", "Amici", "Colleghi", "Gruppo misto"]
-  },
-  ritmo: {
-    tipo: "select-singola",
-    opzioni: ["Lento", "Normale", "Veloce"]
-  },
-  budget: {
-    tipo: "select-singola",
-    opzioni: ["Ridotto", "Medio", "Alto", "Illimitato"]
-  },
-  occasione: {
-    tipo: "select-singola",
-    opzioni: ["Nessuno", "Compleanno", "Viaggio di nozze", "Laurea", "Anniversario", "Addio al nubilato/celibato", "Vacanza", "Romantico", "Altro"]
-  },
-restrizioni_alimentari: {
-  tipo: "textarea",
-  label: "Restrizioni alimentari dettagliate"
-},
+ preferenze: {
+   tipo: "select-multipla",
+   label: "Preferenze"
+   opzioni: ["Cucina locale", "Autenticità", "Artigianato", "Shopping", "Cultura", "Folclore", "Mercati", "Natura e paesaggi", "Tradizione", "Altro"],
+   section: "viaggio"
+ },
+
+ esigenze_speciali: {
+   tipo: "select-multipla",
+   label: "Esigenze speciali"
+   opzioni: ["Allergie stagionali", "Allergie alimentari", "Sedia a rotelle", "Ipovedente", "Problemi uditivi", "Ansia sociale", "Diabete", "Autismo", "Neurodivergenza", "Halal", "Kosher", "Dieta vegana", "Dieta vegetariana", "Celiachia", "Altro"],
+   section: "viaggio" 
+ },
+
+ lingue_parlate: {
+   tipo: "select-multipla",
+   label: "Lingue parlate"
+   opzioni: ["Italiano", "Inglese", "Francese", "Spagnolo", "Tedesco", "Portoghese", "Russo", "Giapponese", "Cinese", "Coreano"],
+   section: "viaggio"
+ },
+ 
+ tatuaggi: {
+   tipo: "select-singola",
+   label: "Tatuaggi",
+   opzioni: ["Sì", "No"]
+   section: "viaggio"
+ },
+  
+ maggiorenne: { 
+   tipo: "select-singola",
+   label: "Maggiorenne",
+   opzioni: ["Sì", "No"],
+   section: "viaggio"
+ },
+
+ fumatore: { 
+   tipo: "select-singola",
+   label: "Fumatore",
+   opzioni: ["Sì", "No"],
+   section: "viaggio"
+ },
+ 
+ claustrofobia: {
+   tipo: "select-singola",
+   label: "Claustrofobia",
+   opzioni: ["Sì", "No"],
+   section: "viaggio"
+ },
+ 
+ acrofobia: { 
+   tipo: "select-singola", 
+   label: "Acrofobia",
+   opzioni: ["Sì", "No"],
+   section: "viaggio"
+ },
+ 
+ cinetosi: {
+   tipo: "select-singola",
+   label: "Cinetosi",
+   opzioni: ["Sì", "No"],
+   section: "viaggio"
+ },
+ 
+ stile_comunicativo: {
+   tipo: "select-singola",
+   label: "Stile comunicativo",  
+   opzioni: ["curioso", "rassicurante", "accogliente", "empatico", "stimolante ma chiaro", "tranquillo", "coinvolgente", "familiare", "consapevole", "sereno"],
+   section: "viaggio"
+ },
+ 
+ approccio_cibo: {
+   tipo: "select-singola",
+   label: "Approccio al cibo",
+   opzioni: ["Aperto a provare", "Tradizionale", "Internazionale", "Cauto/Selettivo", "Veg/Vegano consapevole"],
+   section: "viaggio" 
+ },
+ 
+ comfort: {
+   tipo: "select-singola",
+   label: "Comfort desiderato"  
+   opzioni: ["Spartano", "Standard", "Premium", "Lusso"],
+   section: "viaggio"
+ },
+
+ autonomia: {
+   tipo: "select-singola",
+   label: "Autonomia richiesta", 
+   opzioni: ["Autonomo", "Da accompagnare", "Da guidare passo passo"],
+   section: "viaggio"
+ },
+
+ tipologia_viaggio: {
+   tipo: "select-singola",
+   label: "Tipologia gruppo"
+   opzioni: ["Singolo", "Famiglia", "Amici", "Colleghi", "Gruppo misto"],
+   section: "gruppo" 
+ },
+
+ ritmo: {
+   tipo: "select-singola",
+   label: "Ritmo desiderato",
+   opzioni: ["Lento", "Normale", "Veloce"],
+   section: "viaggio" 
+ },
+ 
+ budget: {
+   tipo: "select-singola",
+   label: "Budget"
+   opzioni: ["Ridotto", "Medio", "Alto", "Illimitato"],
+   section: "viaggio"
+ },
+
+ occasione: {
+   tipo: "select-singola",
+   label: "Occasione di viaggio" 
+   opzioni: ["Nessuno", "Compleanno", "Viaggio di nozze", "Laurea", "Anniversario", "Addio al nubilato/celibato", "Vacanza", "Romantico", "Altro"],
+   section: "gruppo", 
+ },
+
+ restrizioni_alimentari: {
+   tipo: "textarea",
+   label: "Restrizioni alimentari dettagliate",
+   section: "viaggio"
+ },
 
   numero_viaggiatori: {
     tipo: "select-singola",
-    opzioni: ["1", "2", "3", "4", "5", "6"]
-  }
+    label: "Numero componenti"
+    opzioni: ["1", "2", "3", "4", "5", "6"],
+    section: "viaggio" 
+ }
 };
 const MAPPATURA_CAMPI = {
   "Nome": "nome",
@@ -350,20 +461,80 @@ async function caricaDatiCliente() {
   });
 
   const dati = await response.json();
-const form = document.getElementById("modificaForm");
-if (!form) {
-  console.error("Form non trovato!");
-  return;
-}
-if (!dati || typeof dati !== "object") {
-  console.error("Dati non validi:", dati);
-  return;
-}
+  const contenitore = document.getElementById("contenitore-sezioni");
+  if (!contenitore) {
+    console.error("Contenitore sezioni non trovato!");
+    return;
+  }
+  if (!dati || typeof dati !== "object") {
+    console.error("Dati non validi:", dati);
+    return;
+  }
 
-Object.entries(dati).forEach(([keyRaw, value]) => {
-  const key = MAPPATURA_CAMPI[keyRaw];
-  const campo = CAMPI_DEFINITI[key];
-  if (!campo) return;
+  // Crea contenitori per ciascuna sezione
+  const sezioni = {};
+  for (const key in CAMPI_DEFINITI) {
+    const { section } = CAMPI_DEFINITI[key];
+    if (!section) continue;
+
+    if (!sezioni[section]) {
+      const div = document.createElement("div");
+      div.className = "sezione-form";
+      div.dataset.sezione = section;
+      const titolo = document.createElement("h2");
+      titolo.textContent = section.charAt(0).toUpperCase() + section.slice(1);
+      div.appendChild(titolo);
+      sezioni[section] = div;
+      contenitore.appendChild(div);
+    }
+  }
+
+  Object.entries(dati).forEach(([keyRaw, value]) => {
+    const key = MAPPATURA_CAMPI[keyRaw];
+    const campo = CAMPI_DEFINITI[key];
+    if (!campo) return;
+
+if (campo.tipo === "componenti") {
+  const div = document.createElement("div");
+  div.className = "campo-wrapper";
+
+  const label = document.createElement("label");
+  label.textContent = campo.label || "Componenti del gruppo";
+  div.appendChild(label);
+
+  const container = document.createElement("div");
+  container.id = "containerComponenti";
+
+  const componenti = value ? value.split(",").map(v => v.trim()) : [];
+
+  for (let i = 0; i < Math.max(1, componenti.length); i++) {
+    const input = document.createElement("input");
+    input.type = "text";
+    input.className = "input-componente";
+    input.name = "componenti_gruppo";
+    input.value = componenti[i] || "";
+    container.appendChild(input);
+  }
+
+  const btn = document.createElement("button");
+  btn.type = "button";
+  btn.textContent = "➕ Aggiungi altro componente";
+  btn.onclick = () => {
+    const inputs = container.querySelectorAll(".input-componente");
+    if (inputs.length >= 3) return;
+
+    const nuovo = document.createElement("input");
+    nuovo.type = "text";
+    nuovo.className = "input-componente";
+    nuovo.name = "componenti_gruppo";
+    container.appendChild(nuovo);
+  };
+
+  div.appendChild(container);
+  div.appendChild(btn);
+  sezioni[campo.section].appendChild(div);
+  return;
+}
 
     const label = document.createElement("label");
     label.textContent = campo.label || key;
@@ -400,7 +571,6 @@ Object.entries(dati).forEach(([keyRaw, value]) => {
         input.appendChild(option);
       });
 
-
     } else if (campo.tipo === "text" || campo.tipo === "email") {
       input = document.createElement("input");
       input.type = campo.tipo;
@@ -408,12 +578,11 @@ Object.entries(dati).forEach(([keyRaw, value]) => {
       input.id = `campo-${key}`;
       input.value = value || "";
 
-}else if (campo.tipo === "textarea") {
-  input = document.createElement("textarea");
-  input.name = key;
-  input.id = `campo-${key}`;
-  input.value = value || "";
-
+    } else if (campo.tipo === "textarea") {
+      input = document.createElement("textarea");
+      input.name = key;
+      input.id = `campo-${key}`;
+      input.value = value || "";
 
     } else if (campo.tipo === "date") {
       input = document.createElement("input");
@@ -428,64 +597,74 @@ Object.entries(dati).forEach(([keyRaw, value]) => {
       }
     }
 
-    form.appendChild(label);
-    form.appendChild(input);
+    const wrapper = document.createElement("div");
+    wrapper.appendChild(label);
+    wrapper.appendChild(input);
 
-  if (key === "nazionalita") {
-    setTimeout(() => {
-      $(`#campo-${key}`).select2({
-        placeholder: "Seleziona la tua nazionalità",
-        allowClear: true,
-        width: "100%"
-      });
-    }, 0);
-  }
+    sezioni[campo.section].appendChild(wrapper);
 
+    if (key === "nazionalita") {
+      setTimeout(() => {
+        $(`#campo-${key}`).select2({
+          placeholder: "Seleziona la tua nazionalità",
+          allowClear: true,
+          width: "100%"
+        });
+      }, 0);
+    }
+
+// === Sezione modifica password ===
+const separatore = document.createElement("hr");
+
+const sezionePassword = document.createElement("div");
+sezionePassword.className = "sezione-form";
+sezionePassword.dataset.sezione = "profilo";
+sezionePassword.innerHTML = `
+  <h2>🔐 Modifica password</h2>
+  <div id="formPassword" style="margin-top: 20px;">
+    <label for="password_attuale">Password attuale</label>
+    <input type="password" id="password_attuale" name="password_attuale" required />
+    <button type="button" class="toggle-password-text" onclick="togglePassword('password_attuale', this)">Mostra password</button>
+
+    <label for="nuova_password">Nuova password</label>
+    <input type="password" id="nuova_password" name="nuova_password" required />
+    <button type="button" class="toggle-password-text" onclick="togglePassword('nuova_password', this)">Mostra password</button>
+
+    <label for="conferma_password">Conferma nuova password</label>
+    <input type="password" id="conferma_password" name="conferma_password" required />
+    <button type="button" class="toggle-password-text" onclick="togglePassword('conferma_password', this)">Mostra password</button>
+
+    <button type="button" onclick="modificaPassword()">Aggiorna password</button>
+  </div>
+`;
+
+sezioni["profilo"].appendChild(separatore);
+sezioni["profilo"].appendChild(sezionePassword);
   });
-  // ✅ Sezione modifica password
-  const separatore = document.createElement("hr");
-
-  const sezionePassword = document.createElement("div");
-  sezionePassword.id = "sezionePassword";
-  sezionePassword.innerHTML = `
-    <h2>Modifica password</h2>
-    <div id="formPassword" style="margin-top: 20px;">
-      <label for="password_attuale">Password attuale</label>
-      <input type="password" id="password_attuale" name="password_attuale" required />
-      <button type="button" class="toggle-password-text" onclick="togglePassword('password_attuale', this)">Mostra password</button>
-
-      <label for="nuova_password">Nuova password</label>
-      <input type="password" id="nuova_password" name="nuova_password" required />
-      <button type="button" class="toggle-password-text" onclick="togglePassword('nuova_password', this)">Mostra password</button>
-
-      <label for="conferma_password">Conferma nuova password</label>
-      <input type="password" id="conferma_password" name="conferma_password" required />
-      <button type="button" class="toggle-password-text" onclick="togglePassword('conferma_password', this)">Mostra password</button>
-
-      <button type="button" onclick="modificaPassword()">Aggiorna password</button>
-    </div>
-  `;
-
-  const separatore2 = document.createElement("hr");
-
-  const sezioneComponenti = document.createElement("div");
-  sezioneComponenti.id = "sezioneComponenti";
-  sezioneComponenti.innerHTML = `
-    <h2>Componenti del gruppo</h2>
-    <div id="containerComponenti">
-      <label for="comp-1">Codice cliente</label>
-      <input type="text" name="componenti_gruppo" class="input-componente" id="comp-1" />
-    </div>
-    <button type="button" onclick="aggiungiComponente()">Aggiungi altro componente</button>
-  `;
-
-  form.appendChild(separatore);
-  form.appendChild(sezionePassword);
-  form.appendChild(separatore2);
-  form.appendChild(sezioneComponenti);
 }
+
 window.addEventListener("DOMContentLoaded", caricaDatiCliente);
 </script>
+
+<script>
+  document.addEventListener("DOMContentLoaded", () => {
+    // ...altri script di inizializzazione (caricaDatiCliente ecc.)
+
+    // Questo blocco per attivare la navigazione tra le sezioni:
+    document.querySelectorAll("#selettore-sezioni button").forEach(btn => {
+      btn.addEventListener("click", () => {
+        const target = btn.dataset.sezione;
+        document.querySelectorAll(".sezione-form").forEach(div => {
+          div.style.display = div.dataset.sezione === target ? "block" : "none";
+        });
+      });
+    });
+    document.querySelectorAll(".sezione-form").forEach(div => {
+      div.style.display = div.dataset.sezione === "profilo" ? "block" : "none";
+    });
+  });
+</script>
+
 
 <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js"></script>
