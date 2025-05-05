@@ -492,49 +492,9 @@ async function caricaDatiCliente() {
 
   Object.entries(dati).forEach(([keyRaw, value]) => {
     const keyNorm = keyRaw.trim().toLowerCase().replace(/\s+/g, "_");
-    const key = MAPPATURA_CAMPI[keyRaw];
-    let campo = CAMPI_DEFINITI[key];
+const key = MAPPATURA_CAMPI[keyRaw] || keyNorm; // fallback
+let campo = CAMPI_DEFINITI[key];
     if (!campo || ["password_attuale", "nuova_password", "conferma_password"].includes(key)) return;
-
-    if (!campo && keyNorm === "componenti_gruppo") {
-    campo = CAMPI_DEFINITI["componenti_gruppo"];
-    if (campo && !document.getElementById("containerComponenti")) {
-      const div = document.createElement("div");
-      div.className = "campo-wrapper";
-
-      const label = document.createElement("label");
-      label.textContent = campo.label || "Componenti del gruppo";
-      div.appendChild(label);
-
-      const container = document.createElement("div");
-      container.id = "containerComponenti";
-
-      const input = document.createElement("input");
-      input.type = "text";
-      input.className = "input-componente";
-      input.name = "componenti_gruppo";
-      container.appendChild(input);
-
-      const btn = document.createElement("button");
-      btn.type = "button";
-      btn.textContent = "➕ Aggiungi altro componente";
-      btn.onclick = () => {
-        const inputs = container.querySelectorAll(".input-componente");
-        if (inputs.length >= 3) return;
-        const nuovo = document.createElement("input");
-        nuovo.type = "text";
-        nuovo.className = "input-componente";
-        nuovo.name = "componenti_gruppo";
-        container.appendChild(nuovo);
-      };
-
-      div.appendChild(container);
-      div.appendChild(btn);
-      sezioni["gruppo"].appendChild(div);
-    }
-    return;
-  }
-
 
 if (campo.tipo === "componenti") {
   const div = document.createElement("div");
@@ -655,6 +615,45 @@ if (campo.tipo === "componenti") {
       }, 0);
     }
   });
+// === Fallback: se il campo componenti_gruppo non era presente nei dati ===
+if (!document.getElementById("containerComponenti")) {
+  const campo = CAMPI_DEFINITI["componenti_gruppo"];
+  if (campo && sezioni["gruppo"]) {
+    const div = document.createElement("div");
+    div.className = "campo-wrapper";
+
+    const label = document.createElement("label");
+    label.textContent = campo.label || "Componenti del gruppo";
+    div.appendChild(label);
+
+    const container = document.createElement("div");
+    container.id = "containerComponenti";
+
+    const input = document.createElement("input");
+    input.type = "text";
+    input.className = "input-componente";
+    input.name = "componenti_gruppo";
+    container.appendChild(input);
+
+    const btn = document.createElement("button");
+    btn.type = "button";
+    btn.textContent = "➕ Aggiungi altro componente";
+    btn.onclick = () => {
+      const inputs = container.querySelectorAll(".input-componente");
+      if (inputs.length >= 3) return;
+      const nuovo = document.createElement("input");
+      nuovo.type = "text";
+      nuovo.className = "input-componente";
+      nuovo.name = "componenti_gruppo";
+      container.appendChild(nuovo);
+    };
+
+    div.appendChild(container);
+    div.appendChild(btn);
+    sezioni["gruppo"].appendChild(div);
+  }
+}
+
 // === Sezione modifica password === (con controllo per evitare duplicati)
 if (!document.getElementById("formPassword")) {
   const separatore = document.createElement("hr");
@@ -684,6 +683,7 @@ if (!document.getElementById("formPassword")) {
   sezioni["profilo"].appendChild(separatore);
   sezioni["profilo"].appendChild(sezionePassword);
 }
+
 // Mostra solo la sezione "profilo" all'avvio
 Object.values(sezioni).forEach(div => {
   div.style.display = div.dataset.sezione === "profilo" ? "block" : "none";
