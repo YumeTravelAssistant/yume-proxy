@@ -417,7 +417,7 @@ const CAMPI_DEFINITI = {
     tipo: "select-singola",
     label: "Numero componenti",
     opzioni: ["1", "2", "3", "4", "5", "6"],
-    section: "viaggio" 
+    section: "gruppo" 
  }
 };
 const MAPPATURA_CAMPI = {
@@ -490,9 +490,50 @@ async function caricaDatiCliente() {
   }
 
   Object.entries(dati).forEach(([keyRaw, value]) => {
+    const keyNorm = keyRaw.trim().toLowerCase().replace(/\s+/g, "_");
     const key = MAPPATURA_CAMPI[keyRaw];
-    const campo = CAMPI_DEFINITI[key];
-    if (!campo) return;
+    let campo = CAMPI_DEFINITI[key];
+    if (!campo || ["password_attuale", "nuova_password", "conferma_password"].includes(key)) return;
+
+    if (!campo && keyNorm === "componenti_gruppo") {
+    campo = CAMPI_DEFINITI["componenti_gruppo"];
+    if (campo && !document.getElementById("containerComponenti")) {
+      const div = document.createElement("div");
+      div.className = "campo-wrapper";
+
+      const label = document.createElement("label");
+      label.textContent = campo.label || "Componenti del gruppo";
+      div.appendChild(label);
+
+      const container = document.createElement("div");
+      container.id = "containerComponenti";
+
+      const input = document.createElement("input");
+      input.type = "text";
+      input.className = "input-componente";
+      input.name = "componenti_gruppo";
+      container.appendChild(input);
+
+      const btn = document.createElement("button");
+      btn.type = "button";
+      btn.textContent = "➕ Aggiungi altro componente";
+      btn.onclick = () => {
+        const inputs = container.querySelectorAll(".input-componente");
+        if (inputs.length >= 3) return;
+        const nuovo = document.createElement("input");
+        nuovo.type = "text";
+        nuovo.className = "input-componente";
+        nuovo.name = "componenti_gruppo";
+        container.appendChild(nuovo);
+      };
+
+      div.appendChild(container);
+      div.appendChild(btn);
+      sezioni["gruppo"].appendChild(div);
+    }
+    return;
+  }
+
 
 if (campo.tipo === "componenti") {
   const div = document.createElement("div");
@@ -612,36 +653,38 @@ if (campo.tipo === "componenti") {
         });
       }, 0);
     }
-
-// === Sezione modifica password ===
-const separatore = document.createElement("hr");
-
-const sezionePassword = document.createElement("div");
-sezionePassword.className = "sezione-form";
-sezionePassword.dataset.sezione = "profilo";
-sezionePassword.innerHTML = `
-  <h2>🔐 Modifica password</h2>
-  <div id="formPassword" style="margin-top: 20px;">
-    <label for="password_attuale">Password attuale</label>
-    <input type="password" id="password_attuale" name="password_attuale" required />
-    <button type="button" class="toggle-password-text" onclick="togglePassword('password_attuale', this)">Mostra password</button>
-
-    <label for="nuova_password">Nuova password</label>
-    <input type="password" id="nuova_password" name="nuova_password" required />
-    <button type="button" class="toggle-password-text" onclick="togglePassword('nuova_password', this)">Mostra password</button>
-
-    <label for="conferma_password">Conferma nuova password</label>
-    <input type="password" id="conferma_password" name="conferma_password" required />
-    <button type="button" class="toggle-password-text" onclick="togglePassword('conferma_password', this)">Mostra password</button>
-
-    <button type="button" onclick="modificaPassword()">Aggiorna password</button>
-  </div>
-`;
-
-sezioni["profilo"].appendChild(separatore);
-sezioni["profilo"].appendChild(sezionePassword);
   });
+
+// === Sezione modifica password === (con controllo per evitare duplicati)
+if (!document.getElementById("formPassword")) {
+  const separatore = document.createElement("hr");
+
+  const sezionePassword = document.createElement("div");
+  sezionePassword.className = "sezione-form";
+  sezionePassword.dataset.sezione = "profilo";
+  sezionePassword.innerHTML = `
+    <h2>Modifica password</h2>
+    <div id="formPassword" style="margin-top: 20px;">
+      <label for="password_attuale">Password attuale</label>
+      <input type="password" id="password_attuale" name="password_attuale" required />
+      <button type="button" class="toggle-password-text" onclick="togglePassword('password_attuale', this)">Mostra password</button>
+
+      <label for="nuova_password">Nuova password</label>
+      <input type="password" id="nuova_password" name="nuova_password" required />
+      <button type="button" class="toggle-password-text" onclick="togglePassword('nuova_password', this)">Mostra password</button>
+
+      <label for="conferma_password">Conferma nuova password</label>
+      <input type="password" id="conferma_password" name="conferma_password" required />
+      <button type="button" class="toggle-password-text" onclick="togglePassword('conferma_password', this)">Mostra password</button>
+
+      <button type="button" onclick="modificaPassword()">Aggiorna password</button>
+    </div>
+  `;
+
+  sezioni["profilo"].appendChild(separatore);
+  sezioni["profilo"].appendChild(sezionePassword);
 }
+
 
 window.addEventListener("DOMContentLoaded", caricaDatiCliente);
 </script>
