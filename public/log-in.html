@@ -83,9 +83,11 @@ async function verificaAccesso() {
 
     const result = await response.json();
 
-    if (result.status === "success") {
-      localStorage.setItem("codiceClienteYUTA", codice);
-      window.location.href = "area-clienti.html";
+if (result.status === "success") {
+  localStorage.setItem("codiceClienteYUTA", codice);
+  localStorage.setItem("trofeiYUTA", JSON.stringify(result.trofeiSbloccati || []));
+  window.location.href = "area-clienti.html";
+}
     } else {
       erroreDiv.textContent = result.message || "Accesso negato.";
       btn.disabled = false;
@@ -113,6 +115,15 @@ document.addEventListener("DOMContentLoaded", () => {
 
   </script>
 <script src="assets/script.js"></script>
+<script>
+  document.addEventListener("DOMContentLoaded", () => {
+    const trofeiSbloccati = JSON.parse(localStorage.getItem("trofeiYUTA") || "[]");
+
+    trofeiSbloccati.forEach(nome => {
+      sbloccaBadge(`badge-${nome}`, nome);
+    });
+  });
+</script>
 
 </body>
 </html>

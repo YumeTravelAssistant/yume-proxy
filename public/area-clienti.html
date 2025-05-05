@@ -705,6 +705,21 @@ if (!document.getElementById("bacheca-trofei")) {
   contenitore.appendChild(sezione);
 }
 
+// Trofei sbloccati dal CRM
+const trofeiSbloccati = (dati["Trofei sbloccati"] || "").split(",").map(t => t.trim().toLowerCase());
+localStorage.setItem("trofeiYUTA", JSON.stringify(trofeiSbloccati));
+
+// Sblocca graficamente i badge corrispondenti
+trofeiSbloccati.forEach(trofeo => {
+  const div = document.getElementById(`badge-${trofeo}`);
+  if (div) {
+    div.classList.remove("locked");
+    const img = div.querySelector("img");
+    if (img) {
+      img.src = `assets/badges/${trofeo}.png`;
+    }
+  }
+});
 
 // === Sezione modifica password === (con controllo per evitare duplicati)
 if (!document.getElementById("formPassword")) {
