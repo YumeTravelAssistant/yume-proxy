@@ -448,7 +448,8 @@ const MAPPATURA_CAMPI = {
   "Primo giorno in Giappone": "primo_giappone",
   "Ultimo giorno in Giappone": "ultimo_giappone",
   "Data Ritorno": "data_ritorno",
-  "Password_Hash": "password_hash"
+  "Password_Hash": "password_hash",
+  "Componenti del gruppo": "componenti_gruppo",
 };
 
 async function caricaDatiCliente() {
@@ -683,6 +684,10 @@ if (!document.getElementById("formPassword")) {
   sezioni["profilo"].appendChild(separatore);
   sezioni["profilo"].appendChild(sezionePassword);
 }
+// Mostra solo la sezione "profilo" all'avvio
+Object.values(sezioni).forEach(div => {
+  div.style.display = div.dataset.sezione === "profilo" ? "block" : "none";
+});
 }
 
 window.addEventListener("DOMContentLoaded", caricaDatiCliente);
