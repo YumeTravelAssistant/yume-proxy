@@ -253,13 +253,14 @@ button:hover {
 }
 
 .trofeo {
-  background-color: #1b1b1b;
+  background-color: #F9F8F4
   border: 2px solid #ffc86b;
   border-radius: 12px;
   padding: 16px;
   text-align: center;
   box-shadow: 0 0 10px rgba(0,0,0,0.3);
   transition: all 0.3s ease;
+  color: #1c1c1c;
 }
 
 .trofeo.locked .badge-icon {
