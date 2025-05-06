@@ -32,14 +32,18 @@
      <button data-sezione="viaggio">Profilo Viaggio</button>
      <button data-sezione="gruppo">Gestione Gruppo</button>
      <button data-sezione="trofei">Bacheca Trofei</button>
+     <button data-sezione="video">Bacheca Video</button>
 </div>
 <form id="modificaForm" onsubmit="return false;">
   <div id="contenitore-sezioni"></div>
 </form>
 <button id="salvaBtn" onclick="salvaModifiche()">Salva modifiche</button>
 <div id="spinnerSalvataggio" style="display:none; margin-top: 15px;">⌛ Salvataggio in corso...</div>
-  </div>
-</div>
+<div class="sezione-form" data-sezione="video" style="display: none;">
+  <h2>🎥 I tuoi Video</h2>
+  <div id="griglia-video" class="griglia-trofei"></div>
+</div> 
+ </div>
 <script>
 function toggleSidebar() {
   document.querySelector('.sidebar').classList.toggle('active');
@@ -760,24 +764,23 @@ Object.values(sezioni).forEach(div => {
 }
 
 window.addEventListener("DOMContentLoaded", caricaDatiCliente);
-</script>
 
-<script>
-  document.addEventListener("DOMContentLoaded", () => {
-    // ...altri script di inizializzazione (caricaDatiCliente ecc.)
-
-    // Questo blocco per attivare la navigazione tra le sezioni:
+ document.addEventListener("DOMContentLoaded", () => {
     document.querySelectorAll("#selettore-sezioni button").forEach(btn => {
       btn.addEventListener("click", () => {
         const target = btn.dataset.sezione;
         document.querySelectorAll(".sezione-form").forEach(div => {
           div.style.display = div.dataset.sezione === target ? "block" : "none";
         });
+
+        //   Quando si clicca su "video", carica i video dalla bacheca
+        if (target === "video" && typeof caricaVideoBacheca === "function") {
+          caricaVideoBacheca();
+        }
       });
     });
   });
 </script>
-
 
 <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js"></script>

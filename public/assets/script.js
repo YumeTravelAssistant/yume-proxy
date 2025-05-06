@@ -146,6 +146,49 @@ function sbloccaBadge(id, nomeImg) {
   }
 }
 
+async function caricaVideoBacheca() {
+  const codiceCliente = localStorage.getItem("codiceClienteYUTA") || "pubblico";
+  const urlIndex = "https://yutarga700.blob.core.windows.net/yuta-videos/videoIndex.json";
+
+  try {
+    const response = await fetch(urlIndex);
+    const videoList = await response.json();
+    const griglia = document.getElementById("griglia-video");
+    if (!griglia) return;
+
+    griglia.innerHTML = "";
+
+    videoList.forEach(video => {
+      if (video.clienteId !== "pubblico" && video.clienteId !== codiceCliente) return;
+
+      const card = document.createElement("div");
+      card.className = "trofeo";
+
+      const player = document.createElement("video");
+      player.src = video.url;
+      player.controls = true;
+      player.muted = true;
+      player.preload = "none";
+      player.style.width = "100%";
+      player.style.borderRadius = "12px";
+
+      const titolo = document.createElement("h3");
+      titolo.textContent = video.titolo;
+
+      const descrizione = document.createElement("p");
+      descrizione.textContent = video.descrizione;
+
+      card.appendChild(player);
+      card.appendChild(titolo);
+      card.appendChild(descrizione);
+      griglia.appendChild(card);
+    });
+  } catch (e) {
+    console.error("Errore nel caricamento video:", e);
+  }
+}
+
+
 // Esempio test temporaneo
 document.addEventListener("DOMContentLoaded", () => {
   // Simulazione: questi due badge sono "sbloccati"
