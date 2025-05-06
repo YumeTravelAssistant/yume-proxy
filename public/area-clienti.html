@@ -703,6 +703,8 @@ if (!document.getElementById("bacheca-trofei")) {
 
   sezione.appendChild(griglia);
   contenitore.appendChild(sezione);
+  sezione.style.display = sezione.dataset.sezione === "profilo" ? "block" : "none";
+
 }
 
 // Trofei sbloccati dal CRM
