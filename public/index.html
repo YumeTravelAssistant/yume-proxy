@@ -70,6 +70,31 @@
       inviaDomanda();
   }
   });
+
+function rilevaDataFutura(domanda) {
+  const mesi = {
+    gennaio: 0, febbraio: 1, marzo: 2, aprile: 3, maggio: 4, giugno: 5,
+    luglio: 6, agosto: 7, settembre: 8, ottobre: 9, novembre: 10, dicembre: 11
+  };
+
+  const regex = /\b(\d{1,2})\s+(gennaio|febbraio|marzo|aprile|maggio|giugno|luglio|agosto|settembre|ottobre|novembre|dicembre)\b/i;
+  const match = domanda.toLowerCase().match(regex);
+
+  if (match) {
+    const giorno = parseInt(match[1], 10);
+    const mese = mesi[match[2]];
+    const oggi = new Date();
+    const anno = oggi.getMonth() > mese ? oggi.getFullYear() + 1 : oggi.getFullYear();
+
+    const dataRichiesta = new Date(anno, mese, giorno);
+    const diffInGiorni = Math.floor((dataRichiesta - oggi) / (1000 * 60 * 60 * 24));
+
+    return diffInGiorni;
+  }
+
+  return null;
+}
+
 function nuovaDomanda() {
   document.getElementById("domanda").value = "";
   document.getElementById("risposta").innerHTML = "";
@@ -86,7 +111,6 @@ function nuovaDomanda() {
 window.fraseMeteoUtente = "";
 document.getElementById("toggleMeteoBtn").style.display = "none";
 document.getElementById("meteoBox").style.display = "none";
-
 
 }
 
@@ -147,18 +171,24 @@ function trovaCittaNellaDomanda(domanda) {
     const clienteId = document.getElementById("clienteId").value.trim();
     const domanda = document.getElementById("domanda").value.trim();
 
+const oraLocale = new Date().toLocaleTimeString("it-IT", { hour: '2-digit', minute: '2-digit' });
+
 const cittàRichiesta = trovaCittaNellaDomanda(domanda);
 const posizioneMeteo = cittàRichiesta || posizioneUtente;
 
-// 🧽 Reset meteo prima di rigenerarlo
-window.fraseMeteoUtente = "";
+if (!window.fraseMeteoUtente) window.fraseMeteoUtente = "";
+
+const giorniDifferenza = rilevaDataFutura(domanda);
+
+if (giorniDifferenza !== null && giorniDifferenza > 7) {
+  window.fraseMeteoUtente = "⚠️ Hai chiesto il meteo per una data futura. Al momento posso fornire previsioni solo entro i prossimi 7 giorni.";
+}
 
 if (cittàRichiesta === null && domanda.toLowerCase().includes("meteo")) {
   window.fraseMeteoUtente = "⚠️ La funzione Meteo al momento non copre questa località.";
 }
 
 await ottieniMeteo(posizioneMeteo.lat, posizioneMeteo.lon);
-
 
     const rispostaEl = document.getElementById("risposta");
     rispostaEl.innerHTML = "";
@@ -183,7 +213,9 @@ if (window.fraseMeteoUtente && window.fraseMeteoUtente.trim() !== "") {
       body: JSON.stringify({
         clienteId,
         domanda,
-        meteo: window.fraseMeteoUtente || ""
+        meteo: window.fraseMeteoUtente || "",
+        oraLocale,
+        previsioniGiorni: window.previsioniMeteoGiorni || []
        })
     });
 
@@ -288,6 +320,22 @@ async function ottieniMeteo(lat, lon) {
     const response = await fetch(url);
     const json = await response.json();
 
+window.previsioniMeteoGiorni = [];
+
+if (json.daily && Array.isArray(json.daily)) {
+  json.daily.slice(0, 7).forEach((giorno, index) => {
+    const data = new Date(giorno.dt * 1000).toLocaleDateString("it-IT", { weekday: 'long', day: 'numeric', month: 'long' });
+    const descrizione = giorno.weather[0].description;
+    const tempMin = Math.round(giorno.temp.min);
+    const tempMax = Math.round(giorno.temp.max);
+    const pioggia = Math.round((giorno.pop || 0) * 100);
+
+    const frase = `📅 ${data}: ${descrizione}, min ${tempMin}°C / max ${tempMax}°C, probabilità di pioggia ${pioggia}%.`;
+
+    window.previsioniMeteoGiorni.push(frase);
+  });
+}
+
     const condizioneAttuale = json.current.weather[0].description;
     const temperatura = Math.round(json.current.temp);
     const pioveOra = condizioneAttuale.includes("pioggia");
@@ -311,7 +359,6 @@ async function ottieniMeteo(lat, lon) {
     window.fraseMeteoUtente = "";
   }
 }
-
 
 const luoghiConosciuti = {
   "Senso-ji": { lat: 35.7148, lng: 139.7967, link: "https://www.google.com/maps?q=Senso-ji,Tokyo" },
