@@ -207,6 +207,10 @@ if (window.fraseMeteoUtente && window.fraseMeteoUtente.trim() !== "") {
 
     document.getElementById("nuovaDomandaBtn").style.display = "none"; // nasconde il bottone in partenza
 
+console.log("📦 METEO inviato:", window.fraseMeteoUtente);
+console.log("📦 ORA locale:", oraLocale);
+console.log("📦 Previsioni 7 giorni:", window.previsioniMeteoGiorni);
+
     const response = await fetch("https://yuta-proxy-api.azurewebsites.net/api/proxy", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
@@ -419,16 +423,6 @@ function initMap() {
           lat: pos.coords.latitude,
           lng: pos.coords.longitude
         };
-
-ottieniMeteo(posizioneUtente.lat, posizioneUtente.lng).then(meteo => {
-  if (meteo) {
-    const condizione = meteo.current.weather[0].description;
-    const temperatura = Math.round(meteo.current.temp);
-    window.fraseMeteoUtente = `☁️ Meteo attuale: ${condizione}, ${temperatura}°C.`;
-  } else {
-    window.fraseMeteoUtente = "";
-  }
-});
 
         map.setCenter(posizioneUtente);
 
