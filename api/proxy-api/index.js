@@ -1,7 +1,7 @@
 const fetch = require('node-fetch');
 
 module.exports = async function (context, req) {
-const datiRicevuti = req.body || {};
+const datiRicevuti = typeof req.body === "object" ? req.body : JSON.parse(req.body || "{}");
 const { clienteId, domanda } = datiRicevuti;
 
 if (!clienteId || !domanda) {
