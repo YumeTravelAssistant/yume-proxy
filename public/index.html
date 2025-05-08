@@ -73,6 +73,11 @@ function nuovaDomanda() {
   document.getElementById("toggleMappaBtn").style.display = "none";
   document.getElementById("map").style.display = "none";
   document.getElementById("nuovaDomandaBtn").style.display = "none";
+
+   // Rimuove tutti i marker dalla mappa e svuota l’array
+   markers.forEach(m => m.setMap(null));
+   markers = [];
+
 }
 
   async function inviaDomanda() {
@@ -94,12 +99,17 @@ function nuovaDomanda() {
 
     const json = await response.json();
     if (json.risposta) {
+//   Rimuove eventuali marker precedenti prima di creare i nuovi
+markers.forEach(m => m.setMap(null));
+markers = [];
+
       let testo = json.risposta
         .replace(/\*\*(.*?)\*\*/g, "<strong>$1</strong>")
         .replace(/\n### (.*?)\n/g, "<h3>$1</h3>")
         .replace(/\n- (.*?)\n/g, "<ul><li>$1</li></ul>")
         .replace(/(?:\r\n|\r|\n)/g, "<br>");
       testo = testo.replace(/<\/ul><ul>/g, "");
+
 
 let trovatoLuogo = false;
 const luoghiTrovati = [];
@@ -111,7 +121,6 @@ for (const nome in luoghiConosciuti) {
     luoghiTrovati.push({ nome, ...luoghiConosciuti[nome] });
   }
 }
-
       rispostaEl.innerHTML = "";
       let i = 0;
       let testoGrezzato = testo.replace(/<[^>]*>?/gm, ""); // Rimuove tag HTML solo per animazione
@@ -158,6 +167,7 @@ if (trovatoLuogo && map && posizioneUtente) {
     marker.addListener("click", () => {
       window.open(p.link, "_blank");
     });
+     markers.push(marker);
   });
 document.getElementById("map").style.display = "none";
 
@@ -178,6 +188,8 @@ document.getElementById("map").style.display = "none";
 <script>
 let map;
 let posizioneUtente = null;
+let markers = []; // array per tenere traccia dei marker attivi
+
 
 const luoghiConosciuti = {
   "Senso-ji": { lat: 35.7148, lng: 139.7967, link: "https://www.google.com/maps?q=Senso-ji,Tokyo" },
