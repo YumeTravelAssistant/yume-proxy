@@ -5,8 +5,9 @@
       "type": "httpTrigger",
       "direction": "in",
       "name": "req",
-      "methods": [ "post" ],
-      "route": "proxy"
+      "methods": ["post"],
+      "route": "proxy",
+      "dataType": "json"
     },
     {
       "type": "http",
@@ -15,5 +16,4 @@
     }
   ]
 }
-	
 
