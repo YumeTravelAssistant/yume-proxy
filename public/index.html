@@ -45,6 +45,12 @@
     <div class="output" id="risposta"></div>
     <div id="spinner" class="spinner" style="display:none;"></div>
 
+    <div id="luoghi-trovati" style="display:none; margin-top: 20px; font-size: 1em; color: #1C1C1C;"></div>
+
+    <button id="toggleMappaBtn" onclick="toggleMappa()" style="display:none; margin-top: 10px;">📍 Mostra mappa</button>
+
+    <div id="map" style="height: 400px; margin-top: 20px; border-radius: 12px; display: none;"></div>
+
     <button id="nuovaDomandaBtn" style="display:none; margin-top:20px;" onclick="nuovaDomanda()">➕ Nuova domanda</button>
   </main>
 
@@ -92,6 +98,17 @@ function nuovaDomanda() {
         .replace(/(?:\r\n|\r|\n)/g, "<br>");
       testo = testo.replace(/<\/ul><ul>/g, "");
 
+let trovatoLuogo = false;
+const luoghiTrovati = [];
+
+for (const nome in luoghiConosciuti) {
+  const regex = new RegExp(nome, "i");
+  if (regex.test(json.risposta)) {
+    trovatoLuogo = true;
+    luoghiTrovati.push({ nome, ...luoghiConosciuti[nome] });
+  }
+}
+
       rispostaEl.innerHTML = "";
       let i = 0;
       let testoGrezzato = testo.replace(/<[^>]*>?/gm, ""); // Rimuove tag HTML solo per animazione
@@ -105,6 +122,43 @@ function nuovaDomanda() {
           rispostaEl.innerHTML = testo; // mostra versione HTML completa e stilizzata
           document.getElementById("spinner").style.display = "none";
           document.getElementById("nuovaDomandaBtn").style.display = "inline-block";
+
+// ✅ Mostra lista testuale dei luoghi trovati
+if (trovatoLuogo && posizioneUtente) {
+  const divLuoghi = document.getElementById("luoghi-trovati");
+  const lista = luoghiTrovati.map(p => {
+    const distanza = calcolaDistanzaKm(posizioneUtente, { lat: p.lat, lng: p.lng });
+    return `• ${p.nome} (a ${distanza} km da te)`;
+  }).join("<br>");
+  divLuoghi.innerHTML = `<strong>📍 Luoghi rilevati:</strong><br>${lista}`;
+  divLuoghi.style.display = "block";
+
+// ✅ Mostra il pulsante "Mostra mappa"
+      document.getElementById("toggleMappaBtn").style.display = "inline-block";
+    } else {
+      document.getElementById("luoghi-trovati").style.display = "none";
+      document.getElementById("toggleMappaBtn").style.display = "none";
+    }
+
+
+  // ✅ Mostra i luoghi trovati, se presenti
+if (trovatoLuogo && map && posizioneUtente) {
+  luoghiTrovati.forEach((p) => {
+    const distanza = calcolaDistanzaKm(posizioneUtente, { lat: p.lat, lng: p.lng });
+
+    const marker = new google.maps.Marker({
+      position: { lat: p.lat, lng: p.lng },
+      map: map,
+      title: `${p.nome} (a ${distanza} km da te)`
+    });
+
+    marker.addListener("click", () => {
+      window.open(p.link, "_blank");
+    });
+  });
+document.getElementById("map").style.display = "none";
+
+}
         }
       }
       typeChar();
@@ -117,6 +171,100 @@ function nuovaDomanda() {
     }
   }
 </script>
+
+<script>
+let map;
+let posizioneUtente = null;
+
+const luoghiConosciuti = {
+  "Senso-ji": { lat: 35.7148, lng: 139.7967, link: "https://www.google.com/maps?q=Senso-ji,Tokyo" },
+  "Meiji Jingu": { lat: 35.6764, lng: 139.6993, link: "https://www.google.com/maps?q=Meiji+Jingu" },
+  "Tokyo Tower": { lat: 35.6586, lng: 139.7454, link: "https://www.google.com/maps?q=Tokyo+Tower" },
+  "Tokyo Skytree": { lat: 35.7101, lng: 139.8107, link: "https://www.google.com/maps?q=Tokyo+Skytree" },
+  "Shibuya Crossing": { lat: 35.6595, lng: 139.7005, link: "https://www.google.com/maps?q=Shibuya+Crossing" },
+  "Asakusa": { lat: 35.7148, lng: 139.7967, link: "https://www.google.com/maps?q=Asakusa,Tokyo" },
+  "Ueno Zoo": { lat: 35.7166, lng: 139.7710, link: "https://www.google.com/maps?q=Ueno+Zoo" },
+  "Ueno Park": { lat: 35.7148, lng: 139.7736, link: "https://www.google.com/maps?q=Ueno+Park" },
+  "Akihabara": { lat: 35.6984, lng: 139.7730, link: "https://www.google.com/maps?q=Akihabara" },
+  "Ginza": { lat: 35.6717, lng: 139.7650, link: "https://www.google.com/maps?q=Ginza" },
+  "Tsukiji Market": { lat: 35.6655, lng: 139.7708, link: "https://www.google.com/maps?q=Tsukiji+Market" },
+  "TeamLab Planets": { lat: 35.6199, lng: 139.7906, link: "https://www.google.com/maps?q=teamlab+planets+tokyo" },
+  "Tokyo Disneyland": { lat: 35.6329, lng: 139.8804, link: "https://www.google.com/maps?q=Tokyo+Disneyland" },
+  "Tokyo DisneySea": { lat: 35.6263, lng: 139.8889, link: "https://www.google.com/maps?q=Tokyo+DisneySea" },
+  "Roppongi Hills": { lat: 35.6605, lng: 139.7292, link: "https://www.google.com/maps?q=Roppongi+Hills" },
+  "Mori Art Museum": { lat: 35.6606, lng: 139.7294, link: "https://www.google.com/maps?q=Mori+Art+Museum" },
+  "Odaiba": { lat: 35.6273, lng: 139.7758, link: "https://www.google.com/maps?q=Odaiba" },
+  "DiverCity Tokyo": { lat: 35.6191, lng: 139.7761, link: "https://www.google.com/maps?q=DiverCity+Tokyo" },
+  "Rainbow Bridge": { lat: 35.6457, lng: 139.7574, link: "https://www.google.com/maps?q=Rainbow+Bridge+Tokyo" },
+  "Sumida Aquarium": { lat: 35.7102, lng: 139.8107, link: "https://www.google.com/maps?q=Sumida+Aquarium" },
+  "Tokyo National Museum": { lat: 35.7188, lng: 139.7765, link: "https://www.google.com/maps?q=Tokyo+National+Museum" },
+  "Nezu Museum": { lat: 35.6593, lng: 139.7221, link: "https://www.google.com/maps?q=Nezu+Museum" },
+  "Yanaka Ginza": { lat: 35.7275, lng: 139.7654, link: "https://www.google.com/maps?q=Yanaka+Ginza" },
+  "Imperial Palace": { lat: 35.6852, lng: 139.7528, link: "https://www.google.com/maps?q=Imperial+Palace+Tokyo" },
+  "Kabukicho": { lat: 35.6959, lng: 139.7036, link: "https://www.google.com/maps?q=Kabukicho" },
+  "Tokyo Dome": { lat: 35.7056, lng: 139.7519, link: "https://www.google.com/maps?q=Tokyo+Dome" },
+  "Ikebukuro Sunshine City": { lat: 35.7295, lng: 139.7179, link: "https://www.google.com/maps?q=Sunshine+City+Ikebukuro" },
+  "Shinjuku Gyoen": { lat: 35.6852, lng: 139.7100, link: "https://www.google.com/maps?q=Shinjuku+Gyoen" },
+  "Tokyo Metropolitan Government Building": { lat: 35.6896, lng: 139.6921, link: "https://www.google.com/maps?q=Tokyo+Metropolitan+Government+Building" },
+  "Hamarikyu Gardens": { lat: 35.6591, lng: 139.7625, link: "https://www.google.com/maps?q=Hamarikyu+Gardens" }
+};
+
+function calcolaDistanzaKm(p1, p2) {
+  const R = 6371; // Raggio terrestre in km
+  const dLat = (p2.lat - p1.lat) * Math.PI / 180;
+  const dLon = (p2.lng - p1.lng) * Math.PI / 180;
+  const a = 
+    Math.sin(dLat / 2) * Math.sin(dLat / 2) +
+    Math.cos(p1.lat * Math.PI / 180) * Math.cos(p2.lat * Math.PI / 180) *
+    Math.sin(dLon / 2) * Math.sin(dLon / 2);
+  const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
+  return (R * c).toFixed(2); // distanza in km con 2 decimali
+}
+
+function initMap() {
+  map = new google.maps.Map(document.getElementById("map"), {
+    zoom: 13,
+    center: { lat: 35.6895, lng: 139.6917 }, // Tokyo default
+    mapTypeControl: false
+  });
+
+  if (navigator.geolocation) {
+    navigator.geolocation.getCurrentPosition(
+      (pos) => {
+        posizioneUtente = {
+          lat: pos.coords.latitude,
+          lng: pos.coords.longitude
+        };
+
+        map.setCenter(posizioneUtente);
+
+        new google.maps.Marker({
+          position: posizioneUtente,
+          map,
+          title: "Tu sei qui",
+          icon: {
+            path: google.maps.SymbolPath.CIRCLE,
+            scale: 8,
+            fillColor: "#1c1c1c",
+            fillOpacity: 1,
+            strokeWeight: 2,
+            strokeColor: "#ffffff"
+          }
+        });
+
+// document.getElementById("map").style.display = "block"; // sarà gestita manualmente dal pulsante
+      },
+      (error) => {
+        console.warn("❌ Geolocalizzazione non disponibile:", error);
+      }
+    );
+  } else {
+    console.warn("❌ Geolocalizzazione non supportata");
+  }
+}
+</script>
+
+
 <script>
   function toggleSidebar() {
     const sidebar = document.getElementById("sidebar");
@@ -134,6 +282,28 @@ function nuovaDomanda() {
     });
   }
 </script>
+
+<script>
+function toggleMappa() {
+  const mapEl = document.getElementById("map");
+  const btn = document.getElementById("toggleMappaBtn");
+
+  if (mapEl.style.display === "none") {
+    mapEl.style.display = "block";
+    btn.textContent = "🔽 Nascondi mappa";
+  } else {
+    mapEl.style.display = "none";
+    btn.textContent = "📍 Mostra mappa";
+  }
+}
+</script>
+
+
+<script
+  src="https://maps.googleapis.com/maps/api/js?key=AIzaSyCAG11Uloyz4kU6doqFu1WHkg3HhIWH8L8&callback=initMap"
+  async defer>
+</script>
+
 
 </body>
 </html>
