@@ -47,6 +47,10 @@
 
     <div id="luoghi-trovati" style="display:none; margin-top: 20px; font-size: 1em; color: #1C1C1C;"></div>
 
+    <button onclick="toggleMeteo()" id="toggleMeteoBtn" style="display: none; margin-top: 10px;"> 📍 Mostra meteo</button>
+
+    <div id="meteoBox" style="display: none; margin-top: 10px; font-size: 1em; color: #1c1c1c;"></div>
+
     <button id="toggleMappaBtn" onclick="toggleMappa()" style="display:none; margin-top: 10px;">📍 Mostra mappa</button>
 
     <div id="map" style="height: 400px; margin-top: 20px; border-radius: 12px; display: none;"></div>
@@ -78,23 +82,109 @@ function nuovaDomanda() {
    markers.forEach(m => m.setMap(null));
    markers = [];
 
+// ✅ Resetta meteo
+window.fraseMeteoUtente = "";
+document.getElementById("toggleMeteoBtn").style.display = "none";
+document.getElementById("meteoBox").style.display = "none";
+
+
+}
+
+const cittaGiappone = {
+  tokyo: { nome: "Tokyo", lat: 35.6764, lon: 139.6500 },
+  kyoto: { nome: "Kyoto", lat: 35.0116, lon: 135.7681 },
+  osaka: { nome: "Osaka", lat: 34.6937, lon: 135.5023 },
+  nara: { nome: "Nara", lat: 34.6851, lon: 135.8048 },
+  yokohama: { nome: "Yokohama", lat: 35.4437, lon: 139.6380 },
+  sapporo: { nome: "Sapporo", lat: 43.0667, lon: 141.3500 },
+  fukuoka: { nome: "Fukuoka", lat: 33.5902, lon: 130.4017 },
+  nagoya: { nome: "Nagoya", lat: 35.1815, lon: 136.9066 },
+  hiroshima: { nome: "Hiroshima", lat: 34.3853, lon: 132.4553 },
+  kobe: { nome: "Kobe", lat: 34.6901, lon: 135.1955 },
+  kawasaki: { nome: "Kawasaki", lat: 35.5308, lon: 139.7036 },
+  saitama: { nome: "Saitama", lat: 35.8617, lon: 139.6455 },
+  sendai: { nome: "Sendai", lat: 38.2682, lon: 140.8694 },
+  chiba: { nome: "Chiba", lat: 35.6074, lon: 140.1065 },
+  kumamoto: { nome: "Kumamoto", lat: 32.7898, lon: 130.7417 },
+  kagoshima: { nome: "Kagoshima", lat: 31.5966, lon: 130.5571 },
+  nagasaki: { nome: "Nagasaki", lat: 32.7503, lon: 129.8777 },
+  matsuyama: { nome: "Matsuyama", lat: 33.8392, lon: 132.7657 },
+  oita: { nome: "Oita", lat: 33.2396, lon: 131.6093 },
+  takamatsu: { nome: "Takamatsu", lat: 34.3401, lon: 134.0434 },
+  kanazawa: { nome: "Kanazawa", lat: 36.5613, lon: 136.6562 },
+  toyama: { nome: "Toyama", lat: 36.6953, lon: 137.2113 },
+  niigata: { nome: "Niigata", lat: 37.9161, lon: 139.0364 },
+  akita: { nome: "Akita", lat: 39.7200, lon: 140.1025 },
+  aomori: { nome: "Aomori", lat: 40.8244, lon: 140.7400 },
+  iwaki: { nome: "Iwaki", lat: 37.0500, lon: 140.8833 },
+  hakodate: { nome: "Hakodate", lat: 41.7688, lon: 140.7288 },
+  asahikawa: { nome: "Asahikawa", lat: 43.7706, lon: 142.3649 },
+  takayama: { nome: "Takayama", lat: 36.1466, lon: 137.2510 },
+  gifu: { nome: "Gifu", lat: 35.4233, lon: 136.7606 },
+  nagano: { nome: "Nagano", lat: 36.6486, lon: 138.1947 },
+  ueda: { nome: "Ueda", lat: 36.4023, lon: 138.2507 },
+  shizuoka: { nome: "Shizuoka", lat: 34.9756, lon: 138.3828 },
+  hamamatsu: { nome: "Hamamatsu", lat: 34.7100, lon: 137.7261 },
+  hachinohe: { nome: "Hachinohe", lat: 40.5122, lon: 141.4880 },
+  kure: { nome: "Kure", lat: 34.2331, lon: 132.5667 },
+  tsu: { nome: "Tsu", lat: 34.7303, lon: 136.5086 },
+  yokkaichi: { nome: "Yokkaichi", lat: 34.9653, lon: 136.6247 },
+  beppu: { nome: "Beppu", lat: 33.2792, lon: 131.4970 },
+  hikone: { nome: "Hikone", lat: 35.2764, lon: 136.2515 }
+};
+
+function trovaCittaNellaDomanda(domanda) {
+  const testo = domanda.toLowerCase();
+  for (const nome in cittaGiappone) {
+    if (testo.includes(nome)) {
+      return cittaGiappone[nome]; // restituisce { lat, lon, nome }
+    }
+  }
+  return null;
 }
 
   async function inviaDomanda() {
     const clienteId = document.getElementById("clienteId").value.trim();
     const domanda = document.getElementById("domanda").value.trim();
+
+const cittàRichiesta = trovaCittaNellaDomanda(domanda);
+const posizioneMeteo = cittàRichiesta || posizioneUtente;
+
+// 🧽 Reset meteo prima di rigenerarlo
+window.fraseMeteoUtente = "";
+
+if (cittàRichiesta === null && domanda.toLowerCase().includes("meteo")) {
+  window.fraseMeteoUtente = "⚠️ La funzione Meteo al momento non copre questa località.";
+}
+
+await ottieniMeteo(posizioneMeteo.lat, posizioneMeteo.lon);
+
+
     const rispostaEl = document.getElementById("risposta");
     rispostaEl.innerHTML = "";
+    
+if (window.fraseMeteoUtente && window.fraseMeteoUtente.trim() !== "") {
+  document.getElementById("toggleMeteoBtn").style.display = "inline-block";
+} else {
+  document.getElementById("toggleMeteoBtn").style.display = "none";
+  document.getElementById("meteoBox").style.display = "none";
+}
+
     document.getElementById("spinner").style.display = "block";
     document.getElementById("nuovaDomandaBtn").style.display = "inline-block";
 
-    try {
+   try{
+
     document.getElementById("nuovaDomandaBtn").style.display = "none"; // nasconde il bottone in partenza
 
     const response = await fetch("https://yuta-proxy-api.azurewebsites.net/api/proxy", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ clienteId, domanda }),
+      body: JSON.stringify({
+        clienteId,
+        domanda,
+        meteo: window.fraseMeteoUtente || ""
+       })
     });
 
     const json = await response.json();
@@ -190,6 +280,38 @@ let map;
 let posizioneUtente = null;
 let markers = []; // array per tenere traccia dei marker attivi
 
+async function ottieniMeteo(lat, lon) {
+  const apiKey = "7b514410b5b297ed1e5590442ff67eca"; // tua API key attiva
+  const url = `https://api.openweathermap.org/data/3.0/onecall?lat=${lat}&lon=${lon}&exclude=minutely,alerts&appid=${apiKey}&lang=it&units=metric`;
+
+  try {
+    const response = await fetch(url);
+    const json = await response.json();
+
+    const condizioneAttuale = json.current.weather[0].description;
+    const temperatura = Math.round(json.current.temp);
+    const pioveOra = condizioneAttuale.includes("pioggia");
+
+    // Analizza se pioverà nelle prossime 8 ore
+    const previsionePioggia = json.hourly.slice(0, 8).some(hour => {
+      return hour.weather[0].description.includes("pioggia") || (hour.pop && hour.pop > 0.4);
+    });
+
+    let frase = `☁️ Meteo attuale: ${condizioneAttuale}, ${temperatura}°C.`;
+
+    if (pioveOra || previsionePioggia) {
+      frase += " È prevista pioggia nelle prossime ore. Si consigliano attività al chiuso, percorsi coperti e abbigliamento impermeabile.";
+    } else {
+      frase += " Nessuna pioggia prevista fino al tardo pomeriggio.";
+    }
+
+    window.fraseMeteoUtente = frase;
+  } catch (err) {
+    console.error("🌧️ Errore One Call API:", err);
+    window.fraseMeteoUtente = "";
+  }
+}
+
 
 const luoghiConosciuti = {
   "Senso-ji": { lat: 35.7148, lng: 139.7967, link: "https://www.google.com/maps?q=Senso-ji,Tokyo" },
@@ -251,6 +373,16 @@ function initMap() {
           lng: pos.coords.longitude
         };
 
+ottieniMeteo(posizioneUtente.lat, posizioneUtente.lng).then(meteo => {
+  if (meteo) {
+    const condizione = meteo.current.weather[0].description;
+    const temperatura = Math.round(meteo.current.temp);
+    window.fraseMeteoUtente = `☁️ Meteo attuale: ${condizione}, ${temperatura}°C.`;
+  } else {
+    window.fraseMeteoUtente = "";
+  }
+});
+
         map.setCenter(posizioneUtente);
 
         new google.maps.Marker({
@@ -296,6 +428,22 @@ function initMap() {
       }
     });
   }
+</script>
+
+<script>
+function toggleMeteo() {
+  const meteoDiv = document.getElementById("meteoBox");
+  const btn = document.getElementById("toggleMeteoBtn");
+
+  if (meteoDiv.style.display === "none") {
+    meteoDiv.innerHTML = window.fraseMeteoUtente || "Nessuna informazione meteo disponibile.";
+    meteoDiv.style.display = "block";
+    btn.textContent = "🔽 Nascondi meteo";
+  } else {
+    meteoDiv.style.display = "none";
+    btn.textContent = "📍 Mostra meteo";
+  }
+}
 </script>
 
 <script>
