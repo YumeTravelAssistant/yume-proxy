@@ -207,20 +207,26 @@ if (window.fraseMeteoUtente && window.fraseMeteoUtente.trim() !== "") {
 
     document.getElementById("nuovaDomandaBtn").style.display = "none"; // nasconde il bottone in partenza
 
+console.log("🛰️ METEO da inviare:", fraseMeteoFinale);
+console.log("🛰️ PREVISIONI da inviare:", previsioniGiorniFinali);
+
 console.log("📦 METEO inviato:", window.fraseMeteoUtente);
 console.log("📦 ORA locale:", oraLocale);
 console.log("📦 Previsioni 7 giorni:", window.previsioniMeteoGiorni);
+
+const fraseMeteoFinale = typeof window.fraseMeteoUtente === "string" ? window.fraseMeteoUtente : "";
+const previsioniGiorniFinali = Array.isArray(window.previsioniMeteoGiorni) ? window.previsioniMeteoGiorni : [];
 
     const response = await fetch("https://yuta-proxy-api.azurewebsites.net/api/proxy", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({
-        clienteId,
-        domanda,
-        meteo: window.fraseMeteoUtente || "",
-        oraLocale,
-        previsioniGiorni: window.previsioniMeteoGiorni || []
-       })
+       clienteId,
+       domanda,
+       meteo: fraseMeteoFinale,
+       oraLocale,
+       previsioniGiorni: previsioniGiorniFinali 
+      })
     });
 
     const json = await response.json();
