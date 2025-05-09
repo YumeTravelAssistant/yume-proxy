@@ -26,20 +26,13 @@ module.exports = async function (context, req) {
     return;
   }
 
-  // ❌ Se meteo o previsioni non sono corretti
-  if (typeof meteo !== "string" || !Array.isArray(previsioniGiorni)) {
-    context.res = {
-      status: 400,
-      body: {
-        errore: "Dati meteo o previsioniGiorni mancanti o in formato errato.",
-        debug: {
-          tipoMeteo: typeof meteo,
-          tipoPrevisioni: Object.prototype.toString.call(previsioniGiorni)
-        }
-      }
-    };
-    return;
-  }
+// ❗ Converti forzatamente i valori per evitare crash
+const meteoFinale = typeof meteo === "string" ? meteo : "";
+const previsioniFinali = Array.isArray(previsioniGiorni) ? previsioniGiorni : [];
+
+console.log("📦 METEO:", meteoFinale);
+console.log("📦 PREVISIONI:", previsioniFinali);
+console.log("📦 ORA LOCALE:", oraLocale);
 
   // ✅ URL del tuo GAS
   const GAS_URL = "https://script.google.com/macros/s/AKfycbz2hVaNUSMzNzpgQjghkCk3Ov21G0Kuo_z6qq3j_3cRHLt6uFGpzp-bGzlOFdp4Wdwn/exec";
@@ -50,11 +43,12 @@ module.exports = async function (context, req) {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({
-        clienteId,
-        domanda,
-        meteo,
-        previsioniGiorni,
-        oraLocale
+       clienteId,
+       domanda,
+       meteo: meteoFinale,
+       previsioniGiorni: previsioniFinali,
+       oraLocale
+})
       })
     });
 
