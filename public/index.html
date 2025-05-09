@@ -239,7 +239,15 @@ console.log("🛰️ PREVISIONI:", datiPrevisioni);
       })
     });
 
-    const json = await response.json();
+let json;
+try {
+  json = await response.json();
+} catch (e) {
+  rispostaEl.textContent = "❌ Il server ha restituito una risposta non valida.";
+  document.getElementById("spinner").style.display = "none";
+  console.error("Errore parse JSON:", e);
+  return;
+}
     if (json.risposta) {
 //   Rimuove eventuali marker precedenti prima di creare i nuovi
 markers.forEach(m => m.setMap(null));
