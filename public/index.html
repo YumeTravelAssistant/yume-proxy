@@ -227,6 +227,11 @@ console.log("📤 Sto per inviare:");
 console.log("🛰️ METEO:", datiMeteoAttuale);
 console.log("🛰️ PREVISIONI:", datiPrevisioni);
 
+console.log("✅ Tipo previsioniGiorniFinali:", typeof previsioniGiorniFinali);
+console.log("✅ È array?:", Array.isArray(previsioniGiorniFinali));
+console.log("✅ Contenuto previsioni:", JSON.stringify(previsioniGiorniFinali));
+
+
     const response = await fetch("https://yuta-proxy-api.azurewebsites.net/api/proxy", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
