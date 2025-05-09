@@ -1,4 +1,3 @@
-const fetch = require('node-fetch');
 
 module.exports = async function (context, req) {
   let datiRicevuti = typeof req.body === "object" ? req.body : JSON.parse(req.body || "{}");
