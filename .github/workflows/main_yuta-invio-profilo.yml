@@ -10,7 +10,7 @@ on:
   workflow_dispatch:
 
 env:
-  AZURE_FUNCTIONAPP_PACKAGE_PATH: 'api' # path to your function app project
+  AZURE_FUNCTIONAPP_PACKAGE_PATH: '' # path to your function app project
   NODE_VERSION: '20.x'
 
 jobs:
@@ -67,4 +67,4 @@ jobs:
         with:
           app-name: 'yuta-invio-profilo'
           slot-name: 'Production'
-          package: ${{ env.AZURE_FUNCTIONAPP_PACKAGE_PATH }}
+          package: '.'
