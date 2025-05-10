@@ -10,7 +10,7 @@ on:
   workflow_dispatch:
 
 env:
-  AZURE_FUNCTIONAPP_PACKAGE_PATH: '' # path to your function app project
+  AZURE_FUNCTIONAPP_PACKAGE_PATH: 'api'
   NODE_VERSION: '20.x'
 
 jobs:
@@ -28,12 +28,10 @@ jobs:
         with:
           node-version: ${{ env.NODE_VERSION }}
 
-      - name: 'Resolve Project Dependencies Using Npm'
-        shell: pwsh
+      - name: Install Node.js dependencies
         run: |
-          pushd './${{ env.AZURE_FUNCTIONAPP_PACKAGE_PATH }}'
+          cd ${{ env.AZURE_FUNCTIONAPP_PACKAGE_PATH }}
           npm install
-          popd
 
       - name: Upload artifact for deployment job
         uses: actions/upload-artifact@v4
@@ -53,13 +51,13 @@ jobs:
         uses: actions/download-artifact@v4
         with:
           name: node-app
-
+      
       - name: Login to Azure
         uses: azure/login@v2
         with:
-          client-id: ${{ secrets.AZUREAPPSERVICE_CLIENTID_34AAD90BCA484B2789015EE62D88A901 }}
-          tenant-id: ${{ secrets.AZUREAPPSERVICE_TENANTID_AAD2A4F41A8742A4BFF64CF595A13913 }}
-          subscription-id: ${{ secrets.AZUREAPPSERVICE_SUBSCRIPTIONID_7EB46A3D47E6409B836B2C2CF5C2E923 }}
+          client-id: ${{ secrets.AZUREAPPSERVICE_CLIENTID_91AEB4CFBF894FACB6F421CAF7C75CD7 }}
+          tenant-id: ${{ secrets.AZUREAPPSERVICE_TENANTID_8BDF25094FC44E8B9646788BD4F72D3D }}
+          subscription-id: ${{ secrets.AZUREAPPSERVICE_SUBSCRIPTIONID_50C9CB9804AF470AB2D495015EBCAEB0 }}
 
       - name: 'Run Azure Functions Action'
         uses: Azure/functions-action@v1
