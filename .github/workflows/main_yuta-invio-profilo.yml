@@ -1,3 +1,6 @@
+# Docs for the Azure Web Apps Deploy action: https://github.com/azure/functions-action
+# More GitHub Actions for Azure: https://github.com/Azure/actions
+
 name: Build and deploy Node.js project to Azure Function App - yuta-invio-profilo
 
 on:
@@ -7,14 +10,14 @@ on:
   workflow_dispatch:
 
 env:
-  AZURE_FUNCTIONAPP_PACKAGE_PATH: 'api'
-  NODE_VERSION: '20.x'
+  AZURE_FUNCTIONAPP_PACKAGE_PATH: '.' # set this to the path to your web app project, defaults to the repository root
+  NODE_VERSION: '20.x' # set this to the node version to use (supports 8.x, 10.x, 12.x)
 
 jobs:
   build:
     runs-on: windows-latest
     permissions:
-      contents: read
+      contents: read #This is required for actions/checkout
       
     steps:
       - name: 'Checkout GitHub Action'
@@ -25,23 +28,27 @@ jobs:
         with:
           node-version: ${{ env.NODE_VERSION }}
 
-      - name: Install Node.js dependencies
+      - name: 'Resolve Project Dependencies Using Npm'
+        shell: pwsh
         run: |
-          cd ${{ env.AZURE_FUNCTIONAPP_PACKAGE_PATH }}
+          pushd './${{ env.AZURE_FUNCTIONAPP_PACKAGE_PATH }}'
           npm install
+          npm run build --if-present
+          npm run test --if-present
+          popd
 
       - name: Upload artifact for deployment job
         uses: actions/upload-artifact@v4
         with:
           name: node-app
-          path: ${{ env.AZURE_FUNCTIONAPP_PACKAGE_PATH }}
+          path: .
 
   deploy:
     runs-on: windows-latest
     needs: build
     permissions:
-      id-token: write
-      contents: read
+      id-token: write #This is required for requesting the JWT
+      contents: read #This is required for actions/checkout
 
     steps:
       - name: Download artifact from build job
@@ -52,9 +59,9 @@ jobs:
       - name: Login to Azure
         uses: azure/login@v2
         with:
-          client-id: ${{ secrets.AZUREAPPSERVICE_CLIENTID_91AEB4CFBF894FACB6F421CAF7C75CD7 }}
-          tenant-id: ${{ secrets.AZUREAPPSERVICE_TENANTID_8BDF25094FC44E8B9646788BD4F72D3D }}
-          subscription-id: ${{ secrets.AZUREAPPSERVICE_SUBSCRIPTIONID_50C9CB9804AF470AB2D495015EBCAEB0 }}
+          client-id: ${{ secrets.AZUREAPPSERVICE_CLIENTID_34AAD90BCA484B2789015EE62D88A901 }}
+          tenant-id: ${{ secrets.AZUREAPPSERVICE_TENANTID_AAD2A4F41A8742A4BFF64CF595A13913 }}
+          subscription-id: ${{ secrets.AZUREAPPSERVICE_SUBSCRIPTIONID_7EB46A3D47E6409B836B2C2CF5C2E923 }}
 
       - name: 'Run Azure Functions Action'
         uses: Azure/functions-action@v1
@@ -62,4 +69,5 @@ jobs:
         with:
           app-name: 'yuta-invio-profilo'
           slot-name: 'Production'
-          package: '.'
+          package: ${{ env.AZURE_FUNCTIONAPP_PACKAGE_PATH }}
+          
