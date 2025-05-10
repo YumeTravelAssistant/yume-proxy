@@ -80,16 +80,19 @@ async function verificaAccesso() {
         passwordHash: passwordHash
       })
     });
+const rawText = await response.text();
+console.log("🛰️ Risposta grezza:", rawText);
 
- const rawText = await response.text();
-  console.log("🛰️ Risposta grezza:", rawText);
+let result;
+try {
+  result = JSON.parse(rawText);
+} catch (err) {
+  document.getElementById("erroreLogin").textContent = "Errore nella risposta del server. Riprova più tardi.";
+  document.getElementById("spinnerLogin").style.display = "none";
+  document.getElementById("loginBtn").disabled = false;
+  return;
+}
 
-  let result;
-  try {
-    result = JSON.parse(rawText);
-  } catch (err) {
-    throw new Error("❌ Risposta non valida JSON:\n" + rawText);
-  }
 if (result.status === "success") {
   localStorage.setItem("codiceClienteYUTA", codice);
   localStorage.setItem("trofeiYUTA", JSON.stringify(result.trofeiSbloccati || []));
