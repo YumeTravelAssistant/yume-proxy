@@ -1,3 +1,4 @@
+const fetch = require("node-fetch");
 
 module.exports = async function (context, req) {
   // ✅ 1. Gestione della preflight CORS (OPTIONS)
