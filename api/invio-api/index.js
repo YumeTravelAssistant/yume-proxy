@@ -19,6 +19,18 @@ module.exports = async function (context, req) {
     if (!req.body) throw new Error("Corpo della richiesta assente.");
 
     const dati = req.body;
+if (dati.tipoRichiesta === "ping") {
+  context.res = {
+    status: 200,
+    body: {
+      status: "ok",
+      message: "Funzione attiva",
+      fetchType: typeof fetch
+    }
+  };
+  return;
+}
+
     const path = req.url || req.originalUrl || "";
 
     // 🔗 URL del relay.gs
