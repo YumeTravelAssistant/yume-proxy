@@ -81,8 +81,15 @@ async function verificaAccesso() {
       })
     });
 
-    const result = await response.json();
+ const rawText = await response.text();
+  console.log("🛰️ Risposta grezza:", rawText);
 
+  let result;
+  try {
+    result = JSON.parse(rawText);
+  } catch (err) {
+    throw new Error("❌ Risposta non valida JSON:\n" + rawText);
+  }
 if (result.status === "success") {
   localStorage.setItem("codiceClienteYUTA", codice);
   localStorage.setItem("trofeiYUTA", JSON.stringify(result.trofeiSbloccati || []));
