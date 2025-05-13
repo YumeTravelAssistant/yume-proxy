@@ -96,26 +96,71 @@ function rilevaDataFutura(domanda) {
 }
 
 function nuovaDomanda() {
+  // 🔁 Resetta input e risposta GPT
   document.getElementById("domanda").value = "";
   document.getElementById("risposta").innerHTML = "";
-  document.getElementById("luoghi-trovati").style.display = "none";
+
+  // 🔁 Resetta meteo
+  window.fraseMeteoUtente = "";
+  document.getElementById("toggleMeteoBtn").style.display = "none";
+  document.getElementById("meteoBox").style.display = "none";
+  document.getElementById("meteoBox").innerHTML = "";
+
+  // 🔁 Resetta mappa
   document.getElementById("toggleMappaBtn").style.display = "none";
   document.getElementById("map").style.display = "none";
   document.getElementById("nuovaDomandaBtn").style.display = "none";
+  markers.forEach(m => m.setMap(null));
+  markers = [];
 
-   // Rimuove tutti i marker dalla mappa e svuota l’array
-   markers.forEach(m => m.setMap(null));
-   markers = [];
+  // 🔁 Resetta luoghi trovati
+  document.getElementById("luoghi-trovati").style.display = "none";
+  document.getElementById("luoghi-trovati").innerHTML = "";
 
-// ✅ Resetta meteo
-window.fraseMeteoUtente = "";
-document.getElementById("toggleMeteoBtn").style.display = "none";
-document.getElementById("meteoBox").style.display = "none";
+  // 🔁 Rimuove dettagli attrazioni compatibili
+  const dettagliAttrazioni = document.querySelectorAll("[id^='dettagli-attr-']");
+  dettagliAttrazioni.forEach(el => el.remove());
 
+  const pulsantiAttrazioni = Array.from(document.querySelectorAll("button"))
+    .filter(b => b.textContent.startsWith("ℹ️ Dettagli:"));
+  pulsantiAttrazioni.forEach(btn => btn.remove());
 }
 
 const cittaGiappone = {
-  tokyo: { nome: "Tokyo", lat: 35.6764, lon: 139.6500 },
+tokyo: {
+  nome: "Tokyo",
+  lat: 35.6764,
+  lon: 139.6500,
+  quartieri: [
+    "akasaka",
+    "akihabara",
+    "asakusa",
+    "daikanyama",
+    "ebisu",
+    "ginza",
+    "harajuku",
+    "hibiya",
+    "ikebukuro",
+    "marunouchi_tokyo_station",
+    "meguro",
+    "minato_ku",
+    "nakameguro",
+    "nezu",
+    "nogizaka",
+    "odaiba",
+    "roppongi",
+    "sendagi",
+    "shibuya",
+    "shimbashi",
+    "shinjuku",
+    "sumida_oshiage",
+    "takadanobaba",
+    "ueno",
+    "yanaka",
+    "yaesu",
+    "yurakucho"
+  ]
+},
   kyoto: { nome: "Kyoto", lat: 35.0116, lon: 135.7681 },
   osaka: { nome: "Osaka", lat: 34.6937, lon: 135.5023 },
   nara: { nome: "Nara", lat: 34.6851, lon: 135.8048 },
@@ -207,6 +252,24 @@ if (window.fraseMeteoUtente && window.fraseMeteoUtente.trim() !== "") {
     document.getElementById("spinner").style.display = "block";
     document.getElementById("nuovaDomandaBtn").style.display = "inline-block";
 
+// 🔁 RESET UI — resetta meteo, mappa, luoghi trovati e attrazioni compatibili
+document.getElementById("luoghi-trovati").style.display = "none";
+document.getElementById("luoghi-trovati").innerHTML = "";
+
+document.getElementById("meteoBox").style.display = "none";
+document.getElementById("meteoBox").innerHTML = "";
+
+document.getElementById("map").style.display = "none";
+
+// ✅ Rimuove dettagli attrazioni compatibili (div e pulsanti)
+const dettagliAttrazioni = document.querySelectorAll("[id^='dettagli-attr-']");
+dettagliAttrazioni.forEach(el => el.remove());
+
+const pulsantiAttrazioni = Array.from(document.querySelectorAll("button"))
+  .filter(b => b.textContent.startsWith("ℹ️ Dettagli:"));
+pulsantiAttrazioni.forEach(btn => btn.remove());
+
+
    try{
 
     document.getElementById("nuovaDomandaBtn").style.display = "none"; // nasconde il bottone in partenza
@@ -289,6 +352,59 @@ for (const nome in luoghiConosciuti) {
           setTimeout(typeChar, 20); // più lento, circa 3x più umano
         } else {
           rispostaEl.innerHTML = testo; // mostra versione HTML completa e stilizzata
+         
+// 🎯 Mostra / Nascondi dettagli attrazioni compatibili
+if (json.attrazioniDettagliate && json.attrazioniDettagliate.length > 0) {
+  const contenitoreAttrazioni = document.createElement("div");
+  contenitoreAttrazioni.style.marginTop = "20px";
+
+  const titolo = document.createElement("strong");
+  titolo.textContent = "📍 Vuoi vedere i dettagli delle attrazioni compatibili?";
+  contenitoreAttrazioni.appendChild(titolo);
+  contenitoreAttrazioni.appendChild(document.createElement("br"));
+
+  json.attrazioniDettagliate.forEach((attr, index) => {
+    const toggleId = `dettagli-attr-${index}`;
+
+    const btn = document.createElement("button");
+    btn.textContent = `ℹ️ Dettagli: ${attr.nome}`;
+    btn.setAttribute("data-target", toggleId);
+    btn.style.marginTop = "8px";
+    btn.onclick = () => {
+      const target = document.getElementById(toggleId);
+      if (target.style.display === "none") {
+        target.style.display = "block";
+      } else {
+        target.style.display = "none";
+      }
+    };
+
+    const box = document.createElement("div");
+    box.id = toggleId;
+    box.style.display = "none";
+    box.style.margin = "6px 0 16px";
+    box.style.padding = "10px";
+    box.style.border = "1px solid #ccc";
+    box.style.borderRadius = "6px";
+    box.style.background = "#f9f9f9";
+    box.style.whiteSpace = "pre-line";
+
+    const orari = Array.isArray(attr.orariSettimana) ? attr.orariSettimana.join("\n") : "n.d.";
+box.innerHTML = `
+  <div style="font-weight: bold; font-size: 1.1em; margin-bottom: 6px;">${attr.nome}</div>
+  <div>⭐ <strong>Valutazione:</strong> ${attr.rating || "n.d."}</div>
+  <div>📬 <strong>Indirizzo:</strong> ${attr.indirizzo || "n.d."}</div>
+  <div>🕒 <strong>Orari:</strong><br><pre style="margin: 4px 0 0; font-family: inherit;">${orari}</pre></div>
+  <div style="margin-top: 6px;">🔗 <a href="${attr.urlGoogleMaps}" target="_blank">Apri su Google Maps</a></div>
+`;
+
+    contenitoreAttrazioni.appendChild(btn);
+    contenitoreAttrazioni.appendChild(box);
+  });
+
+  rispostaEl.appendChild(contenitoreAttrazioni);
+}
+
           document.getElementById("spinner").style.display = "none";
           document.getElementById("nuovaDomandaBtn").style.display = "inline-block";
 
