@@ -193,6 +193,8 @@ if (posizioneMeteo && posizioneMeteo.lat && posizioneMeteo.lon) {
 }
 
     const rispostaEl = document.getElementById("risposta");
+    attivaGooglePlacesDaDomanda(domanda);
+    attivaAttrazioniDaDomanda(domanda);
     rispostaEl.innerHTML = "";
     
 if (window.fraseMeteoUtente && window.fraseMeteoUtente.trim() !== "") {
@@ -479,6 +481,176 @@ function initMap() {
     console.warn("❌ Geolocalizzazione non supportata");
   }
 }
+
+function estraiKeywordLuogo(domanda) {
+  const paroleChiave = ["ramen", "sushi", "vegano", "izakaya", "tempura", "okonomiyaki"];
+  const testo = domanda.toLowerCase();
+  return paroleChiave.find(p => testo.includes(p)) || ""; // se nulla, restituisce stringa vuota
+}
+
+function cercaLuoghiPerZona(domanda, tipo = "restaurant", keyword = "") {
+  const posizione = trovaCittaNellaDomanda(domanda);
+
+  if (!posizione || !map) {
+    console.warn("❌ Nessuna città trovata per la ricerca Places.");
+    return;
+  }
+
+  const location = {
+    lat: posizione.lat,
+    lng: posizione.lon
+  };
+
+  const service = new google.maps.places.PlacesService(map);
+  const request = {
+    location: location,
+    radius: 2000, // puoi regolare in base al tipo: 1500 per ristoranti, 3000 per attrazioni
+    type: [tipo],
+    keyword: keyword
+  };
+
+  service.nearbySearch(request, (results, status) => {
+    if (status === google.maps.places.PlacesServiceStatus.OK && results.length > 0) {
+      console.log(`✅ ${results.length} luoghi trovati a ${posizione.nome}`);
+      mostraLuoghi(results, tipo);
+    } else if (status === google.maps.places.PlacesServiceStatus.ZERO_RESULTS) {
+      console.warn(`⚠️ Nessun luogo trovato a ${posizione.nome}`);
+      document.getElementById("luoghi-trovati").innerHTML = `Nessun risultato trovato per questa zona.`;
+    } else {
+      console.error("❌ Errore Places API:", status);
+    }
+  });
+}
+
+function cercaLuoghiSmart(domanda, tipo = "restaurant", keyword = "") {
+  const testo = domanda.toLowerCase();
+  const posizioneRilevata = trovaCittaNellaDomanda(domanda);
+
+  // ✅ Regex avanzata per prossimità (include varianti e forme comuni)
+  const regexProssimita = /\b(vicin[oa]?(?:\s*a?\s*me)?|nei\s*dintorni|qui\s*vicino|a\s*pochi\s*pass[iy]?|nelle\s+vicinanze|intorno\s*a\s*me|attorno\s*a\s*me|prossimità|zona\s*mia|da\s*qui|dove\s*sono|a\s*due\s*passi|immediate\s+vicinanze)\b/i;
+
+  // ✅ Parole simili come fallback in caso di digitazioni errate
+  const paroleSimiliProssimita = [
+    "vicin", "dintorn", "pochi pass", "intorn", "qui", "attorn", "vicinanz", "zona mia", "da qui", "dove son"
+  ];
+
+  const eVicinoAme = regexProssimita.test(testo) || paroleSimiliProssimita.some(p => testo.includes(p));
+
+  // 📍 Decidi quale posizione usare: città menzionata o posizione utente
+  const location = posizioneRilevata
+    ? { lat: posizioneRilevata.lat, lng: posizioneRilevata.lon }
+    : (eVicinoAme && posizioneUtente)
+      ? posizioneUtente
+      : null;
+
+  if (!location || !map) {
+    console.warn("❌ Nessuna posizione valida per la ricerca smart.");
+    return;
+  }
+
+  const service = new google.maps.places.PlacesService(map);
+  const request = {
+    location: location,
+    radius: 1500,
+    type: [tipo],
+    keyword: keyword
+  };
+
+  service.nearbySearch(request, (results, status) => {
+    if (status === google.maps.places.PlacesServiceStatus.OK) {
+      mostraLuoghi(results, tipo);
+    } else {
+      console.error("❌ Errore Places smart:", status);
+    }
+  });
+}
+
+function attivaGooglePlacesDaDomanda(domanda) {
+  const testo = domanda.toLowerCase();
+
+  const regexCibo = /\b(mangiare|dove\s+mangiare|ristorant[ei]|izakaya|un\s+posto\s+(dove\s+)?mangiare|mi\s+consigli\s+un\s+ristorante|posto\s+per\s+pranzare|cena\s+fuori|cibo\s+tipico|locale\s+dove\s+mangiare)\b/i;
+
+  const paroleSimiliCibo = ["ristoran", "mangiar", "mangare", "izak", "pranzar", "cenar", "cib", "lokale", "magiare", "restorant"];
+
+  const eDomandaCibo = regexCibo.test(testo) || paroleSimiliCibo.some(p => testo.includes(p));
+
+  if (eDomandaCibo) {
+    const keyword = estraiKeywordLuogo(domanda);
+    cercaLuoghiSmart(domanda, "restaurant", keyword);
+  }
+}
+
+function attivaAttrazioniDaDomanda(domanda) {
+  const testo = domanda.toLowerCase();
+
+  // ✅ Regex principale
+  const regexAttrazioni = /\b(cosa\s+(vedere|fare|visitare)|luoghi\s+di\s+interesse|attrazioni|posti\s+da\s+vedere|cosa\s+c'è\s+da\s+vedere|esperienze\s+turistiche|tour|da\s+visitare|luogo\s+interessante|luoghi\s+turistici|posti\s+interessanti)\b/i;
+
+  // ✅ Fallback parole chiave fuzzy o generiche
+  const paroleSimiliAttrazioni = [
+    "veder", "visitar", "attrazion", "interess", "esperienz", "turist", "tour", "posti", "scoprire", "cosa da vedere", "luoghi carini", "da esplorare"
+  ];
+
+  const eDomandaAttrazioni = regexAttrazioni.test(testo) || paroleSimiliAttrazioni.some(p => testo.includes(p));
+
+  if (eDomandaAttrazioni) {
+    cercaLuoghiSmart(domanda, "tourist_attraction", "");
+  }
+}
+
+function mostraLuoghi(results, tipo = "luogo") {
+  const div = document.getElementById("luoghi-trovati");
+  let contenuto = `<strong>🔍 ${tipo === "restaurant" ? "Ristoranti consigliati" : "Luoghi da visitare"}:</strong><br><br>`;
+
+  // Pulisce marker precedenti
+  markers.forEach(m => m.setMap(null));
+  markers = [];
+
+  results.slice(0, 4).forEach(place => {
+    const posizione = place.geometry.location;
+    const nome = place.name;
+    const rating = place.rating ? `⭐ ${place.rating}` : "—";
+    const indirizzo = place.vicinity || "Indirizzo non disponibile";
+    const categoria = tipo === "restaurant" ? "Ristorante" : "Attrazione";
+    const aperto = place.opening_hours?.open_now !== undefined
+      ? (place.opening_hours.open_now ? "🟢 Aperto ora" : "🔴 Chiuso ora")
+      : "Orari non disponibili";
+
+    let distanzaTesto = "";
+    if (posizioneUtente) {
+      const distanzaKm = calcolaDistanzaKm(posizioneUtente, { lat: posizione.lat(), lng: posizione.lng() });
+      distanzaTesto = `🧭 ${distanzaKm} km da te<br>`;
+    }
+
+    contenuto += `
+      <div style="margin-bottom: 12px;">
+        <strong>${nome}</strong><br>
+        ${categoria} · ${rating}<br>
+        ${aperto}<br>
+        ${distanzaTesto}${indirizzo}<br>
+        <hr>
+      </div>
+    `;
+
+    const marker = new google.maps.Marker({
+      position: posizione,
+      map: map,
+      title: nome
+    });
+
+    marker.addListener("click", () => {
+      window.open(`https://www.google.com/maps/search/?api=1&query_place_id=${place.place_id}`, "_blank");
+    });
+
+    markers.push(marker);
+  });
+
+  div.innerHTML = contenuto;
+  div.style.display = "block";
+  document.getElementById("map").style.display = "block";
+  document.getElementById("toggleMappaBtn").textContent = "🔽 Nascondi mappa";
+}
+
 </script>
 
 
