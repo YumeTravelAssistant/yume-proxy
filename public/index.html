@@ -204,17 +204,53 @@ tokyo: {
 
 function trovaCittaNellaDomanda(domanda) {
   const testo = domanda.toLowerCase();
+
   for (const nome in cittaGiappone) {
     if (testo.includes(nome)) {
-      return cittaGiappone[nome]; // restituisce { lat, lon, nome }
+      return cittaGiappone[nome]; // città corrispondente
+    }
+
+    // 👇 Cerca anche tra i quartieri, se presenti
+    const quartieri = cittaGiappone[nome].quartieri;
+    if (Array.isArray(quartieri)) {
+      for (let q of quartieri) {
+        if (testo.includes(q)) {
+          return cittaGiappone[nome]; // restituisce la città associata al quartiere
+        }
+      }
     }
   }
+
   return null;
 }
 
   async function inviaDomanda() {
     const clienteId = document.getElementById("clienteId").value.trim();
     const domanda = document.getElementById("domanda").value.trim();
+
+// 🔄 Nasconde visivamente meteo e mappa SEMPRE all'inizio
+document.getElementById("toggleMeteoBtn").style.display = "none";
+document.getElementById("meteoBox").style.display = "none";
+document.getElementById("toggleMappaBtn").style.display = "none";
+document.getElementById("map").style.display = "none";
+
+
+// 🔁 RESET UI — resetta meteo, mappa, luoghi trovati e attrazioni compatibili
+document.getElementById("luoghi-trovati").style.display = "none";
+document.getElementById("luoghi-trovati").innerHTML = "";
+
+document.getElementById("meteoBox").style.display = "none";
+document.getElementById("meteoBox").innerHTML = "";
+
+document.getElementById("map").style.display = "none";
+
+//   Rimuove dettagli attrazioni compatibili (div e pulsanti)
+const dettagliAttrazioni = document.querySelectorAll("[id^='dettagli-attr-']");
+dettagliAttrazioni.forEach(el => el.remove());
+
+const pulsantiAttrazioni = Array.from(document.querySelectorAll("button"))
+  .filter(b => b.textContent.startsWith("ℹ️ Dettagli:"));
+pulsantiAttrazioni.forEach(btn => btn.remove());
 
 const oraLocale = new Date().toLocaleTimeString("it-IT", { hour: '2-digit', minute: '2-digit' });
 
@@ -251,24 +287,6 @@ if (window.fraseMeteoUtente && window.fraseMeteoUtente.trim() !== "") {
 
     document.getElementById("spinner").style.display = "block";
     document.getElementById("nuovaDomandaBtn").style.display = "inline-block";
-
-// 🔁 RESET UI — resetta meteo, mappa, luoghi trovati e attrazioni compatibili
-document.getElementById("luoghi-trovati").style.display = "none";
-document.getElementById("luoghi-trovati").innerHTML = "";
-
-document.getElementById("meteoBox").style.display = "none";
-document.getElementById("meteoBox").innerHTML = "";
-
-document.getElementById("map").style.display = "none";
-
-// ✅ Rimuove dettagli attrazioni compatibili (div e pulsanti)
-const dettagliAttrazioni = document.querySelectorAll("[id^='dettagli-attr-']");
-dettagliAttrazioni.forEach(el => el.remove());
-
-const pulsantiAttrazioni = Array.from(document.querySelectorAll("button"))
-  .filter(b => b.textContent.startsWith("ℹ️ Dettagli:"));
-pulsantiAttrazioni.forEach(btn => btn.remove());
-
 
    try{
 
@@ -793,8 +811,10 @@ function toggleMeteo() {
   const meteoDiv = document.getElementById("meteoBox");
   const btn = document.getElementById("toggleMeteoBtn");
 
-  if (meteoDiv.style.display === "none") {
-    meteoDiv.innerHTML = window.fraseMeteoUtente || "Nessuna informazione meteo disponibile.";
+  // Aggiorna sempre il contenuto, indipendentemente dallo stato visibile
+  meteoDiv.innerHTML = window.fraseMeteoUtente || "Nessuna informazione meteo disponibile.";
+
+  if (meteoDiv.style.display === "none" || meteoDiv.style.display === "") {
     meteoDiv.style.display = "block";
     btn.textContent = "🔽 Nascondi meteo";
   } else {
@@ -802,6 +822,7 @@ function toggleMeteo() {
     btn.textContent = "📍 Mostra meteo";
   }
 }
+
 </script>
 
 <script>
