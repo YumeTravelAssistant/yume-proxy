@@ -204,23 +204,19 @@ tokyo: {
 
 function trovaCittaNellaDomanda(domanda) {
   const testo = domanda.toLowerCase();
+  for (const codiceCitta in cittaGiappone) {
+    const citta = cittaGiappone[codiceCitta];
+    if (testo.includes(codiceCitta)) return { lat: citta.lat, lon: citta.lon };
 
-  for (const nome in cittaGiappone) {
-    if (testo.includes(nome)) {
-      return cittaGiappone[nome]; // città corrispondente
-    }
-
-    // 👇 Cerca anche tra i quartieri, se presenti
-    const quartieri = cittaGiappone[nome].quartieri;
-    if (Array.isArray(quartieri)) {
-      for (let q of quartieri) {
+    if (Array.isArray(citta.quartieri)) {
+      for (const q of citta.quartieri) {
         if (testo.includes(q)) {
-          return cittaGiappone[nome]; // restituisce la città associata al quartiere
+          console.log("🎯 Quartiere riconosciuto:", q);
+          return { lat: citta.lat, lon: citta.lon }; // ✅ restituisci coordinate città
         }
       }
     }
   }
-
   return null;
 }
 
