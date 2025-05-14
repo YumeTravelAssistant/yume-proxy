@@ -131,35 +131,35 @@ tokyo: {
   nome: "Tokyo",
   lat: 35.6764,
   lon: 139.6500,
-  quartieri: [
-    "akasaka",
-    "akihabara",
-    "asakusa",
-    "daikanyama",
-    "ebisu",
-    "ginza",
-    "harajuku",
-    "hibiya",
-    "ikebukuro",
-    "marunouchi_tokyo_station",
-    "meguro",
-    "minato_ku",
-    "nakameguro",
-    "nezu",
-    "nogizaka",
-    "odaiba",
-    "roppongi",
-    "sendagi",
-    "shibuya",
-    "shimbashi",
-    "shinjuku",
-    "sumida_oshiage",
-    "takadanobaba",
-    "ueno",
-    "yanaka",
-    "yaesu",
-    "yurakucho"
-  ]
+  quartieri: {
+    akasaka: { lat: 35.6736, lon: 139.7360 },
+    akihabara: { lat: 35.6984, lon: 139.7730 },
+    asakusa: { lat: 35.7148, lon: 139.7967 },
+    daikanyama: { lat: 35.6495, lon: 139.7032 },
+    ebisu: { lat: 35.6467, lon: 139.7101 },
+    ginza: { lat: 35.6717, lon: 139.7650 },
+    harajuku: { lat: 35.6702, lon: 139.7020 },
+    hibiya: { lat: 35.6731, lon: 139.7607 },
+    ikebukuro: { lat: 35.7289, lon: 139.7100 },
+    marunouchi_tokyo_station: { lat: 35.6812, lon: 139.7671 },
+    meguro: { lat: 35.6339, lon: 139.7155 },
+    minato_ku: { lat: 35.6581, lon: 139.7516 },
+    nakameguro: { lat: 35.6419, lon: 139.6985 },
+    nezu: { lat: 35.7205, lon: 139.7570 },
+    nogizaka: { lat: 35.6657, lon: 139.7267 },
+    odaiba: { lat: 35.6273, lon: 139.7758 },
+    roppongi: { lat: 35.6605, lon: 139.7292 },
+    sendagi: { lat: 35.7244, lon: 139.7526 },
+    shibuya: { lat: 35.6595, lon: 139.7005 },
+    shimbashi: { lat: 35.6663, lon: 139.7586 },
+    shinjuku: { lat: 35.6938, lon: 139.7036 },
+    sumida_oshiage: { lat: 35.7101, lon: 139.8107 },
+    takadanobaba: { lat: 35.7126, lon: 139.7036 },
+    ueno: { lat: 35.7148, lon: 139.7736 },
+    yanaka: { lat: 35.7275, lon: 139.7654 },
+    yaesu: { lat: 35.6779, lon: 139.7693 },
+    yurakucho: { lat: 35.6755, lon: 139.7632 }
+  }
 },
   kyoto: { nome: "Kyoto", lat: 35.0116, lon: 135.7681 },
   osaka: { nome: "Osaka", lat: 34.6937, lon: 135.5023 },
@@ -208,15 +208,18 @@ function trovaCittaNellaDomanda(domanda) {
     const citta = cittaGiappone[codiceCitta];
     if (testo.includes(codiceCitta)) return { lat: citta.lat, lon: citta.lon };
 
-    if (Array.isArray(citta.quartieri)) {
-      for (const q of citta.quartieri) {
-        if (testo.includes(q)) {
-          console.log("🎯 Quartiere riconosciuto:", q);
-          return { lat: citta.lat, lon: citta.lon }; // ✅ restituisci coordinate città
-        }
-      }
+if (typeof citta.quartieri === "object") {
+  for (const q in citta.quartieri) {
+    if (testo.includes(q)) {
+      console.log("🎯 Quartiere riconosciuto:", q);
+      return {
+        lat: citta.quartieri[q].lat,
+        lon: citta.quartieri[q].lon
+      };
     }
   }
+}
+
   return null;
 }
 
@@ -653,6 +656,11 @@ function cercaLuoghiPerZona(domanda, tipo = "restaurant", keyword = "") {
 }
 
 function cercaLuoghiSmart(domanda, tipo = "restaurant", keyword = "") {
+  if (!google.maps?.places || !map) {
+    console.warn("❌ La libreria Google Places o la mappa non è ancora pronta.");
+    return;
+  }
+
   const testo = domanda.toLowerCase();
   const posizioneRilevata = trovaCittaNellaDomanda(domanda);
 
