@@ -206,20 +206,22 @@ function trovaCittaNellaDomanda(domanda) {
   const testo = domanda.toLowerCase();
   for (const codiceCitta in cittaGiappone) {
     const citta = cittaGiappone[codiceCitta];
-    if (testo.includes(codiceCitta)) return { lat: citta.lat, lon: citta.lon };
+    if (testo.includes(codiceCitta)) {
+      return { lat: citta.lat, lon: citta.lon };
+    }
 
-if (typeof citta.quartieri === "object") {
-  for (const q in citta.quartieri) {
-    if (testo.includes(q)) {
-      console.log("🎯 Quartiere riconosciuto:", q);
-      return {
-        lat: citta.quartieri[q].lat,
-        lon: citta.quartieri[q].lon
-      };
+    if (typeof citta.quartieri === "object") {
+      for (const q in citta.quartieri) {
+        if (testo.includes(q)) {
+          console.log("🎯 Quartiere riconosciuto:", q);
+          return {
+            lat: citta.quartieri[q].lat,
+            lon: citta.quartieri[q].lon
+          };
+        }
+      }
     }
   }
-}
-
   return null;
 }
 
