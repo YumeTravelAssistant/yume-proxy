@@ -15,6 +15,7 @@
 </head>
 <body>
 
+
   <header>
     <img src="assets/logo-yuta.jpg" alt="Logo YUTA">
     <h1>YUTA - il tuo assistente di viaggio</h1>
@@ -409,12 +410,27 @@ if (json.attrazioniDettagliate && json.attrazioniDettagliate.length > 0) {
     box.style.whiteSpace = "pre-line";
 
     const orari = Array.isArray(attr.orariSettimana) ? attr.orariSettimana.join("\n") : "n.d.";
+
+const id = "attr-" + Math.random().toString(36).substr(2, 9); // ID univoco per ogni attrazione
+
 box.innerHTML = `
   <div style="font-weight: bold; font-size: 1.1em; margin-bottom: 6px;">${attr.nome}</div>
-  <div>⭐ <strong>Valutazione:</strong> ${attr.rating || "n.d."}</div>
+  <div><strong>Valutazione:</strong> ${attr.rating || "n.d."}</div>
   <div>📬 <strong>Indirizzo:</strong> ${attr.indirizzo || "n.d."}</div>
   <div>🕒 <strong>Orari:</strong><br><pre style="margin: 4px 0 0; font-family: inherit;">${orari}</pre></div>
+  <div>💰 <strong>Prezzo:</strong> ${attr.prezzo || "¥ N.D."}</div>
+  <div>🏷️ <strong>Categoria:</strong> ${attr.tipoLuogo || "N.D."}</div>
   <div style="margin-top: 6px;">🔗 <a href="${attr.urlGoogleMaps}" target="_blank">Apri su Google Maps</a></div>
+  ${
+    attr.urlFoto
+      ? `<div style="margin-top: 6px;">
+            <button onclick="document.getElementById('${id}').classList.toggle('hidden')">📸 Mostra/Nascondi Foto</button>
+            <div id="${id}" class="hidden" style="margin-top: 8px;">
+              <img src="${attr.urlFoto}" alt="Foto di ${attr.nome}" style="max-width: 100%; border-radius: 8px;">
+            </div>
+         </div>`
+      : ""
+  }
 `;
 
     contenitoreAttrazioni.appendChild(btn);
