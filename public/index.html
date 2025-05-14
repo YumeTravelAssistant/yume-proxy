@@ -746,31 +746,60 @@ function mostraLuoghi(results, tipo = "luogo") {
   markers.forEach(m => m.setMap(null));
   markers = [];
 
-  results.slice(0, 4).forEach(place => {
-    const posizione = place.geometry.location;
-    const nome = place.name;
-    const rating = place.rating ? `⭐ ${place.rating}` : "—";
-    const indirizzo = place.vicinity || "Indirizzo non disponibile";
-    const categoria = tipo === "restaurant" ? "Ristorante" : "Attrazione";
-    const aperto = place.opening_hours?.open_now !== undefined
-      ? (place.opening_hours.open_now ? "🟢 Aperto ora" : "🔴 Chiuso ora")
-      : "Orari non disponibili";
+results.slice(0, 4).forEach(place => {
+  const posizione = place.geometry.location;
+  const nome = place.name;
+  const rating = place.rating ? `⭐ ${place.rating}` : "—";
+  const indirizzo = place.vicinity || "Indirizzo non disponibile";
+  const categoria = tipo === "restaurant" ? "Ristorante" : (
+    place.types?.includes("museum") ? "Museo" : "Attrazione"
+  );
+  const aperto = place.opening_hours?.open_now !== undefined
+    ? (place.opening_hours.open_now ? "🟢 Aperto ora" : "🔴 Chiuso ora")
+    : "Orari non disponibili";
 
-    let distanzaTesto = "";
-    if (posizioneUtente) {
-      const distanzaKm = calcolaDistanzaKm(posizioneUtente, { lat: posizione.lat(), lng: posizione.lng() });
-      distanzaTesto = `🧭 ${distanzaKm} km da te<br>`;
-    }
+  const priceMap = {
+    0: "¥ Gratuito",
+    1: "¥ Economico",
+    2: "¥¥ Medio",
+    3: "¥¥¥ Costoso",
+    4: "¥¥¥¥ Molto costoso"
+  };
+  const prezzo = priceMap[place.price_level] || "¥ N.D.";
 
-    contenuto += `
-      <div style="margin-bottom: 12px;">
-        <strong>${nome}</strong><br>
-        ${categoria} · ${rating}<br>
-        ${aperto}<br>
-        ${distanzaTesto}${indirizzo}<br>
-        <hr>
-      </div>
-    `;
+  const categorie = place.types?.map(c => c.replace(/_/g, " ")).join(", ") || "n.d.";
+
+  const foto = place.photos?.[0]?.photo_reference
+    ? `https://maps.googleapis.com/maps/api/place/photo?maxwidth=400&photoreference=${place.photos[0].photo_reference}&key=${GOOGLE_KEY}`
+    : null;
+
+  const mapsUrl = place.place_id
+    ? `https://maps.google.com/?cid=${place.place_id}`
+    : "#";
+
+  let distanzaTesto = "";
+  if (posizioneUtente) {
+    const distanzaKm = calcolaDistanzaKm(posizioneUtente, { lat: posizione.lat(), lng: posizione.lng() });
+    distanzaTesto = `🧭 ${distanzaKm} km da te<br>`;
+  }
+
+  contenuto += `
+    <div style="margin-bottom: 16px;">
+      <strong>${nome}</strong><br>
+      ${categoria} · ${rating} · ${prezzo}<br>
+      ${aperto}<br>
+      ${distanzaTesto}${indirizzo}<br>
+      <a href="${mapsUrl}" target="_blank">📍 Apri su Google Maps</a><br>
+      <details style="margin-top: 6px;">
+        <summary>📋 Info aggiuntive</summary>
+        <div style="font-size: 0.95em; margin-top: 6px;">
+          <strong>📚 Categorie:</strong> ${categorie}<br>
+          ${foto ? `<img src="${foto}" alt="Foto ${nome}" style="margin-top:6px; width:100%; max-width:300px; border-radius:6px;">` : ""}
+        </div>
+      </details>
+      <hr>
+    </div>
+  `;
 
     const marker = new google.maps.Marker({
       position: posizione,
