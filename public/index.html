@@ -1011,7 +1011,7 @@ let interpretazioneFormattata = json.interpretazione
   .replace(/(?:\r\n|\r|\n)/g, "<br>");
 interpretazioneFormattata = interpretazioneFormattata.replace(/<\/ul><ul>/g, "");
 
-document.getElementById("interpretazioneVision").innerHTML = `<div class="output-fadein"><strong>🧠 Interpretazione YUTA:</strong><br>${interpretazioneFormattata}</div>`;
+scriviTypingInterpretazione(interpretazioneFormattata, "interpretazioneVision");
      
  }
 
@@ -1067,6 +1067,32 @@ function scriviTypingSimboli(testoFinaleHTML, contenitoreID = "risultatoVision")
 
 </script>
 
+<script>
+function scriviTypingInterpretazione(testoFinaleHTML, contenitoreID = "interpretazioneVision") {
+  const testoGrezzato = testoFinaleHTML.replace(/<[^>]*>?/gm, ""); // Rimuove tag HTML per typing
+  let i = 0;
+  const target = document.getElementById(contenitoreID);
+  if (!target) return;
+
+  target.innerHTML = `<div id="typingInterpretazione" class="output-fadein" style="white-space: pre-wrap;"></div>`;
+  const typingEl = document.getElementById("typingInterpretazione");
+
+  function typeChar() {
+    if (i < testoGrezzato.length) {
+      typingEl.textContent += testoGrezzato.charAt(i);
+      i++;
+      setTimeout(typeChar, 20); // regola la velocità qui
+    } else {
+      typingEl.innerHTML = `
+        <div class="output-fadein"><strong>🧠 Interpretazione YUTA:</strong><br>${testoFinaleHTML}</div>
+      `;
+    }
+  }
+
+  typeChar();
+}
+
+</script>
 
 </body>
 </html>
