@@ -60,6 +60,8 @@
   <button onclick="document.getElementById('imageInput').click()">📷 Carica immagine</button>
   <input type="file" id="imageInput" accept="image/*" style="display:none;" onchange="analizzaImmagine()" />
   <img id="previewImg" style="margin-top: 10px; max-width: 300px; display:none; border-radius:8px;" />
+<button id="resetButton" class="hidden" onclick="resetAnalisiImmagine()">🔄 Nuova immagine</button>
+
 </div>
 
 <div id="risultatoVision" style="margin-top: 15px; padding: 12px; border: 1px solid #ccc; background: #f9f9f9; border-radius: 8px; color: #1C1C1C;"></div>
@@ -941,17 +943,29 @@ async function analizzaImmagine() {
     preview.src = reader.result;
     preview.style.display = "block";
 
-    try {
-      const response = await fetch("https://yuta-proxy-api.azurewebsites.net/api/proxy", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          tipoRichiesta: "analisiImmagine",
-          immagineBase64: base64,
-          tipoAnalisi: tipo
-        })
-      });
+document.getElementById("resetButton").classList.remove("hidden");
 
+  const clienteId = document.getElementById("clienteId").value.trim();
+  const domanda = document.getElementById("domanda").value.trim();
+
+  if (!clienteId) {
+    alert("⚠️ Inserisci il codice cliente prima di caricare l'immagine.");
+    output.innerHTML = "";
+    return;
+  }
+
+  try {
+    const response = await fetch("https://yuta-proxy-api.azurewebsites.net/api/proxy", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        tipoRichiesta: "analisiImmagine",
+        immagineBase64: base64,
+        tipoAnalisi: tipo,
+        clienteId: clienteId,
+        domanda: domanda
+      })
+    });
       const json = await response.json();
 
 // 🔍 DEBUG: log utile per sapere esattamente cosa succede
@@ -964,6 +978,11 @@ async function analizzaImmagine() {
   console.log("📥 Risposta completa da Vision:", json);
 
       const res = json.risultato?.responses?.[0] || {};
+
+if (json.interpretazione) {
+  output.innerHTML += `<br><br><strong>🧠 Interpretazione GPT:</strong><br>${json.interpretazione}`;
+}
+
 
       if (tipo === "LABEL_DETECTION" && res.labelAnnotations) {
         output.innerHTML = `<strong>📋 Etichette rilevate:</strong><br>` +
@@ -992,6 +1011,17 @@ async function analizzaImmagine() {
 
   reader.readAsDataURL(file);
 }
+</script>
+<script>
+function resetAnalisiImmagine() {
+  document.getElementById("imageInput").value = "";
+  document.getElementById("previewImg").src = "";
+  document.getElementById("previewImg").style.display = "none";
+  document.getElementById("risultatoVision").innerHTML = "";
+  document.getElementById("domanda").value = "";
+  document.getElementById("resetButton").classList.add("hidden");
+}
+
 </script>
 
 
