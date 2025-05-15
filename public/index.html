@@ -1034,19 +1034,20 @@ function resetAnalisiImmagine() {
 </script>
 
 <script>
-function scriviTypingSimboli(testoFinaleHTML, contenitoreID = "output") {
+function scriviTypingSimboli(testoFinaleHTML, contenitoreID = "risultatoVision") {
   const testoGrezzato = testoFinaleHTML.replace(/<[^>]*>?/gm, ""); // Rimuove tag HTML
   let i = 0;
   const target = document.getElementById(contenitoreID);
+  if (!target) return; // Protezione extra in caso di errore
+
   target.innerHTML = ""; // Reset
 
   function typeChar() {
     if (i < testoGrezzato.length) {
       target.textContent += testoGrezzato.charAt(i);
       i++;
-      setTimeout(typeChar, 20); // Stessa velocità della risposta GPT
+      setTimeout(typeChar, 20);
     } else {
-      // Al termine: mostra HTML formattato e badge YUTA
       target.innerHTML = `
         <div class="output-fadein">${testoFinaleHTML}</div>
         <div class="output-fadein" style="font-size: 0.85em; color: #444; margin-top: 20px; text-align: right;">
