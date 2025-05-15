@@ -953,6 +953,16 @@ async function analizzaImmagine() {
       });
 
       const json = await response.json();
+
+// 🔍 DEBUG: log utile per sapere esattamente cosa succede
+  console.log("📤 Tipo analisi:", tipo);
+  console.log("📤 Payload inviato:", {
+    tipoRichiesta: "analisiImmagine",
+    immagineBase64: "(omesso per lunghezza)",
+    tipoAnalisi: tipo
+  });
+  console.log("📥 Risposta completa da Vision:", json);
+
       const res = json.risultato?.responses?.[0] || {};
 
       if (tipo === "LABEL_DETECTION" && res.labelAnnotations) {
