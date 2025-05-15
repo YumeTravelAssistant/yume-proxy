@@ -175,3 +175,23 @@ footer {
   display: none;
 }
 
+.output-fadein {
+  opacity: 0;
+  animation: fadeinText 0.8s forwards;
+}
+
+@keyframes fadeinText {
+  to {
+    opacity: 1;
+  }
+}
+
+.output-fadein ul {
+  margin: 0 0 10px 20px;
+  padding: 0;
+}
+
+.output-fadein li {
+  margin-bottom: 6px;
+}
+
