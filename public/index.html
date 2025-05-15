@@ -64,7 +64,11 @@
 
 </div>
 
+<!-- Blocco per risultato simboli riconosciuti -->
 <div id="risultatoVision" style="margin-top: 15px; padding: 12px; border: 1px solid #ccc; background: #f9f9f9; border-radius: 8px; color: #1C1C1C;"></div>
+
+<!-- Blocco separato per interpretazione GPT -->
+<div id="interpretazioneVision" style="margin-top: 20px;"></div>
 
 
     <div class="output" id="risposta"></div>
@@ -986,6 +990,7 @@ async function analizzaImmagine() {
         risultati = `<strong>💼 Loghi:</strong><br>` +
           res.logoAnnotations.map(l => `• ${l.description} (${Math.round(l.score * 100)}%)`).join("<br>");
 } else if (json.visione?.predictions?.length > 0) {
+
   // ✅ Azure Custom Vision
   const simboli = json.visione.predictions
     .filter(p => p.probability >= 0.6)
@@ -995,7 +1000,7 @@ async function analizzaImmagine() {
   risultati = "⚠️ Nessun risultato visivo rilevato.";
 }
 
-scriviTypingSimboli(risultati);
+scriviTypingSimboli(risultati, "risultatoVision");
 
       // ✅ Mostra sempre interpretazione GPT se disponibile
       if (json.interpretazione) {
@@ -1006,8 +1011,7 @@ let interpretazioneFormattata = json.interpretazione
   .replace(/(?:\r\n|\r|\n)/g, "<br>");
 interpretazioneFormattata = interpretazioneFormattata.replace(/<\/ul><ul>/g, "");
 
-output.innerHTML += `<br><br><div class="output-fadein"><strong>🧠 Interpretazione YUTA:</strong><br>${interpretazioneFormattata}</div>`;
-
+document.getElementById("interpretazioneVision").innerHTML = `<div class="output-fadein"><strong>🧠 Interpretazione YUTA:</strong><br>${interpretazioneFormattata}</div>`;
      
  }
 
@@ -1038,17 +1042,18 @@ function scriviTypingSimboli(testoFinaleHTML, contenitoreID = "risultatoVision")
   const testoGrezzato = testoFinaleHTML.replace(/<[^>]*>?/gm, ""); // Rimuove tag HTML
   let i = 0;
   const target = document.getElementById(contenitoreID);
-  if (!target) return; // Protezione extra in caso di errore
+  if (!target) return;
 
-  target.innerHTML = ""; // Reset
+  target.innerHTML = `<div id="typingContainer" class="output-fadein" style="white-space: pre-wrap;"></div>`;
+  const typingEl = document.getElementById("typingContainer");
 
   function typeChar() {
     if (i < testoGrezzato.length) {
-      target.textContent += testoGrezzato.charAt(i);
+      typingEl.textContent += testoGrezzato.charAt(i);
       i++;
       setTimeout(typeChar, 20);
     } else {
-      target.innerHTML = `
+      typingEl.innerHTML = `
         <div class="output-fadein">${testoFinaleHTML}</div>
         <div class="output-fadein" style="font-size: 0.85em; color: #444; margin-top: 20px; text-align: right;">
           ✅ Analisi effettuata con <strong>YUTA Vision AI</strong>
