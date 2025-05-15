@@ -931,7 +931,7 @@ async function analizzaImmagine() {
   const clienteId = document.getElementById("clienteId").value.trim();
   const domanda = document.getElementById("domanda").value.trim();
 
-  output.innerHTML = "⏳ Analisi in corso...<br>";
+  output.innerHTML = `<div class="output-fadein" style="font-size: 1em; font-weight: 500; color: #555;">🔎 <em>Analisi YUTA in corso...</em></div>`;
   preview.style.display = "none";
 
   if (!file) {
@@ -990,17 +990,24 @@ async function analizzaImmagine() {
   const simboli = json.visione.predictions
     .filter(p => p.probability >= 0.6)
     .map(p => `• ${p.tagName} (${Math.round(p.probability * 100)}%)`);
-  risultati = `<strong>🎯 Simboli riconosciuti da Yume Vision AI:</strong><br>${simboli.join("<br>")}`;
+  risultati = `<strong>🎯 Simboli riconosciuti da YUTA Vision AI:</strong><br>${simboli.join("<br>")}`;
 } else {
   risultati = "⚠️ Nessun risultato visivo rilevato.";
 }
 
-      output.innerHTML = `<div class="output-fadein">${risultati}</div>`;
+scriviTypingSimboli(risultati);
 
       // ✅ Mostra sempre interpretazione GPT se disponibile
       if (json.interpretazione) {
-      output.innerHTML += `<br><br><div class="output-fadein"><strong>🧠 Interpretazione YUTA:</strong><br>${json.interpretazione}</div>`;
-      output.innerHTML += `<div class="output-fadein" style="font-size: 0.85em; color: #444; margin-top: 20px; text-align: right;">✅ Analisi effettuata con <strong>YUTA Vision AI</strong></div>`;
+let interpretazioneFormattata = json.interpretazione
+  .replace(/\*\*(.*?)\*\*/g, "<strong>$1</strong>")
+  .replace(/\n### (.*?)\n/g, "<h3>$1</h3>")
+  .replace(/\n- (.*?)\n/g, "<ul><li>$1</li></ul>")
+  .replace(/(?:\r\n|\r|\n)/g, "<br>");
+interpretazioneFormattata = interpretazioneFormattata.replace(/<\/ul><ul>/g, "");
+
+output.innerHTML += `<br><br><div class="output-fadein"><strong>🧠 Interpretazione YUTA:</strong><br>${interpretazioneFormattata}</div>`;
+
      
  }
 
@@ -1022,6 +1029,34 @@ function resetAnalisiImmagine() {
   document.getElementById("risultatoVision").innerHTML = "";
   document.getElementById("domanda").value = "";
   document.getElementById("resetButton").classList.add("hidden");
+}
+
+</script>
+
+<script>
+function scriviTypingSimboli(testoFinaleHTML, contenitoreID = "output") {
+  const testoGrezzato = testoFinaleHTML.replace(/<[^>]*>?/gm, ""); // Rimuove tag HTML
+  let i = 0;
+  const target = document.getElementById(contenitoreID);
+  target.innerHTML = ""; // Reset
+
+  function typeChar() {
+    if (i < testoGrezzato.length) {
+      target.textContent += testoGrezzato.charAt(i);
+      i++;
+      setTimeout(typeChar, 20); // Stessa velocità della risposta GPT
+    } else {
+      // Al termine: mostra HTML formattato e badge YUTA
+      target.innerHTML = `
+        <div class="output-fadein">${testoFinaleHTML}</div>
+        <div class="output-fadein" style="font-size: 0.85em; color: #444; margin-top: 20px; text-align: right;">
+          ✅ Analisi effettuata con <strong>YUTA Vision AI</strong>
+        </div>
+      `;
+    }
+  }
+
+  typeChar();
 }
 
 </script>
