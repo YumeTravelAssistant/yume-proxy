@@ -985,16 +985,24 @@ async function analizzaImmagine() {
       } else if (tipo === "LOGO_DETECTION" && res.logoAnnotations) {
         risultati = `<strong>💼 Loghi:</strong><br>` +
           res.logoAnnotations.map(l => `• ${l.description} (${Math.round(l.score * 100)}%)`).join("<br>");
-      } else {
-        risultati = "⚠️ Nessun risultato visivo rilevato.";
-      }
+} else if (json.visione?.predictions?.length > 0) {
+  // ✅ Azure Custom Vision
+  const simboli = json.visione.predictions
+    .filter(p => p.probability >= 0.6)
+    .map(p => `• ${p.tagName} (${Math.round(p.probability * 100)}%)`);
+  risultati = `<strong>🎯 Simboli riconosciuti da Yume Vision AI:</strong><br>${simboli.join("<br>")}`;
+} else {
+  risultati = "⚠️ Nessun risultato visivo rilevato.";
+}
 
-      output.innerHTML = risultati;
+      output.innerHTML = `<div class="output-fadein">${risultati}</div>`;
 
       // ✅ Mostra sempre interpretazione GPT se disponibile
       if (json.interpretazione) {
-        output.innerHTML += `<br><br><strong>🧠 Interpretazione GPT:</strong><br>${json.interpretazione}`;
-      }
+      output.innerHTML += `<br><br><div class="output-fadein"><strong>🧠 Interpretazione YUTA:</strong><br>${json.interpretazione}</div>`;
+      output.innerHTML += `<div class="output-fadein" style="font-size: 0.85em; color: #444; margin-top: 20px; text-align: right;">✅ Analisi effettuata con <strong>YUTA Vision AI</strong></div>`;
+     
+ }
 
     } catch (err) {
       console.error("❌ Errore proxy Azure o GAS:", err);
