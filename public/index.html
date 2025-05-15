@@ -1004,14 +1004,35 @@ scriviTypingSimboli(risultati, "risultatoVision");
 
       // ✅ Mostra sempre interpretazione GPT se disponibile
       if (json.interpretazione) {
-let interpretazioneFormattata = json.interpretazione
-  .replace(/\*\*(.*?)\*\*/g, "<strong>$1</strong>")
-  .replace(/\n### (.*?)\n/g, "<h3>$1</h3>")
-  .replace(/\n- (.*?)\n/g, "<ul><li>$1</li></ul>")
-  .replace(/(?:\r\n|\r|\n)/g, "<br>");
-interpretazioneFormattata = interpretazioneFormattata.replace(/<\/ul><ul>/g, "");
+const righe = json.interpretazione.split("\n");
+let interpretazioneFormattata = "";
+let inLista = false;
 
-scriviTypingInterpretazione(interpretazioneFormattata, "interpretazioneVision");
+for (const riga of righe) {
+  if (riga.startsWith("- ")) {
+    if (!inLista) {
+      interpretazioneFormattata += "<ul>";
+      inLista = true;
+    }
+    interpretazioneFormattata += `<li>${riga.slice(2)}</li>`;
+  } else {
+    if (inLista) {
+      interpretazioneFormattata += "</ul>";
+      inLista = false;
+    }
+    // Formattazioni inline
+    const lineaFormattata = riga
+      .replace(/\*\*(.*?)\*\*/g, "<strong>$1</strong>")
+      .replace(/^### (.*)/, "<h3>$1</h3>");
+
+    interpretazioneFormattata += `${lineaFormattata}<br>`;
+  }
+}
+if (inLista) interpretazioneFormattata += "</ul>";
+
+setTimeout(() => {
+  scriviTypingInterpretazione(interpretazioneFormattata, "interpretazioneVision");
+}, 1000); // Ritardo di 1 secondo dopo i simboli
      
  }
 
@@ -1036,7 +1057,7 @@ function resetAnalisiImmagine() {
 }
 
 </script>
-
+ ->
 <script>
 function scriviTypingSimboli(testoFinaleHTML, contenitoreID = "risultatoVision") {
   const testoGrezzato = testoFinaleHTML.replace(/<[^>]*>?/gm, ""); // Rimuove tag HTML
@@ -1055,9 +1076,6 @@ function scriviTypingSimboli(testoFinaleHTML, contenitoreID = "risultatoVision")
     } else {
       typingEl.innerHTML = `
         <div class="output-fadein">${testoFinaleHTML}</div>
-        <div class="output-fadein" style="font-size: 0.85em; color: #444; margin-top: 20px; text-align: right;">
-          ✅ Analisi effettuata con <strong>YUTA Vision AI</strong>
-        </div>
       `;
     }
   }
@@ -1083,9 +1101,14 @@ function scriviTypingInterpretazione(testoFinaleHTML, contenitoreID = "interpret
       i++;
       setTimeout(typeChar, 20); // regola la velocità qui
     } else {
-      typingEl.innerHTML = `
-        <div class="output-fadein"><strong>🧠 Interpretazione YUTA:</strong><br>${testoFinaleHTML}</div>
-      `;
+typingEl.innerHTML = `
+  <div class="output-fadein">
+    <strong>🧠 Interpretazione YUTA:</strong><br>${testoFinaleHTML}
+    <div class="output-fadein" style="font-size: 0.85em; color: #444; margin-top: 20px; text-align: right;">
+      ✅ Analisi effettuata con <strong>YUTA Vision AI</strong>
+    </div>
+  </div>
+`;
     }
   }
 
