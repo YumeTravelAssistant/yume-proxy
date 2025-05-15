@@ -1014,7 +1014,9 @@ for (const riga of righe) {
       interpretazioneFormattata += "<ul>";
       inLista = true;
     }
-    interpretazioneFormattata += `<li>${riga.slice(2)}</li>`;
+const contenutoItem = riga.slice(2).replace(/\*\*(.*?)\*\*/g, "<strong>$1</strong>");
+interpretazioneFormattata += `<li>${contenutoItem}</li>`;
+
   } else {
     if (inLista) {
       interpretazioneFormattata += "</ul>";
@@ -1101,14 +1103,18 @@ function scriviTypingInterpretazione(testoFinaleHTML, contenitoreID = "interpret
       i++;
       setTimeout(typeChar, 20); // regola la velocità qui
     } else {
-typingEl.innerHTML = `
+const interpretazioneHTML = `
   <div class="output-fadein">
-    <strong>🧠 Interpretazione YUTA:</strong><br>${testoFinaleHTML}
+    <div style="font-size: 1.15em; font-weight: bold;">🧠 Interpretazione YUTA:</div>
+    ${testoFinaleHTML}
     <div class="output-fadein" style="font-size: 0.85em; color: #444; margin-top: 20px; text-align: right;">
       ✅ Analisi effettuata con <strong>YUTA Vision AI</strong>
     </div>
   </div>
 `;
+
+typingEl.innerHTML = interpretazioneHTML;
+
     }
   }
 
