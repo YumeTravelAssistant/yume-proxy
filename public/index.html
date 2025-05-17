@@ -360,6 +360,7 @@ console.log("✅ Contenuto previsioni:", JSON.stringify(previsioniGiorniFinali))
 let json;
 try {
   json = await response.json();
+console.log("🔁 Risposta completa dal backend:", json); // ✅ Aggiunto qui
 } catch (e) {
   rispostaEl.textContent = "❌ Il server ha restituito una risposta non valida.";
   document.getElementById("spinner").style.display = "none";
