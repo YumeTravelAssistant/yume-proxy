@@ -400,6 +400,63 @@ for (const nome in luoghiConosciuti) {
           setTimeout(typeChar, 20); // più lento, circa 3x più umano
         } else {
           rispostaEl.innerHTML = testo; // mostra versione HTML completa e stilizzata
+
+      // 🎨 Se c'è un'immagine generata da YUTA, la mostriamo
+      if (json.immagineBase64) {
+        const img = document.createElement("img");
+        img.src = "data:image/png;base64," + json.immagineBase64;
+        img.alt = "Immagine generata da YUTA";
+        img.style.maxWidth = "100%";
+        img.style.marginTop = "16px";
+        img.style.borderRadius = "8px";
+        img.style.boxShadow = "0 0 10px rgba(0,0,0,0.2)";
+        rispostaEl.appendChild(img);
+
+        // 💾 Bottone per scaricare l'immagine con data
+        const downloadBtn = document.createElement("button");
+        downloadBtn.textContent = "💾 Salva immagine";
+        downloadBtn.style.marginTop = "12px";
+        downloadBtn.style.display = "block";
+        downloadBtn.style.padding = "8px 14px";
+        downloadBtn.style.fontSize = "1em";
+        downloadBtn.style.borderRadius = "6px";
+        downloadBtn.style.border = "1px solid #ccc";
+        downloadBtn.style.background = "#f0f0f0";
+        downloadBtn.style.cursor = "pointer";
+
+        downloadBtn.onclick = () => {
+          const now = new Date();
+          const yyyy = now.getFullYear();
+          const mm = String(now.getMonth() + 1).padStart(2, '0');
+          const dd = String(now.getDate()).padStart(2, '0');
+          const hh = String(now.getHours()).padStart(2, '0');
+          const min = String(now.getMinutes()).padStart(2, '0');
+          const filename = `immagine-yuta_${yyyy}-${mm}-${dd}_${hh}-${min}.png`;
+
+          const link = document.createElement("a");
+          link.href = img.src;
+          link.download = filename;
+          document.body.appendChild(link);
+          link.click();
+          document.body.removeChild(link);
+        };
+
+        rispostaEl.appendChild(downloadBtn);
+      }
+
+      document.getElementById("spinner").style.display = "none";
+    } else {
+      rispostaEl.textContent = "❌ Nessuna risposta ricevuta.";
+      document.getElementById("spinner").style.display = "none";
+    }
+
+  } catch (err) {
+    rispostaEl.textContent = "❌ Errore durante la richiesta.";
+    document.getElementById("spinner").style.display = "none";
+    console.error("Errore:", err);
+  }
+}
+
          
 // 🎯 Mostra / Nascondi dettagli attrazioni compatibili
 if (json.attrazioniDettagliate && json.attrazioniDettagliate.length > 0) {
