@@ -1447,11 +1447,14 @@ async function inviaRichiestaYUTAMusic() {
 <script>
 function generaImmagineDaScelta() {
   const clienteId = document.getElementById("clienteId")?.value?.trim() || "anonimo";
-  const domanda = document.getElementById("domanda")?.value?.trim() || "";
+  const domanda = (() => {
+  const el = document.getElementById("domanda");
+  return el && typeof el.value === "string" ? el.value.trim() : "";
+})();
 
-  const soggetto = document.getElementById("soggetto").value;
-  const background = document.getElementById("background").value;
-  const stile = document.getElementById("stile").value;
+  const soggetto = document.getElementById("soggettoYUTA").value;
+  const background = document.getElementById("backgroundYUTA").value;
+  const stile = document.getElementById("stileYUTA").value;
 
   const button = document.getElementById("generaImmagineButton");
   const status = document.getElementById("statoGenerazione");
