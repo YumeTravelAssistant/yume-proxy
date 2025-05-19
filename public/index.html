@@ -1327,22 +1327,24 @@ document.addEventListener("click", function handleClickOutsideMenu(event) {
 let dizionarioYUTAMusicale = {};
 
 async function caricaDizionarioYUTAMusic() {
+  const clienteId = document.getElementById("clienteId")?.value?.trim() || "anonimo";
+
   try {
     const res = await fetch("https://yuta-proxy-api.azurewebsites.net/api/proxy", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({
-        tipoRichiesta: "ottieni_dizionario_musicale"
+        tipoRichiesta: "ottieni_dizionario_musicale",
+        clienteId: clienteId,
+        domanda: "caricamento dizionario"
       })
     });
+
     dizionarioYUTAMusicale = await res.json();
   } catch (err) {
     console.error("❌ Errore caricamento dizionario musicale:", err);
   }
 }
-window.addEventListener("load", () => {
-  caricaDizionarioYUTAMusic();
-});
 
 function caricaArtisti() {
   const genere = document.getElementById("genereYUTA").value;
@@ -1441,6 +1443,51 @@ async function inviaRichiestaYUTAMusic() {
 
 
 </script>
+
+<script>
+  function generaImmagineDaScelta() {
+    const soggetto = document.getElementById("soggettoYUTA").value;
+    const background = document.getElementById("backgroundYUTA").value;
+    const stile = document.getElementById("stileYUTA").value;
+    const clienteId = document.getElementById("clienteId")?.value?.trim() || "anonimo";
+
+    // Spinner on
+    document.getElementById("outputImmagineYUTA").innerHTML = "";
+    const spinner = document.getElementById("spinner");
+    if (spinner) spinner.style.display = "block";
+
+    fetch("https://yuta-proxy-api.azurewebsites.net/api/proxy", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        tipoRichiesta: "genera_immagine_guidata",
+        soggetto,
+        background,
+        stile,
+        clienteId
+      })
+    })
+    .then(res => res.json())
+    .then(data => {
+      if (spinner) spinner.style.display = "none";
+
+      if (data?.immagineBase64) {
+        document.getElementById("outputImmagineYUTA").innerHTML = `
+          <img src="data:image/png;base64,${data.immagineBase64}" alt="YUTA Fantasy AI" style="max-width: 100%; border-radius: 8px; margin-top: 12px;">
+          <p style="margin-top: 8px; font-style: italic; font-size: 0.9em;">🖌️ Immagine generata da YUTA Fantasy AI</p>
+        `;
+      } else {
+        document.getElementById("outputImmagineYUTA").innerHTML = "<p>⚠️ Errore nella generazione dell'immagine.</p>";
+      }
+    })
+    .catch(err => {
+      if (spinner) spinner.style.display = "none";
+      console.error("Errore generazione immagine:", err);
+      document.getElementById("outputImmagineYUTA").innerHTML = "<p>❌ Errore nella richiesta. Riprova.</p>";
+    });
+  }
+</script>
+
 
 <script>
 function resettaOutputCompleto() {
