@@ -84,6 +84,7 @@
 
 <!-- YUTA Fantasy AI -->
 <div id="yutaFantasyAI" class="output hidden" style="margin-top: 30px;">
+<h3>🎨 Genera un’immagine ispirata al Giappone</h3>
 <label for="soggettoYUTA">🎭 Soggetto:</label>
 <select id="soggettoYUTA">
   <option value="">— Seleziona —</option>
@@ -147,7 +148,15 @@
 
   <button id="generaImmagineButton" onclick="generaImmagineDaScelta()">🎨 Genera immagine</button>
   <div id="outputImmagineYUTA" class="output"></div>
+
+<!-- 🟡 Messaggio di stato -->
+  <p id="statoGenerazione" style="margin-top: 12px; font-weight: 500;"></p>
+
+  <!-- 🖼️ Immagine generata -->
+  <img id="immagineGenerata" style="max-width: 100%; margin-top: 10px; border-radius: 8px;" />
+
 </div>
+
 
 <!-- YUTA Music AI -->
 <div id="yutaMusicAI" class="output hidden" style="margin-top: 30px;">
