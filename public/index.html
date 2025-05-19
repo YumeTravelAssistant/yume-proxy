@@ -1456,10 +1456,7 @@ async function inviaRichiestaYUTAMusic() {
 <script>
 function generaImmagineDaScelta() {
   const clienteId = document.getElementById("clienteId")?.value?.trim() || "anonimo";
-  const domanda = (() => {
-  const el = document.getElementById("domanda");
-  return el && typeof el.value === "string" ? el.value.trim() : "";
-})();
+  const domanda = document.getElementById("domanda")?.value?.trim() || "";
 
   const soggetto = document.getElementById("soggettoYUTA").value;
   const background = document.getElementById("backgroundYUTA").value;
