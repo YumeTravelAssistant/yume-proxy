@@ -1445,28 +1445,28 @@ async function inviaRichiestaYUTAMusic() {
 </script>
 
 <script>
-  function generaImmagineDaScelta() {
-    const soggetto = document.getElementById("soggettoYUTA").value;
-    const background = document.getElementById("backgroundYUTA").value;
-    const stile = document.getElementById("stileYUTA").value;
-    const clienteId = document.getElementById("clienteId")?.value?.trim() || "anonimo";
+function generaImmagineDaScelta() {
+  const soggetto = document.getElementById("soggettoYUTA").value;
+  const background = document.getElementById("backgroundYUTA").value;
+  const stile = document.getElementById("stileYUTA").value;
+  const clienteId = document.getElementById("clienteId")?.value?.trim() || "anonimo";
 
-    // Spinner on
-    document.getElementById("outputImmagineYUTA").innerHTML = "";
-    const spinner = document.getElementById("spinner");
-    if (spinner) spinner.style.display = "block";
+  // Spinner on
+  document.getElementById("outputImmagineYUTA").innerHTML = "";
+  const spinner = document.getElementById("spinner");
+  if (spinner) spinner.style.display = "block";
 
-    fetch("https://yuta-proxy-api.azurewebsites.net/api/proxy", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({
-        tipoRichiesta: "genera_immagine_guidata",
-        soggetto,
-        background,
-        stile,
-        clienteId
-      })
+  fetch("https://yuta-proxy-api.azurewebsites.net/api/proxy", {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({
+      tipoRichiesta: "genera_immagine_guidata",
+      soggetto,
+      background,
+      stile,
+      clienteId
     })
+  })
     .then(res => res.json())
     .then(data => {
       if (spinner) spinner.style.display = "none";
@@ -1485,7 +1485,8 @@ async function inviaRichiestaYUTAMusic() {
       console.error("Errore generazione immagine:", err);
       document.getElementById("outputImmagineYUTA").innerHTML = "<p>❌ Errore nella richiesta. Riprova.</p>";
     });
-  }
+}
+
 </script>
 
 
