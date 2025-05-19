@@ -280,3 +280,15 @@ footer {
   background-color: #6e221f; /* rosso vino più scuro */
 }
 
+#interpretazioneVision,
+#outputImmagineYUTA,
+#risultatoYUTAMusic {
+  max-height: 400px;
+  overflow-y: auto;
+  background: #FFF8F4;
+  padding: 12px;
+  border: 1px solid #ddd;
+  border-radius: 10px;
+  margin-top: 20px;
+}
+
