@@ -1446,45 +1446,51 @@ async function inviaRichiestaYUTAMusic() {
 
 <script>
 function generaImmagineDaScelta() {
-  const soggetto = document.getElementById("soggettoYUTA").value;
-  const background = document.getElementById("backgroundYUTA").value;
-  const stile = document.getElementById("stileYUTA").value;
   const clienteId = document.getElementById("clienteId")?.value?.trim() || "anonimo";
+  const domanda = document.getElementById("domanda")?.value?.trim() || "";
 
-  // Spinner on
-  document.getElementById("outputImmagineYUTA").innerHTML = "";
-  const spinner = document.getElementById("spinner");
-  if (spinner) spinner.style.display = "block";
+  const soggetto = document.getElementById("soggetto").value;
+  const background = document.getElementById("background").value;
+  const stile = document.getElementById("stile").value;
+
+  const button = document.getElementById("generaImmagineButton");
+  const status = document.getElementById("statoGenerazione");
+  const immagineGenerata = document.getElementById("immagineGenerata");
+
+  button.disabled = true;
+  status.textContent = "🎨 Generazione in corso...";
+
+  const body = {
+    tipoRichiesta: "genera_immagine_guidata",
+    soggetto,
+    background,
+    stile,
+    clienteId,
+    domanda  // ✅ stesso approccio di Vision AI
+  };
 
   fetch("https://yuta-proxy-api.azurewebsites.net/api/proxy", {
     method: "POST",
     headers: { "Content-Type": "application/json" },
-    body: JSON.stringify({
-      tipoRichiesta: "genera_immagine_guidata",
-      soggetto,
-      background,
-      stile,
-      clienteId,
-      domanda: ""
-    })
+    body: JSON.stringify(body)
   })
-    .then(res => res.json())
-    .then(data => {
-      if (spinner) spinner.style.display = "none";
-
-      if (data?.immagineBase64) {
-        document.getElementById("outputImmagineYUTA").innerHTML = `
-          <img src="data:image/png;base64,${data.immagineBase64}" alt="YUTA Fantasy AI" style="max-width: 100%; border-radius: 8px; margin-top: 12px;">
-          <p style="margin-top: 8px; font-style: italic; font-size: 0.9em;">🖌️ Immagine generata da YUTA Fantasy AI</p>
-        `;
+    .then((res) => res.json())
+    .then((data) => {
+      if (data.immagineBase64) {
+        immagineGenerata.src = "data:image/png;base64," + data.immagineBase64;
+        status.textContent = "✅ Immagine generata con successo!";
+      } else if (data.errore) {
+        status.textContent = "❌ Errore: " + data.errore;
       } else {
-        document.getElementById("outputImmagineYUTA").innerHTML = "<p>⚠️ Errore nella generazione dell'immagine.</p>";
+        status.textContent = "❌ Errore nella generazione dell'immagine.";
       }
     })
-    .catch(err => {
-      if (spinner) spinner.style.display = "none";
-      console.error("Errore generazione immagine:", err);
-      document.getElementById("outputImmagineYUTA").innerHTML = "<p>❌ Errore nella richiesta. Riprova.</p>";
+    .catch((err) => {
+      console.error("Errore:", err);
+      status.textContent = "❌ Errore durante la richiesta.";
+    })
+    .finally(() => {
+      button.disabled = false;
     });
 }
 
