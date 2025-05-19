@@ -80,6 +80,7 @@
 
 <!-- Blocco separato per interpretazione GPT -->
 <div id="interpretazioneVision" style="margin-top: 20px;"></div>
+</div> 
 
 <!-- YUTA Fantasy AI -->
 <div id="yutaFantasyAI" class="output hidden" style="margin-top: 30px;">
@@ -1284,18 +1285,21 @@ function apriVisionAI() {
   chiudiTuttiYUTA();
   document.getElementById("yutaVisionAI").classList.remove("hidden");
   document.getElementById("yutaVisionAI").scrollIntoView({ behavior: "smooth" });
+  document.getElementById("nuovaDomandaBtn").style.display = "inline-block";
 }
 
 function apriFantasyAI() {
   chiudiTuttiYUTA();
   document.getElementById("yutaFantasyAI").classList.remove("hidden");
   document.getElementById("yutaFantasyAI").scrollIntoView({ behavior: "smooth" });
+  document.getElementById("nuovaDomandaBtn").style.display = "inline-block";
 }
 
 function apriMusicAI() {
   chiudiTuttiYUTA();
   document.getElementById("yutaMusicAI").classList.remove("hidden");
   document.getElementById("yutaMusicAI").scrollIntoView({ behavior: "smooth" });
+  document.getElementById("nuovaDomandaBtn").style.display = "inline-block";
 }
 
 function chiudiTuttiYUTA() {
