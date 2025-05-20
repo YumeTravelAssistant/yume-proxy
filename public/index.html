@@ -462,18 +462,6 @@ if (giorniDifferenza !== null && giorniDifferenza > 7) {
   window.fraseMeteoUtente = "⚠️ Hai chiesto il meteo per una data futura. Al momento posso fornire previsioni solo entro i prossimi 7 giorni.";
 }
 
-out.innerHTML = `
-  <div><strong>🖋️ Autore:</strong> ${json.autore}</div>
-  <div class="haiku-container">
-    <div class="haiku-giapponese">${h.originale.replace(/\n/g, "<br>")}</div>
-    <div class="haiku-traduzioni">
-      <div class="haiku-italiano">${h.italiano}</div>
-      <div class="haiku-inglese">${h.inglese}</div>
-    </div>
-  </div>
-  <div style="margin-top: 10px;"><strong>📌 Contesto:</strong> ${h.contesto}</div>
-  <div id="descrizioneYUTACulture" style="margin-top: 10px;">  Analisi in corso...</div>
-`;
 if (cittàRichiesta === null && domanda.toLowerCase().includes("meteo")) {
   window.fraseMeteoUtente = "⚠️ La funzione Meteo al momento non copre questa località.";
 }
@@ -888,18 +876,6 @@ function initMap() {
 
         map.setCenter(posizioneUtente);
 
-out.innerHTML = `
-  <div><strong>🖋️ Autore:</strong> ${json.autore}</div>
-  <div class="haiku-container">
-    <div class="haiku-giapponese">${h.originale.replace(/\n/g, "<br>")}</div>
-    <div class="haiku-traduzioni">
-      <div class="haiku-italiano">${h.italiano}</div>
-      <div class="haiku-inglese">${h.inglese}</div>
-    </div>
-  </div>
-  <div style="margin-top: 10px;"><strong>📌 Contesto:</strong> ${h.contesto}</div>
-  <div id="descrizioneYUTACulture" style="margin-top: 10px;">  Analisi in corso...</div>
-`;
         new google.maps.Marker({
           position: posizioneUtente,
           map,
