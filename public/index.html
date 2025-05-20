@@ -1588,6 +1588,13 @@ function apriInterpretAI() {
   document.getElementById("nuovaDomandaBtn").style.display = "inline-block";
 }
 
+  function apriNaviAI() {
+    chiudiTuttiYUTA();
+    document.getElementById("yutaNaviAI").classList.remove("hidden");
+    document.getElementById("yutaNaviAI").scrollIntoView({ behavior: "smooth" });
+    document.getElementById("nuovaDomandaBtn").style.display = "inline-block";
+  }
+
 function chiudiTuttiYUTA() {
   document.getElementById("menuYUTA").classList.add("hidden");
   document.getElementById("yutaFantasyAI")?.classList.add("hidden");
