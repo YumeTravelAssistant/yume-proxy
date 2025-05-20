@@ -375,7 +375,7 @@ select {
 .haiku-verticale {
   display: flex;
   flex-direction: row;
-  gap: 4px; /* 🔍 stretto tra colonne */
+  gap: 1em; /* distanza tra ogni colonna (1 carattere giapponese circa) */
   font-family: 'Noto Serif JP', serif;
   font-weight: bold;
   font-size: 1.3em;
@@ -395,6 +395,7 @@ select {
   flex-direction: column;
   justify-content: flex-start;
   font-size: 1.05em;
+  margin-left: 4em; /* distanza dalla parte giapponese */
 }
 
 .haiku-italiano,
