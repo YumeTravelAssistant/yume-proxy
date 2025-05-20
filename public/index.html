@@ -142,18 +142,6 @@
   <option value="realistico">📸 Fotografia realistica (predefinito)</option>
   <option value="ukiyoe">🖌️ Ukiyo-e (stampa tradizionale)</option>
   <option value="anime">🎞️ Anime giapponese</option>
-out.innerHTML = `
-  <div><strong>🖋️ Autore:</strong> ${json.autore}</div>
-  <div class="haiku-container">
-    <div class="haiku-giapponese">${h.originale.replace(/\n/g, "<br>")}</div>
-    <div class="haiku-traduzioni">
-      <div class="haiku-italiano">${h.italiano}</div>
-      <div class="haiku-inglese">${h.inglese}</div>
-    </div>
-  </div>
-  <div style="margin-top: 10px;"><strong>📌 Contesto:</strong> ${h.contesto}</div>
-  <div id="descrizioneYUTACulture" style="margin-top: 10px;">  Analisi in corso...</div>
-`;
   <option value="folklore">🧚‍♂️ Folklore giapponese</option>
   <option value="romantico">🌅 Giappone romantico</option>
   <option value="paesaggio">🌄 Paesaggio tradizionale</option>
