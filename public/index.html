@@ -685,18 +685,6 @@ if (trovatoLuogo && posizioneUtente) {
 if (trovatoLuogo && map && posizioneUtente) {
   luoghiTrovati.forEach((p) => {
     const distanza = calcolaDistanzaKm(posizioneUtente, { lat: p.lat, lng: p.lng });
-out.innerHTML = `
-  <div><strong>🖋️ Autore:</strong> ${json.autore}</div>
-  <div class="haiku-container">
-    <div class="haiku-giapponese">${h.originale.replace(/\n/g, "<br>")}</div>
-    <div class="haiku-traduzioni">
-      <div class="haiku-italiano">${h.italiano}</div>
-      <div class="haiku-inglese">${h.inglese}</div>
-    </div>
-  </div>
-  <div style="margin-top: 10px;"><strong>📌 Contesto:</strong> ${h.contesto}</div>
-  <div id="descrizioneYUTACulture" style="margin-top: 10px;">  Analisi in corso...</div>
-`;
 
     const marker = new google.maps.Marker({
       position: { lat: p.lat, lng: p.lng },
@@ -1827,6 +1815,7 @@ function resettaOutputCompleto() {
 <script>
   window.addEventListener("DOMContentLoaded", () => {
     caricaDizionarioYUTAMusic(); // Pre-carica tutto
+    caricaDizionarioYUTACulture();
   });
 </script>
 
