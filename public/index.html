@@ -359,18 +359,6 @@ tokyo: {
   kyoto: { nome: "Kyoto", lat: 35.0116, lon: 135.7681 },
   osaka: { nome: "Osaka", lat: 34.6937, lon: 135.5023 },
   nara: { nome: "Nara", lat: 34.6851, lon: 135.8048 },
-out.innerHTML = `
-  <div><strong>🖋️ Autore:</strong> ${json.autore}</div>
-  <div class="haiku-container">
-    <div class="haiku-giapponese">${h.originale.replace(/\n/g, "<br>")}</div>
-    <div class="haiku-traduzioni">
-      <div class="haiku-italiano">${h.italiano}</div>
-      <div class="haiku-inglese">${h.inglese}</div>
-    </div>
-  </div>
-  <div style="margin-top: 10px;"><strong>📌 Contesto:</strong> ${h.contesto}</div>
-  <div id="descrizioneYUTACulture" style="margin-top: 10px;">  Analisi in corso...</div>
-`;
   yokohama: { nome: "Yokohama", lat: 35.4437, lon: 139.6380 },
   sapporo: { nome: "Sapporo", lat: 43.0667, lon: 141.3500 },
   fukuoka: { nome: "Fukuoka", lat: 33.5902, lon: 130.4017 },
@@ -1197,18 +1185,6 @@ function toggleMappa() {
 
 
 <script
-out.innerHTML = `
-  <div><strong>🖋️ Autore:</strong> ${json.autore}</div>
-  <div class="haiku-container">
-    <div class="haiku-giapponese">${h.originale.replace(/\n/g, "<br>")}</div>
-    <div class="haiku-traduzioni">
-      <div class="haiku-italiano">${h.italiano}</div>
-      <div class="haiku-inglese">${h.inglese}</div>
-    </div>
-  </div>
-  <div style="margin-top: 10px;"><strong>📌 Contesto:</strong> ${h.contesto}</div>
-  <div id="descrizioneYUTACulture" style="margin-top: 10px;">  Analisi in corso...</div>
-`;
   src="https://maps.googleapis.com/maps/api/js?key=AIzaSyCAG11Uloyz4kU6doqFu1WHkg3HhIWH8L8&libraries=places&callback=initMap"
   async defer>
 </script>
@@ -1569,6 +1545,26 @@ async function caricaDizionarioYUTAMusic() {
     dizionarioYUTAMusicale = await res.json();
   } catch (err) {
     console.error("❌ Errore caricamento dizionario musicale:", err);
+  }
+}
+
+async function caricaDizionarioYUTACulture() {
+  const clienteId = document.getElementById("clienteId")?.value?.trim() || "anonimo";
+
+  try {
+    const res = await fetch("https://yuta-proxy-api.azurewebsites.net/api/proxy", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        tipoRichiesta: "ottieni_dizionario_haiku",
+        clienteId: clienteId,
+        domanda: "caricamento dizionario haiku"
+      })
+    });
+
+    dizionarioYUTACulture = await res.json();
+  } catch (err) {
+    console.error("❌ Errore caricamento dizionario haiku:", err);
   }
 }
 
