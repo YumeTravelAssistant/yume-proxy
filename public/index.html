@@ -51,7 +51,9 @@
       <button onclick="apriFantasyAI()">🎨 Fantasy AI</button>
       <button onclick="apriMusicAI()">🎧 Music AI</button>
       <button onclick="apriCultureAI()">📚 Culture AI</button>
-    </div>
+      <button onclick="apriInterpretAI()">🈶 Interpret AI</button>
+   
+ </div>
   </div>
 </div>
 
@@ -219,6 +221,41 @@
   <button style="margin-top: 14px;" onclick="inviaRichiestaYUTACulture()">📖 Analizza haiku</button>
 
   <div id="risultatoYUTACulture" style="margin-top: 20px;"></div>
+</div>
+
+<!-- YUTA Interpret AI -->
+<div id="yutaInterpretAI" class="output2 hidden" style="margin-top: 30px;">
+  <h3>🗣️ YUTA Interpret AI</h3>
+
+  <label for="linguaOriginaleYUTA">🌐 Lingua originale:</label>
+  <select id="linguaOriginaleYUTA">
+    <option value="">— Seleziona —</option>
+    <option value="giapponese">Giapponese</option>
+    <option value="italiano">Italiano</option>
+    <option value="inglese">Inglese</option>
+  </select>
+
+  <label for="linguaTradottaYUTA" style="margin-top: 12px;">🔁 Tradurre in:</label>
+  <select id="linguaTradottaYUTA">
+    <option value="">— Seleziona —</option>
+    <option value="italiano">Italiano</option>
+    <option value="inglese">Inglese</option>
+    <option value="giapponese">Giapponese</option>
+  </select>
+
+  <label for="testoInterpretYUTA" style="margin-top: 14px;">✍️ Inserisci una frase, detto o espressione:</label>
+  <textarea id="testoInterpretYUTA" rows="3" placeholder="Es: 花より団子 (preferire la sostanza all'apparenza)"></textarea>
+
+  <label for="immagineOCR" style="margin-top: 14px; display: block;">📸 Oppure carica un’immagine con testo da interpretare:</label>
+  <input type="file" id="immagineOCR" accept="image/*" style="margin-top: 6px;" />  
+
+  <img id="previewOCR" style="display: none; max-width: 300px; margin-top: 10px; border-radius: 8px;" />
+
+  <div id="statoOCR" style="font-size: 0.95em; color: #555; margin-top: 8px;"></div>
+
+  <button style="margin-top: 14px;" onclick="inviaRichiestaYUTAInterpret()">🗣️ Interpreta</button>
+
+  <div id="risultatoYUTAInterpret" style="margin-top: 20px;"></div>
 </div>
 
 
@@ -1430,6 +1467,12 @@ function apriCultureAI() {
   document.getElementById("nuovaDomandaBtn").style.display = "inline-block";
 }
 
+function apriInterpretAI() {
+  chiudiTuttiYUTA();
+  document.getElementById("yutaInterpretAI").classList.remove("hidden");
+  document.getElementById("yutaInterpretAI").scrollIntoView({ behavior: "smooth" });
+  document.getElementById("nuovaDomandaBtn").style.display = "inline-block";
+}
 
 function chiudiTuttiYUTA() {
   document.getElementById("menuYUTA").classList.add("hidden");
@@ -1437,6 +1480,7 @@ function chiudiTuttiYUTA() {
   document.getElementById("yutaMusicAI")?.classList.add("hidden");
   document.getElementById("yutaVisionAI")?.classList.add("hidden");
   document.getElementById("yutaCultureAI")?.classList.add("hidden");
+  document.getElementById("yutaInterpretAI")?.classList.add("hidden");
 }
 
 // ✅ Chiude il menu YUTA se si clicca fuori
@@ -1721,6 +1765,86 @@ out.innerHTML = `
   }
 }
 
+async function inviaRichiestaYUTAInterpret() {
+  const clienteId = document.getElementById("clienteId")?.value?.trim() || "anonimo";
+  const linguaOrigine = document.getElementById("linguaOriginaleYUTA")?.value;
+  const linguaDest = document.getElementById("linguaTradottaYUTA")?.value;
+  const testoManuale = document.getElementById("testoInterpretYUTA")?.value?.trim();
+  const immagineFile = document.getElementById("immagineOCR").files[0];
+
+  const out = document.getElementById("risultatoYUTAInterpret");
+  out.innerHTML = "⏳ Analisi in corso...";
+
+  if (!linguaOrigine || !linguaDest || (!testoManuale && !immagineFile)) {
+    out.innerHTML = "⚠️ Inserisci un testo o carica un'immagine.";
+    return;
+  }
+
+  if (immagineFile) {
+    // OCR con immagine
+    const reader = new FileReader();
+    reader.onload = async function (e) {
+      const base64 = e.target.result.split(",")[1]; // rimuovi il prefix "data:image..."
+      
+          // ✅ Mostra preview
+    document.getElementById("previewOCR").src = e.target.result;
+    document.getElementById("previewOCR").style.display = "block";
+
+    // ✅ Stato OCR
+    document.getElementById("statoOCR").innerHTML = `📸 Immagine caricata. Riconoscimento testuale in corso...`;
+
+      const response = await fetch("https://yuta-proxy-api.azurewebsites.net/api/proxy", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          tipoRichiesta: "interpreta_testo_immagine",
+          clienteId,
+          linguaOrigine,
+          linguaDest,
+          immagineBase64: base64
+        })
+      });
+      const json = await response.json();
+      if (json.errore) {
+        out.innerHTML = `❌ Errore: ${json.errore}`;
+        return;
+      }
+
+      document.getElementById("statoOCR").innerHTML = `✅ Testo riconosciuto e interpretato correttamente.`;
+      if (json.errore) {
+      document.getElementById("statoOCR").innerHTML = `❌ Errore: ${json.errore}`;
+      ...
+
+
+      const descrizione = formattaMarkdownGenerico(json.descrizione);
+      scriviTypingSimboli(descrizione, "risultatoYUTAInterpret");
+    };
+    reader.readAsDataURL(immagineFile);
+  } else {
+    // Testo manuale
+    const response = await fetch("https://yuta-proxy-api.azurewebsites.net/api/proxy", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        tipoRichiesta: "interpreta_testo_guidato",
+        clienteId,
+        linguaOrigine,
+        linguaDest,
+        testo: testoManuale
+      })
+    });
+
+    const json = await response.json();
+    if (json.errore) {
+      out.innerHTML = `❌ Errore: ${json.errore}`;
+      return;
+    }
+
+    const descrizione = formattaMarkdownGenerico(json.descrizione);
+    scriviTypingSimboli(descrizione, "risultatoYUTAInterpret");
+  }
+}
+
 
 </script>
 
@@ -1792,6 +1916,26 @@ function resettaOutputCompleto() {
   document.getElementById("yutaVisionAI")?.classList.add("hidden");
   document.getElementById("yutaFantasyAI")?.classList.add("hidden");
   document.getElementById("yutaMusicAI")?.classList.add("hidden");
+  document.getElementById("yutaCultureAI")?.classList.add("hidden");
+  document.getElementById("yutaInterpretAI")?.classList.add("hidden");
+
+  // Reset campi Culture AI
+  document.getElementById("risultatoYUTACulture").innerHTML = "";
+  document.getElementById("autoreHaiku").value = "";
+  document.getElementById("operaHaiku").value = "casuale";
+  document.getElementById("bloccoAutoreHaiku").classList.add("hidden");
+  document.getElementById("bloccoOperaHaiku").classList.add("hidden");
+  
+  // Reset campi Culture AI
+  document.getElementById("risultatoYUTAInterpret").innerHTML = "";
+  document.getElementById("testoInterpretYUTA").value = "";
+  document.getElementById("linguaOriginaleYUTA").value = "";
+  document.getElementById("linguaTradottaYUTA").value = "";
+  document.getElementById("immagineOCR").value = "";
+  document.getElementById("previewOCR").style.display = "none";
+  document.getElementById("previewOCR").src = "";
+  document.getElementById("statoOCR").innerHTML = "";
+  document.getElementById("nomeFileOCR")?.innerHTML = ""; // se lo hai aggiunto
 
   // Reset meteo
   document.getElementById("toggleMeteoBtn").style.display = "none";
