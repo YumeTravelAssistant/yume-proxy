@@ -1563,6 +1563,10 @@ async function caricaDizionarioYUTACulture() {
     });
 
     dizionarioYUTACulture = await res.json();
+
+    // 🟢 AGGIUNGIAMO QUESTO per attivare il caricamento autori
+    attivaSelezioneAutoreHaiku();
+
   } catch (err) {
     console.error("❌ Errore caricamento dizionario haiku:", err);
   }
@@ -1723,9 +1727,11 @@ function creaLayoutHaikuVerticale(originale, italiano, inglese) {
     return col;
   });
 
-  const colHTML = colonneCompattate.map(col => `
-    <div class="colonna-haiku">${col.join("\n")}</div>
-  `).join("");
+const colHTML = colonneCompattate.map(col => `
+  <div class="colonna-haiku">
+    ${col.map(char => `<div>${char || "　"}</div>`).join("")}
+  </div>
+`).join("");
 
   return `
     <div class="haiku-layout">
