@@ -1419,6 +1419,34 @@ function scriviTypingYUTACulture(testoFinaleHTML, contenitoreID = "descrizioneYU
   typeChar();
 }
 
+function scriviTypingYUTAInterpret(testoFinaleHTML, contenitoreID = "risultatoYUTAInterpret") {
+  const testoGrezzato = testoFinaleHTML.replace(/<[^>]*>?/gm, "");
+  let i = 0;
+  const target = document.getElementById(contenitoreID);
+  if (!target) return;
+
+  target.innerHTML = `<div id="typingYUTAInterpret" class="output-fadein" style="white-space: pre-wrap;"></div>`;
+  const typingEl = document.getElementById("typingYUTAInterpret");
+
+  function typeChar() {
+    if (i < testoGrezzato.length) {
+      typingEl.textContent += testoGrezzato.charAt(i);
+      i++;
+      setTimeout(typeChar, 20);
+    } else {
+      typingEl.innerHTML = `
+        <div class="output-fadein" style="white-space: pre-line;">
+          ${testoFinaleHTML}
+          <div style="font-size: 0.85em; color: #444; margin-top: 6px; text-align: right;">
+            ✅ Analisi effettuata con <strong>YUTA Interpret AI</strong>
+          </div>
+        </div>
+      `;
+    }
+  }
+
+  typeChar();
+}
 
 </script>
 
@@ -1629,8 +1657,8 @@ out.innerHTML = `
 
 
 setTimeout(() => {
-  const descrizioneFormattata = formattaMarkdownGenerico(json.descrizione);
-  scriviTypingYUTAMusic(descrizioneFormattata, "descrizioneYUTAMusic");
+  const descrizione = formattaMarkdownGenerico(json.descrizione);
+  scriviTypingYUTAMusic(descrizione, "descrizioneYUTAMusic");
 }, 800);
 
     document.getElementById("spinnerMusic").style.display = "none";
@@ -1814,8 +1842,9 @@ async function inviaRichiestaYUTAInterpret() {
 
         document.getElementById("statoOCR").innerHTML = `✅ Testo riconosciuto e interpretato correttamente.`;
         const descrizione = formattaMarkdownGenerico(json.descrizione);
-        scriviTypingSimboli(descrizione, "risultatoYUTAInterpret");
-
+        scriviTypingYUTAInterpret(descrizione, "risultatoYUTAInterpret");
+ 
+     
       } catch (err) {
         document.getElementById("statoOCR").innerHTML = "❌ Errore durante la comunicazione con il server.";
         out.innerHTML = "❌ Errore tecnico nella richiesta OCR.";
@@ -1848,7 +1877,8 @@ async function inviaRichiestaYUTAInterpret() {
       }
 
       const descrizione = formattaMarkdownGenerico(json.descrizione);
-      scriviTypingSimboli(descrizione, "risultatoYUTAInterpret");
+      scriviTypingYUTAInterpret(descrizione, "risultatoYUTAInterpret");
+
 
     } catch (err) {
       out.innerHTML = "❌ Errore durante la comunicazione.";
