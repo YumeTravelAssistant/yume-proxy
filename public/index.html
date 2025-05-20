@@ -52,7 +52,7 @@
       <button onclick="apriMusicAI()">🎧 Music AI</button>
       <button onclick="apriCultureAI()">📚 Culture AI</button>
       <button onclick="apriInterpretAI()">🈶 Interpret AI</button>
-   
+      <button onclick="apriNavitAI()">🗺️ Navi AI</button>   
  </div>
   </div>
 </div>
@@ -240,6 +240,39 @@
     <option value="">— Seleziona —</option>
     <option value="italiano">Italiano</option>
     <option value="inglese">Inglese</option>
+function resettaOutputCompleto() {
+  // Reset principali
+  document.getElementById("risposta").innerHTML = "";
+  document.getElementById("outputImmagineYUTA").innerHTML = "";
+  document.getElementById("risultatoYUTAMusic").innerHTML = "";
+  document.getElementById("risultatoVision").innerHTML = "";
+  document.getElementById("interpretazioneVision").innerHTML = "";
+  document.getElementById("spinner").style.display = "none";
+  document.getElementById("spinnerMusic").style.display = "none";
+
+  // Nasconde tutte le sezioni AI
+  document.getElementById("yutaVisionAI")?.classList.add("hidden");
+  document.getElementById("yutaFantasyAI")?.classList.add("hidden");
+  document.getElementById("yutaMusicAI")?.classList.add("hidden");
+  document.getElementById("yutaCultureAI")?.classList.add("hidden");
+  document.getElementById("yutaInterpretAI")?.classList.add("hidden");
+
+  // Reset campi Culture AI
+  document.getElementById("risultatoYUTACulture").innerHTML = "";
+  document.getElementById("autoreHaiku").value = "";
+  document.getElementById("operaHaiku").value = "casuale";
+  document.getElementById("bloccoAutoreHaiku").classList.add("hidden");
+  document.getElementById("bloccoOperaHaiku").classList.add("hidden");
+
+  // Reset campi Culture AI
+  document.getElementById("risultatoYUTAInterpret").innerHTML = "";
+  document.getElementById("testoInterpretYUTA").value = "";
+  document.getElementById("linguaOriginaleYUTA").value = "";
+  document.getElementById("linguaTradottaYUTA").value = "";
+  document.getElementById("immagineOCR").value = "";
+  document.getElementById("previewOCR").style.display = "none";
+  document.getElementById("previewOCR").src = "";
+  document.getElementById("statoOCR").innerHTML = "";
     <option value="giapponese">Giapponese</option>
   </select>
 
@@ -256,6 +289,29 @@
   <button style="margin-top: 14px;" onclick="inviaRichiestaYUTAInterpret()">🗣️ Interpreta</button>
 
   <div id="risultatoYUTAInterpret" style="margin-top: 20px;"></div>
+</div>
+
+<!-- YUTA Navi AI -->
+<div id="yutaNaviAI" class="output2 hidden" style="margin-top: 30px;">
+  <h3>🗺️ YUTA Navi AI</h3>
+
+  <label for="partenza">📍 Partenza:</label>
+  <input type="text" id="partenza" placeholder="Es: Shinjuku Station" />
+
+  <label for="arrivo" style="margin-top: 10px;">🏁 Arrivo:</label>
+  <input type="text" id="arrivo" placeholder="Es: Asakusa" />
+
+  <label for="mezzo" style="margin-top: 10px;">🚶‍♀️ Mezzo:</label>
+  <select id="mezzo">
+    <option value="walking">A piedi</option>
+    <option value="driving">Auto</option>
+    <option value="transit">Treno/Bus</option>
+    <option value="bicycling">Bici</option>
+  </select>
+
+  <button style="margin-top: 14px;" onclick="inviaRichiestaYUTANavi()">🗺️ Calcola percorso</button>
+
+  <div id="risultatoYUTANavi" style="margin-top: 20px;"></div>
 </div>
 
 
@@ -1448,6 +1504,36 @@ function scriviTypingYUTAInterpret(testoFinaleHTML, contenitoreID = "risultatoYU
   typeChar();
 }
 
+function scriviTypingYUTANavi(testoFinaleHTML, contenitoreID = "risultatoYUTANavi") {
+  const testoGrezzato = testoFinaleHTML.replace(/<[^>]*>?/gm, "");
+  let i = 0;
+  const target = document.getElementById(contenitoreID);
+  if (!target) return;
+
+  target.innerHTML = `<div id="typingYUTANavi" class="output-fadein" style="white-space: pre-wrap;"></div>`;
+  const typingEl = document.getElementById("typingYUTANavi");
+
+  function typeChar() {
+    if (i < testoGrezzato.length) {
+      typingEl.textContent += testoGrezzato.charAt(i);
+      i++;
+      setTimeout(typeChar, 20);
+    } else {
+      typingEl.innerHTML = `
+        <div class="output-fadein" style="white-space: pre-line;">
+          ${testoFinaleHTML}
+          <div style="font-size: 0.85em; color: #444; margin-top: 6px; text-align: right;">
+            ✅ Analisi effettuata con <strong>YUTA Navi AI</strong>
+          </div>
+        </div>
+      `;
+    }
+  }
+
+  typeChar();
+}
+
+
 </script>
 
 <script>
@@ -1509,6 +1595,7 @@ function chiudiTuttiYUTA() {
   document.getElementById("yutaVisionAI")?.classList.add("hidden");
   document.getElementById("yutaCultureAI")?.classList.add("hidden");
   document.getElementById("yutaInterpretAI")?.classList.add("hidden");
+  document.getElementById("yutaNaviAI")?.classList.add("hidden");
 }
 
 // ✅ Chiude il menu YUTA se si clicca fuori
@@ -1887,6 +1974,49 @@ async function inviaRichiestaYUTAInterpret() {
   }
 }
 
+async function inviaRichiestaYUTANavi() {
+  const clienteId = document.getElementById("clienteId")?.value?.trim() || "anonimo";
+  const partenza = document.getElementById("partenza")?.value?.trim();
+  const arrivo = document.getElementById("arrivo")?.value?.trim();
+  const mezzo = document.getElementById("mezzo")?.value;
+
+  const out = document.getElementById("risultatoYUTANavi");
+  out.innerHTML = "🗺️ Calcolo del percorso in corso...";
+
+  if (!partenza || !arrivo) {
+    out.innerHTML = "⚠️ Inserisci sia la partenza che l'arrivo.";
+    return;
+  }
+
+  try {
+    const response = await fetch("https://yuta-proxy-api.azurewebsites.net/api/proxy", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        tipoRichiesta: "calcola_percorso_guidato",
+        clienteId,
+        partenza,
+        arrivo,
+        mezzo
+      })
+    });
+
+    const json = await response.json();
+
+    if (json.errore) {
+      out.innerHTML = `❌ Errore: ${json.errore}`;
+      return;
+    }
+
+    const descrizione = formattaMarkdownGenerico(json.descrizione);
+    scriviTypingYUTANavi(descrizione, "risultatoYUTANavi");
+
+  } catch (err) {
+    out.innerHTML = "❌ Errore nella comunicazione.";
+    console.error("Errore Navi:", err);
+  }
+}
+
 
 </script>
 
@@ -1942,6 +2072,30 @@ function generaImmagineDaScelta() {
 
 </script>
 
+<script>
+  function initAutocompleteYUTA() {
+    const partenza = document.getElementById("partenza");
+    const arrivo = document.getElementById("arrivo");
+
+    if (partenza && arrivo) {
+      new google.maps.places.Autocomplete(partenza, {
+        types: ["geocode"],
+        componentRestrictions: { country: "jp" }
+      });
+
+      new google.maps.places.Autocomplete(arrivo, {
+        types: ["geocode"],
+        componentRestrictions: { country: "jp" }
+      });
+    }
+  }
+
+  window.addEventListener("load", initAutocompleteYUTA);
+</script>
+
+<!-- Includi Google Maps con Places -->
+<script src="https://maps.googleapis.com/maps/api/js?key=YOUR_API_KEY&libraries=places"></script>
+
 
 <script>
 function resettaOutputCompleto() {
@@ -1977,6 +2131,13 @@ function resettaOutputCompleto() {
   document.getElementById("previewOCR").style.display = "none";
   document.getElementById("previewOCR").src = "";
   document.getElementById("statoOCR").innerHTML = "";
+
+    // Reset campi YUTA Navi AI
+  document.getElementById("yutaNaviAI")?.classList.add("hidden");
+  document.getElementById("risultatoYUTANavi").innerHTML = "";
+  document.getElementById("partenza").value = "";
+  document.getElementById("arrivo").value = "";
+  document.getElementById("mezzo").value = "walking";
 
   // Reset meteo
   document.getElementById("toggleMeteoBtn").style.display = "none";
