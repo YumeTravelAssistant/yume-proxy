@@ -1784,62 +1784,76 @@ async function inviaRichiestaYUTAInterpret() {
     // OCR con immagine
     const reader = new FileReader();
     reader.onload = async function (e) {
-      const base64 = e.target.result.split(",")[1]; // rimuovi il prefix "data:image..."
-      
-          // ✅ Mostra preview
-    document.getElementById("previewOCR").src = e.target.result;
-    document.getElementById("previewOCR").style.display = "block";
+      const base64 = e.target.result.split(",")[1]; // rimuove il "data:image/..."
 
-    // ✅ Stato OCR
-    document.getElementById("statoOCR").innerHTML = `📸 Immagine caricata. Riconoscimento testuale in corso...`;
+      // ✅ Mostra preview e messaggio
+      document.getElementById("previewOCR").src = e.target.result;
+      document.getElementById("previewOCR").style.display = "block";
+      document.getElementById("statoOCR").innerHTML = `📸 Immagine caricata. Riconoscimento testuale in corso...`;
 
+      try {
+        const response = await fetch("https://yuta-proxy-api.azurewebsites.net/api/proxy", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            tipoRichiesta: "interpreta_testo_immagine",
+            clienteId,
+            linguaOrigine,
+            linguaDest,
+            immagineBase64: base64
+          })
+        });
+
+        const json = await response.json();
+
+        if (json.errore) {
+          document.getElementById("statoOCR").innerHTML = `❌ Errore: ${json.errore}`;
+          out.innerHTML = `❌ Errore: ${json.errore}`;
+          return;
+        }
+
+        document.getElementById("statoOCR").innerHTML = `✅ Testo riconosciuto e interpretato correttamente.`;
+        const descrizione = formattaMarkdownGenerico(json.descrizione);
+        scriviTypingSimboli(descrizione, "risultatoYUTAInterpret");
+
+      } catch (err) {
+        document.getElementById("statoOCR").innerHTML = "❌ Errore durante la comunicazione con il server.";
+        out.innerHTML = "❌ Errore tecnico nella richiesta OCR.";
+        console.error("Errore OCR:", err);
+      }
+    };
+
+    reader.readAsDataURL(immagineFile);
+
+  } else {
+    // Testo manuale
+    try {
       const response = await fetch("https://yuta-proxy-api.azurewebsites.net/api/proxy", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
-          tipoRichiesta: "interpreta_testo_immagine",
+          tipoRichiesta: "interpreta_testo_guidato",
           clienteId,
           linguaOrigine,
           linguaDest,
-          immagineBase64: base64
+          testo: testoManuale
         })
       });
+
       const json = await response.json();
+
       if (json.errore) {
         out.innerHTML = `❌ Errore: ${json.errore}`;
         return;
       }
 
-      document.getElementById("statoOCR").innerHTML = `✅ Testo riconosciuto e interpretato correttamente.`;
-      if (json.errore) {
-      document.getElementById("statoOCR").innerHTML = `❌ Errore: ${json.errore}`;
-
       const descrizione = formattaMarkdownGenerico(json.descrizione);
       scriviTypingSimboli(descrizione, "risultatoYUTAInterpret");
-    };
-    reader.readAsDataURL(immagineFile);
-  } else {
-    // Testo manuale
-    const response = await fetch("https://yuta-proxy-api.azurewebsites.net/api/proxy", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({
-        tipoRichiesta: "interpreta_testo_guidato",
-        clienteId,
-        linguaOrigine,
-        linguaDest,
-        testo: testoManuale
-      })
-    });
 
-    const json = await response.json();
-    if (json.errore) {
-      out.innerHTML = `❌ Errore: ${json.errore}`;
-      return;
+    } catch (err) {
+      out.innerHTML = "❌ Errore durante la comunicazione.";
+      console.error("Errore testo manuale:", err);
     }
-
-    const descrizione = formattaMarkdownGenerico(json.descrizione);
-    scriviTypingSimboli(descrizione, "risultatoYUTAInterpret");
   }
 }
 
