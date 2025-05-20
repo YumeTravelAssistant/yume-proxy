@@ -1813,8 +1813,6 @@ async function inviaRichiestaYUTAInterpret() {
       document.getElementById("statoOCR").innerHTML = `✅ Testo riconosciuto e interpretato correttamente.`;
       if (json.errore) {
       document.getElementById("statoOCR").innerHTML = `❌ Errore: ${json.errore}`;
-      ...
-
 
       const descrizione = formattaMarkdownGenerico(json.descrizione);
       scriviTypingSimboli(descrizione, "risultatoYUTAInterpret");
