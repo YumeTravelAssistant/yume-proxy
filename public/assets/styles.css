@@ -365,3 +365,43 @@ select {
   margin-top: 3px !important;
 }
 
+.haiku-layout {
+  display: flex;
+  gap: 20px;
+  margin-top: 20px;
+  align-items: flex-start;
+}
+
+.haiku-verticale {
+  display: flex;
+  flex-direction: row;
+  gap: 4px; /* 🔍 stretto tra colonne */
+  font-family: 'Noto Serif JP', serif;
+  font-weight: bold;
+  font-size: 1.3em;
+  line-height: 1.4;
+}
+
+.colonna-haiku {
+  writing-mode: vertical-rl;
+  text-orientation: upright;
+  white-space: pre-line;
+  padding: 0;
+  margin: 0;
+  display: inline-block;
+  letter-spacing: 0;
+}
+
+.haiku-traduzioni {
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-start;
+  font-size: 1.05em;
+}
+
+.haiku-italiano,
+.haiku-inglese {
+  font-style: italic;
+  margin-bottom: 8px;
+}
+
