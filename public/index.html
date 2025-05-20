@@ -1309,6 +1309,11 @@ function apriMusicAI() {
   document.getElementById("yutaMusicAI").classList.remove("hidden");
   document.getElementById("yutaMusicAI").scrollIntoView({ behavior: "smooth" });
   document.getElementById("nuovaDomandaBtn").style.display = "inline-block";
+
+  // 🔁 Se il dizionario non è ancora stato caricato, caricalo ora
+  if (Object.keys(dizionarioYUTAMusicale).length === 0) {
+    caricaDizionarioYUTAMusic();
+  }
 }
 
 function chiudiTuttiYUTA() {
@@ -1541,6 +1546,12 @@ function resettaOutputCompleto() {
   document.getElementById("luoghi-trovati").style.display = "none";
   document.getElementById("luoghi-trovati").innerHTML = "";
 }
+</script>
+
+<script>
+  window.addEventListener("DOMContentLoaded", () => {
+    caricaDizionarioYUTAMusic(); // Pre-carica tutto
+  });
 </script>
 
 
