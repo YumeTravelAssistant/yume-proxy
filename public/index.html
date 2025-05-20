@@ -1467,20 +1467,24 @@ async function inviaRichiestaYUTAMusic() {
       return;
     }
 
-    out.innerHTML = `
-      <div style="margin-bottom: 10px; font-weight: bold; font-size: 1.1em;">
-        🎵 <strong>${json.titolo}</strong> di <strong>${json.artista}</strong>
-      </div>
+out.innerHTML = `
+  <div style="margin-bottom: 10px; font-weight: bold; font-size: 1.1em;">
+    🎵 <strong>${json.titolo}</strong> di <strong>${json.artista}</strong>
+  </div>
 
-      <iframe width="100%" height="240"
-        src="https://www.youtube.com/embed/${json.youtubeId}"
-        frameborder="0" allowfullscreen style="border-radius: 12px;"></iframe>
-    `;
+  <div id="playerYUTAMusic">
+    <iframe width="100%" height="240"
+      src="https://www.youtube.com/embed/${json.youtubeId}"
+      frameborder="0" allowfullscreen style="border-radius: 12px;"></iframe>
+  </div>
 
-    setTimeout(() => {
-      const descrizioneFormattata = formattaMarkdownGenerico(json.descrizione);
-      scriviTypingYUTAMusic(descrizioneFormattata, "risultatoYUTAMusic");
-    }, 800);
+  <div id="descrizioneYUTAMusic" style="margin-top: 20px;"></div>
+`;
+
+setTimeout(() => {
+  const descrizioneFormattata = formattaMarkdownGenerico(json.descrizione);
+  scriviTypingYUTAMusic(descrizioneFormattata, "descrizioneYUTAMusic");
+}, 800);
 
     document.getElementById("spinnerMusic").style.display = "none";
   } catch (err) {
