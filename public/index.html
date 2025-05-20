@@ -1646,18 +1646,22 @@ function attivaSelezioneOperaHaiku() {
 }
 
 function creaLayoutHaikuVerticale(originale, italiano, inglese) {
-  const versi = originale.trim().split("\n");
-  const colonne = versi.map(verso => verso.split(""));
+  // Usa lo spazio ideografico giapponese come separatore
+  const versi = originale.trim().split("　");
+
+  const colonne = versi.map(verso =>
+    verso.trim().split("") // ogni carattere in verticale
+  );
 
   const maxAltezza = Math.max(...colonne.map(col => col.length));
-  const colonneCompattate = colonne.map(col => {
-    while (col.length < maxAltezza) col.unshift("");
+  const colonneEqualizzate = colonne.map(col => {
+    while (col.length < maxAltezza) col.unshift("　"); // padding in alto
     return col;
   });
 
-  const colHTML = colonneCompattate.map(col => `
+  const colHTML = colonneEqualizzate.map(col => `
     <div class="colonna-haiku">
-      ${col.map(char => `<span>${char || "　"}</span>`).join("")}
+      ${col.map(char => `<span>${char}</span>`).join("")}
     </div>
   `).join("");
 
@@ -1665,8 +1669,8 @@ function creaLayoutHaikuVerticale(originale, italiano, inglese) {
     <div class="haiku-layout">
       <div class="haiku-verticale">${colHTML}</div>
       <div class="haiku-traduzioni">
-        <div class="haiku-italiano">${italiano}</div>
-        <div class="haiku-inglese">${inglese}</div>
+        <div class="haiku-italiano"><em>${italiano}</em></div>
+        <div class="haiku-inglese"><em>${inglese}</em></div>
       </div>
     </div>
   `;
