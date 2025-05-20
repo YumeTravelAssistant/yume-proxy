@@ -45,39 +45,6 @@ main {
 label {
   display: block;
   margin: 20px 0 8px;
-function resettaOutputCompleto() {
-  // Reset principali
-  document.getElementById("risposta").innerHTML = "";
-  document.getElementById("outputImmagineYUTA").innerHTML = "";
-  document.getElementById("risultatoYUTAMusic").innerHTML = "";
-  document.getElementById("risultatoVision").innerHTML = "";
-  document.getElementById("interpretazioneVision").innerHTML = "";
-  document.getElementById("spinner").style.display = "none";
-  document.getElementById("spinnerMusic").style.display = "none";
-
-  // Nasconde tutte le sezioni AI
-  document.getElementById("yutaVisionAI")?.classList.add("hidden");
-  document.getElementById("yutaFantasyAI")?.classList.add("hidden");
-  document.getElementById("yutaMusicAI")?.classList.add("hidden");
-  document.getElementById("yutaCultureAI")?.classList.add("hidden");
-  document.getElementById("yutaInterpretAI")?.classList.add("hidden");
-
-  // Reset campi Culture AI
-  document.getElementById("risultatoYUTACulture").innerHTML = "";
-  document.getElementById("autoreHaiku").value = "";
-  document.getElementById("operaHaiku").value = "casuale";
-  document.getElementById("bloccoAutoreHaiku").classList.add("hidden");
-  document.getElementById("bloccoOperaHaiku").classList.add("hidden");
-
-  // Reset campi Culture AI
-  document.getElementById("risultatoYUTAInterpret").innerHTML = "";
-  document.getElementById("testoInterpretYUTA").value = "";
-  document.getElementById("linguaOriginaleYUTA").value = "";
-  document.getElementById("linguaTradottaYUTA").value = "";
-  document.getElementById("immagineOCR").value = "";
-  document.getElementById("previewOCR").style.display = "none";
-  document.getElementById("previewOCR").src = "";
-  document.getElementById("statoOCR").innerHTML = "";
   font-weight: 500;
 }
 
