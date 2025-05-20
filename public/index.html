@@ -529,18 +529,6 @@ try {
   json = await response.json();
 console.log("🔁 Risposta completa dal backend:", json); // ✅ Aggiunto qui
 } catch (e) {
-out.innerHTML = `
-  <div><strong>🖋️ Autore:</strong> ${json.autore}</div>
-  <div class="haiku-container">
-    <div class="haiku-giapponese">${h.originale.replace(/\n/g, "<br>")}</div>
-    <div class="haiku-traduzioni">
-      <div class="haiku-italiano">${h.italiano}</div>
-      <div class="haiku-inglese">${h.inglese}</div>
-    </div>
-  </div>
-  <div style="margin-top: 10px;"><strong>📌 Contesto:</strong> ${h.contesto}</div>
-  <div id="descrizioneYUTACulture" style="margin-top: 10px;">  Analisi in corso...</div>
-`;
   rispostaEl.textContent = "❌ Il server ha restituito una risposta non valida.";
   document.getElementById("spinner").style.display = "none";
   console.error("Errore parse JSON:", e);
@@ -789,18 +777,6 @@ if (json.daily && Array.isArray(json.daily)) {
 
     let frase = `☁️ Meteo attuale: ${condizioneAttuale}, ${temperatura}°C.`;
 
-out.innerHTML = `
-  <div><strong>🖋️ Autore:</strong> ${json.autore}</div>
-  <div class="haiku-container">
-    <div class="haiku-giapponese">${h.originale.replace(/\n/g, "<br>")}</div>
-    <div class="haiku-traduzioni">
-      <div class="haiku-italiano">${h.italiano}</div>
-      <div class="haiku-inglese">${h.inglese}</div>
-    </div>
-  </div>
-  <div style="margin-top: 10px;"><strong>📌 Contesto:</strong> ${h.contesto}</div>
-  <div id="descrizioneYUTACulture" style="margin-top: 10px;">  Analisi in corso...</div>
-`;
     if (pioveOra || previsionePioggia) {
       frase += " È prevista pioggia nelle prossime ore. Si consigliano attività al chiuso, percorsi coperti e abbigliamento impermeabile.";
     } else {
