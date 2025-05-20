@@ -202,14 +202,14 @@ footer {
 
 .dropdown-content {
   position: absolute;
-  background-color: #fff2eb;
+  background-color: #FFF8F4; /* beige YUME */
   min-width: 180px;
-  border: 1px solid #ccc;
+  border: 1px solid #ddd;
   box-shadow: 0 2px 8px rgba(0,0,0,0.1);
   z-index: 1000;
-  margin-top: 5px;
+  margin-top: 4px;
   border-radius: 10px;
-  padding: 4px 0;
+  padding: 2px 0; /* meno spazio verticale */
   animation: fadeIn 0.2s ease-out;
 }
 
@@ -243,15 +243,19 @@ footer {
 }
 
 .dropdown-content button {
-  background: none;
-  border: none;
-  padding: 8px 14px;
+  padding: 4px 10px;
+  margin: 1px 0;
   width: 100%;
   text-align: left;
   font-family: inherit;
   font-size: 14px;
   cursor: pointer;
   color: #1c1c1c;
+  background: none;
+  border: none;
+}
+.dropdown-content button:not(:last-child) {
+  border-bottom: 1px solid #f2eae4;
 }
 
 .dropdown-content button:hover {
