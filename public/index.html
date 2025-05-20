@@ -2018,6 +2018,38 @@ async function inviaRichiestaYUTANavi() {
     const descrizione = formattaMarkdownGenerico(json.descrizione);
     scriviTypingYUTANavi(descrizione, "risultatoYUTANavi");
 
+if (json.puntiPercorso && Array.isArray(json.puntiPercorso)) {
+  const bounds = new google.maps.LatLngBounds();
+  const percorsoCoords = json.puntiPercorso.map(p => {
+    const punto = { lat: p.lat, lng: p.lng };
+    bounds.extend(punto);
+    return punto;
+  });
+
+  const percorsoLine = new google.maps.Polyline({
+    path: percorsoCoords,
+    geodesic: true,
+    strokeColor: "#4285F4",
+    strokeOpacity: 0.8,
+    strokeWeight: 5,
+  });
+
+  percorsoLine.setMap(map);
+  map.fitBounds(bounds);
+  document.getElementById("map").style.display = "block";
+  document.getElementById("toggleMappaBtn").style.display = "inline-block";
+
+  markers.forEach(m => m.setMap(null));
+  markers = [];
+
+  // Aggiungi marker partenza e arrivo
+  if (percorsoCoords.length > 0) {
+    new google.maps.Marker({ position: percorsoCoords[0], map, title: "Partenza" });
+    new google.maps.Marker({ position: percorsoCoords.at(-1), map, title: "Arrivo" });
+  }
+}
+
+
   } catch (err) {
     out.innerHTML = "❌ Errore nella comunicazione.";
     console.error("Errore Navi:", err);
