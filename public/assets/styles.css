@@ -355,3 +355,14 @@ select {
   margin-top: 3px !important;
 }
 
+/* 🎯 Override locale dello stile .output per le sezioni Vision, Fantasy, Music */
+#yutaVisionAI .output,
+#yutaFantasyAI .output,
+#yutaMusicAI .output {
+  margin-top: 14px !important;
+  padding: 12px !important;
+  font-size: 1em !important;
+  line-height: 1.3 !important;
+  white-space: pre-line !important;
+}
+
