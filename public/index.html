@@ -1165,33 +1165,8 @@ scriviTypingSimboli(risultati, "risultatoVision");
 
       // ✅ Mostra sempre interpretazione GPT se disponibile
       if (json.interpretazione) {
-const righe = json.interpretazione.split("\n");
-let interpretazioneFormattata = "";
-let inLista = false;
 
-for (const riga of righe) {
-  if (riga.startsWith("- ")) {
-    if (!inLista) {
-      interpretazioneFormattata += "<ul>";
-      inLista = true;
-    }
-const contenutoItem = riga.slice(2).replace(/\*\*(.*?)\*\*/g, "<strong>$1</strong>");
-interpretazioneFormattata += `<li>${contenutoItem}</li>`;
-
-  } else {
-    if (inLista) {
-      interpretazioneFormattata += "</ul>";
-      inLista = false;
-    }
-    // Formattazioni inline
-    const lineaFormattata = riga
-      .replace(/\*\*(.*?)\*\*/g, "<strong>$1</strong>")
-      .replace(/^### (.*)/, "<h3>$1</h3>");
-
-    interpretazioneFormattata += `${lineaFormattata}<br>`;
-  }
-}
-if (inLista) interpretazioneFormattata += "</ul>";
+const interpretazioneFormattata = formattaMarkdownGenerico(json.interpretazione);
 
 setTimeout(() => {
   scriviTypingInterpretazione(interpretazioneFormattata, "interpretazioneVision");
@@ -1249,6 +1224,39 @@ function scriviTypingSimboli(testoFinaleHTML, contenitoreID = "risultatoVision")
 </script>
 
 <script>
+
+function formattaMarkdownGenerico(testo) {
+  const righe = testo.split("\n");
+  let risultato = "";
+  let inLista = false;
+
+  for (const riga of righe) {
+    if (riga.startsWith("- ")) {
+      if (!inLista) {
+        risultato += "<ul>";
+        inLista = true;
+      }
+      const contenuto = riga.slice(2).replace(/\*\*(.*?)\*\*/g, "<strong>$1</strong>");
+      risultato += `<li>${contenuto}</li>`;
+    } else {
+      if (inLista) {
+        risultato += "</ul>";
+        inLista = false;
+      }
+
+      const lineaFormattata = riga
+        .replace(/^### (.*)/, "<h3>$1</h3>")
+        .replace(/\*\*(.*?)\*\*/g, "<strong>$1</strong>");
+
+      risultato += lineaFormattata + "<br>";
+    }
+  }
+
+  if (inLista) risultato += "</ul>";
+  return risultato;
+}
+
+
 function scriviTypingInterpretazione(testoFinaleHTML, contenitoreID = "interpretazioneVision") {
   const testoGrezzato = testoFinaleHTML.replace(/<[^>]*>?/gm, ""); // Rimuove tag HTML per typing
   let i = 0;
@@ -1281,6 +1289,36 @@ typingEl.innerHTML = interpretazioneHTML;
 
   typeChar();
 }
+
+function scriviTypingYUTAMusic(testoFinaleHTML, contenitoreID = "risultatoYUTAMusic") {
+  const testoGrezzato = testoFinaleHTML.replace(/<[^>]*>?/gm, "");
+  let i = 0;
+  const target = document.getElementById(contenitoreID);
+  if (!target) return;
+
+  target.innerHTML = `<div id="typingYUTAMusic" class="output-fadein" style="white-space: pre-wrap;"></div>`;
+  const typingEl = document.getElementById("typingYUTAMusic");
+
+  function typeChar() {
+    if (i < testoGrezzato.length) {
+      typingEl.textContent += testoGrezzato.charAt(i);
+      i++;
+      setTimeout(typeChar, 20);
+    } else {
+      typingEl.innerHTML = `
+        <div class="output-fadein" style="white-space: pre-line;">
+          ${testoFinaleHTML}
+          <div style="font-size: 0.85em; color: #444; margin-top: 20px; text-align: right;">
+            ✅ Analisi effettuata con <strong>YUTA Music AI</strong>
+          </div>
+        </div>
+      `;
+    }
+  }
+
+  typeChar();
+}
+
 
 </script>
 
@@ -1434,18 +1472,15 @@ async function inviaRichiestaYUTAMusic() {
         🎵 <strong>${json.titolo}</strong> di <strong>${json.artista}</strong>
       </div>
 
-      <iframe width="100%" height="240" 
-        src="https://www.youtube.com/embed/${json.youtubeId}" 
+      <iframe width="100%" height="240"
+        src="https://www.youtube.com/embed/${json.youtubeId}"
         frameborder="0" allowfullscreen style="border-radius: 12px;"></iframe>
-
-      <div style="margin-top: 20px; white-space: pre-line; background: #FFF8F4; border-left: 4px solid #C9A86A; padding: 12px; font-size: 0.95em; color: #1c1c1c; border-radius: 6px;">
-        ${json.descrizione}
-
-        <div style="font-size: 0.85em; color: #444; margin-top: 20px; text-align: right;">
-          ✅ Analisi effettuata con <strong>YUTA Music AI</strong>
-        </div>
-      </div>
     `;
+
+    setTimeout(() => {
+      const descrizioneFormattata = formattaMarkdownGenerico(json.descrizione);
+      scriviTypingYUTAMusic(descrizioneFormattata, "risultatoYUTAMusic");
+    }, 800);
 
     document.getElementById("spinnerMusic").style.display = "none";
   } catch (err) {
