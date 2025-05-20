@@ -1248,7 +1248,10 @@ function formattaMarkdownGenerico(testo) {
         .replace(/^### (.*)/, "<h3>$1</h3>")
         .replace(/\*\*(.*?)\*\*/g, "<strong>$1</strong>");
 
-      risultato += lineaFormattata + "<br>";
+if (lineaFormattata.trim() !== "") {
+  risultato += lineaFormattata + "<br>";
+}
+
     }
   }
 
