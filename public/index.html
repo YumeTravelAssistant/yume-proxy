@@ -1472,11 +1472,12 @@ out.innerHTML = `
     🎵 <strong>${json.titolo}</strong> di <strong>${json.artista}</strong>
   </div>
 
-  <div id="playerYUTAMusic">
-    <iframe width="100%" height="240"
-      src="https://www.youtube.com/embed/${json.youtubeId}"
-      frameborder="0" allowfullscreen style="border-radius: 12px;"></iframe>
-  </div>
+<div id="playerYUTAMusic" style="margin-top: 10px;">
+  <a href="${json.link}" target="_blank" style="text-decoration: none; color: inherit;">
+    <img src="${json.thumbnail}" alt="Anteprima ${json.titolo}" style="width: 100%; max-width: 480px; border-radius: 12px; box-shadow: 0 4px 12px rgba(0,0,0,0.15);" />
+    <div style="margin-top: 8px; font-weight: bold; font-size: 1.05em;">▶ Ascolta su YouTube</div>
+  </a>
+</div>
 
   <div id="descrizioneYUTAMusic" style="margin-top: 20px;"></div>
 `;
