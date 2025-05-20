@@ -1651,15 +1651,15 @@ function creaLayoutHaikuVerticale(originale, italiano, inglese) {
 
   const maxAltezza = Math.max(...colonne.map(col => col.length));
   const colonneCompattate = colonne.map(col => {
-    while (col.length < maxAltezza) col.unshift(""); // padding in alto
+    while (col.length < maxAltezza) col.unshift("");
     return col;
   });
 
-const colHTML = colonneCompattate.map(col => `
-  <div class="colonna-haiku">
-    ${col.map(char => `<div>${char || "　"}</div>`).join("")}
-  </div>
-`).join("");
+  const colHTML = colonneCompattate.map(col => `
+    <div class="colonna-haiku">
+      ${col.map(char => `<span>${char || "　"}</span>`).join("")}
+    </div>
+  `).join("");
 
   return `
     <div class="haiku-layout">
