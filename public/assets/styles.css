@@ -504,18 +504,33 @@ select {
   text-align: right;
 }
 
+/* Riduce margine tra frase, pulsanti tab e blocchi previsione */
 #risultatoYUTAForecast {
-  margin-bottom: 8px !important;
+  margin-bottom: 4px !important;
 }
 
 #tabsForecast {
-  margin-top: 8px !important;
+  margin-top: 6px !important;
+  margin-bottom: 6px !important;
 }
 
 #contenitorePrevisioni {
-  margin-top: 4px !important;
+  margin-top: 2px !important;
 }
-.forecastTab {
-  margin-top: 6px !important;
+
+/* Riduce spaziatura nei box previsione */
+.previsione-box {
+  padding: 8px 12px;
+  margin-bottom: 6px;
+}
+
+.previsione-fascia {
+  font-weight: 600;
+  font-size: 0.95em;
+}
+
+.previsione-temp {
+  font-size: 0.95em;
+  text-align: left;
 }
 
