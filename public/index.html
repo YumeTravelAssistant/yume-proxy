@@ -54,6 +54,7 @@
       <button onclick="apriInterpretAI()">🈶 Interpret AI</button>
       <button onclick="apriNaviAI()">🗺️ Navi AI</button>   
       <button onclick="apriForecastAI()">🌤️ Forecast AI</button>
+      <button onclick="apriTableAI()">🍽️ Table AI</button>
 
  </div>
   </div>
@@ -284,6 +285,36 @@
   <div id="bloccoNavigazioneYUTA" style="margin-top: 16px;"></div>
 </div>
 
+<!-- YUTA Table AI -->
+
+<div id="yutaTableAI" class="output2 hidden" style="margin-top: 30px;">
+  <h3>🍽️ YUTA Table AI – Ristoranti e locali</h3>
+
+  <label for="categoriaYUTA">🍴 Categoria:</label>
+  <select id="categoriaYUTA" onchange="aggiornaSottocategoria()">
+    <option value="">— Seleziona —</option>
+    <option value="ristorante">🍜 Ristorante</option>
+    <option value="locale">🎤 Locale notturno</option>
+  </select>
+
+  <label for="sottocategoriaYUTA" style="margin-top: 10px;">📂 Sottocategoria:</label>
+  <select id="sottocategoriaYUTA">
+    <option value="">— Seleziona sottocategoria —</option>
+  </select>
+
+  <label for="zonaYUTA" style="margin-top: 10px;">📍 Zona o quartiere:</label>
+  <input type="text" id="zonaYUTA" placeholder="Es: Shibuya, Ginza, Kyoto..." />
+
+  <button style="margin-top: 14px;" onclick="cercaYUTATable()">🔍 Cerca locali</button>
+
+<div id="scriviTypingYUTATable" style="margin-top: 20px;">
+  <div id="typingYUTATable" class="output2"></div>
+</div>
+<div id="risultatoYUTATable" class="output2 hidden"></div>
+
+</div>
+
+
 <!-- YUTA Forecast AI -->
 <div id="yutaForecastAI" class="output3 hidden" style="margin-top: 30px;">
   <h3>🌤️ YUTA Forecast AI</h3>
@@ -322,8 +353,9 @@
   <div id="forecast7gg" class="forecastTab hidden"></div>
 </div>
 
-
 </div>
+
+
 
     <div class="output" id="risposta"></div>
     <div id="spinner" class="spinner" style="display:none;"></div>
@@ -1572,6 +1604,34 @@ function scriviTypingYUTAForecast(testoFinaleHTML, contenitoreID = "risultatoYUT
   typeChar();
 }
 
+function scriviTypingYUTATable(testo) {
+  const target = document.getElementById("typingYUTATable");
+  const output = document.getElementById("risultatoYUTATable");
+
+  target.innerHTML = "";
+  output.classList.add("hidden");
+
+  let i = 0;
+  const intervallo = setInterval(() => {
+    if (i < testo.length) {
+      target.innerHTML += testo.charAt(i);
+      i++;
+    } else {
+      clearInterval(intervallo);
+      target.innerHTML = "";
+
+      output.innerHTML = `
+        <div class="output-fadein" style="white-space: pre-line;">
+          ${testo}
+          <div style="font-size: 0.85em; color: #444; margin-top: 16px; text-align: right;">
+            ✅ Analisi effettuata con <strong>YUTA Table AI</strong>
+          </div>
+        </div>
+      `;
+      output.classList.remove("hidden");
+    }
+  }, 20);
+}
 
 </script>
 
@@ -1641,6 +1701,13 @@ function apriInterpretAI() {
   document.getElementById("nuovaDomandaBtn").style.display = "inline-block";
 }
 
+function apriTableAI() {
+  chiudiTuttiYUTA();
+  document.getElementById("yutaTableAI").classList.remove("hidden");
+  document.getElementById("yutaTableAI").scrollIntoView({ behavior: "smooth" });
+  document.getElementById("nuovaDomandaBtn").style.display = "inline-block";
+}
+
 
 function chiudiTuttiYUTA() {
   document.getElementById("menuYUTA").classList.add("hidden");
@@ -1651,6 +1718,7 @@ function chiudiTuttiYUTA() {
   document.getElementById("yutaInterpretAI")?.classList.add("hidden");
   document.getElementById("yutaNaviAI")?.classList.add("hidden");
   document.getElementById("yutaForecastAI")?.classList.add("hidden");
+  document.getElementById("yutaTableAI")?.classList.add("hidden");
 }
 
 // ✅ Chiude il menu YUTA se si clicca fuori
@@ -2221,6 +2289,62 @@ function toggleForecastDettagli() {
   dettagli.classList.toggle("hidden");
 }
 
+async function cercaYUTATable() {
+  const keyword = document.getElementById("zonaYUTA").value.trim();
+  const codiceGenere = document.getElementById("sottocategoriaYUTA").value;
+  const categoria = document.getElementById("categoriaYUTA").value;
+  const out = document.getElementById("risultatoYUTATable");
+  out.innerHTML = "⏳ Analisi in corso...";
+
+  const payload = {
+    tipoRichiesta: "yutaTableInfo",
+    zona: keyword,
+    categoria: categoria,
+    codiceGenere: codiceGenere
+  };
+
+  try {
+    const res = await fetch("https://yuta-proxy-api.azurewebsites.net/api/proxy", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(payload)
+    });
+
+    const data = await res.json();
+    const testoFinale = data.risultato || data.errore || "⚠️ Nessuna risposta.";
+    scriviTypingYUTATable(testoFinale);
+
+    // ✅ Estrai indirizzi dalle righe per creare i marker
+    if (window.map && data.risultato) {
+      const righe = testoFinale.split("\n").filter(r => r.startsWith("📍 "));
+      markers.forEach(m => m.setMap(null)); // resetta vecchi marker
+      markers = [];
+
+      for (const riga of righe) {
+        const indirizzo = riga.replace("📍 ", "").trim();
+
+        const geocoder = new google.maps.Geocoder();
+        geocoder.geocode({ address: indirizzo }, (results, status) => {
+          if (status === "OK" && results[0]) {
+            const location = results[0].geometry.location;
+            const marker = new google.maps.Marker({
+              position: location,
+              map,
+              title: indirizzo
+            });
+            markers.push(marker);
+            document.getElementById("map").style.display = "block";
+            document.getElementById("toggleMappaBtn").style.display = "inline-block";
+          }
+        });
+      }
+    }
+
+  } catch (err) {
+    out.innerHTML = "❌ Errore durante la richiesta: " + err.message;
+  }
+}
+
 
 </script>
 
@@ -2372,6 +2496,45 @@ function initAutocompleteForecast() {
 }
 window.addEventListener("load", initAutocompleteForecast);
 
+function aggiornaSottocategoria() {
+  const cat = document.getElementById("categoriaYUTA").value;
+  const sotto = document.getElementById("sottocategoriaYUTA");
+
+  const ristoranti = [
+    { nome: "Sushi", codice: "G001" },
+    { nome: "Ramen", codice: "G013" },
+    { nome: "Izakaya", codice: "G007" },
+    { nome: "Yakiniku", codice: "G008" },
+    { nome: "Okonomiyaki", codice: "G017" },
+    { nome: "Curry giapponese", codice: "G010" },
+    { nome: "Udon / Soba", codice: "G011" },
+    { nome: "Shabu-shabu", codice: "G006" },
+    { nome: "Teishoku (set meal)", codice: "G004" },
+    { nome: "Vegetariano / Vegano", codice: "G014" }
+  ];
+
+  const locali = [
+    { nome: "Karaoke", codice: "Z011" },
+    { nome: "Bar", codice: "Z003" },
+    { nome: "Discoteca / Club", codice: "Z005" },
+    { nome: "Lounge Bar", codice: "Z002" },
+    { nome: "Live Music / Live House", codice: "Z004" },
+    { nome: "Snack Bar / Hostess", codice: "Z009" },
+    { nome: "Game Bar", codice: "Z013" },
+    { nome: "Maid Café / Themed Café", codice: "Z012" }
+  ];
+
+  sotto.innerHTML = '<option value="">— Seleziona sottocategoria —</option>';
+  const lista = cat === "ristorante" ? ristoranti : locali;
+
+  lista.forEach(opt => {
+    const el = document.createElement("option");
+    el.value = opt.codice;
+    el.textContent = opt.nome;
+    sotto.appendChild(el);
+  });
+}
+
 </script>
 
 <script>
@@ -2393,6 +2556,7 @@ function resettaOutputCompleto() {
   document.getElementById("yutaInterpretAI")?.classList.add("hidden");
   document.getElementById("yutaNaviAI")?.classList.add("hidden");
   document.getElementById("yutaForecastAI")?.classList.add("hidden");
+  document.getElementById("yutaTableAI")?.classList.add("hidden");
 
   // Reset campi Culture AI
   document.getElementById("risultatoYUTACulture").innerHTML = "";
@@ -2429,6 +2593,15 @@ function resettaOutputCompleto() {
   document.getElementById("forecastoggi").classList.add("hidden");
   document.getElementById("forecast48h").classList.add("hidden");
   document.getElementById("forecast7gg").classList.add("hidden");
+
+  // Reset campi YUTA Forecast AI
+  document.getElementById("categoriaYUTA").value = "";
+  document.getElementById("sottocategoriaYUTA").innerHTML = '<option value="">— Seleziona sottocategoria —</option>';
+  document.getElementById("zonaYUTA").value = "";
+  document.getElementById("risultatoYUTATable").innerHTML = "";
+  document.getElementById("typingYUTATable").innerHTML = "";
+  document.getElementById("risultatoYUTATable").classList.add("hidden");
+
 
   // Reset meteo
   document.getElementById("toggleMeteoBtn").style.display = "none";
