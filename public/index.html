@@ -287,7 +287,7 @@
 
 <!-- YUTA Table AI -->
 
-<div id="yutaTableAI" class="output2 hidden" style="margin-top: 30px;">
+<div id="yutaTableAI" class="output4 hidden" style="margin-top: 30px;">
   <h3>🍽️ YUTA Table AI – Ristoranti e locali</h3>
 
   <label for="categoriaYUTA">🍴 Categoria:</label>
@@ -307,11 +307,13 @@
 
   <button style="margin-top: 14px;" onclick="cercaYUTATable()">🔍 Cerca locali</button>
 
-<div id="scriviTypingYUTATable" style="margin-top: 20px;">
-  <div id="typingYUTATable" class="output2"></div>
-</div>
-<div id="risultatoYUTATable" class="output2 hidden"></div>
+  <!-- Effetto scrittura AI -->
+  <div id="scriviTypingYUTATable" style="margin-top: 20px;">
+    <div id="typingYUTATable" class="output4"></div>
+  </div>
 
+  <!-- Risultato finale -->
+  <div id="risultatoYUTATable" class="output4 hidden" style="white-space: pre-line;"></div>
 </div>
 
 
@@ -2314,7 +2316,7 @@ async function cercaYUTATable() {
     const testoFinale = data.risultato || data.errore || "⚠️ Nessuna risposta.";
     scriviTypingYUTATable(testoFinale);
 
-    // ✅ Estrai indirizzi dalle righe per creare i marker
+    // 🌐 Mappa interattiva
     if (window.map && data.risultato) {
       const righe = testoFinale.split("\n").filter(r => r.startsWith("📍 "));
       markers.forEach(m => m.setMap(null)); // resetta vecchi marker
@@ -2322,17 +2324,30 @@ async function cercaYUTATable() {
 
       for (const riga of righe) {
         const indirizzo = riga.replace("📍 ", "").trim();
-
         const geocoder = new google.maps.Geocoder();
+
         geocoder.geocode({ address: indirizzo }, (results, status) => {
           if (status === "OK" && results[0]) {
             const location = results[0].geometry.location;
+            const urlMaps = `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(indirizzo)}`;
+
             const marker = new google.maps.Marker({
               position: location,
               map,
               title: indirizzo
             });
+
+            const infowindow = new google.maps.InfoWindow({
+              content: `<a href="${urlMaps}" target="_blank" style="text-decoration:none; font-size:0.9em;">📍 Apri in Google Maps</a>`
+            });
+
+            marker.addListener("click", () => {
+              infowindow.open(map, marker);
+            });
+
             markers.push(marker);
+
+            // Mostra la mappa se è nascosta
             document.getElementById("map").style.display = "block";
             document.getElementById("toggleMappaBtn").style.display = "inline-block";
           }
