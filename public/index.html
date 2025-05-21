@@ -2527,28 +2527,41 @@ function aggiornaSottocategoria() {
   const cat = document.getElementById("categoriaYUTA").value;
   const sotto = document.getElementById("sottocategoriaYUTA");
 
-  const ristoranti = [
-  { nome: "Sushi", codice: "G001" },
-  { nome: "Ramen", codice: "G013" },
-  { nome: "Izakaya", codice: "G001" },
-  { nome: "Yakiniku", codice: "G008" },
-  { nome: "Okonomiyaki", codice: "G016" },
-  { nome: "Curry giapponese", codice: "G004" },        // meglio G004 = 和食
-  { nome: "Udon / Soba", codice: "G004" },              // era sbagliato (G011 = karaoke)
-  { nome: "Shabu-shabu", codice: "G004" },              // G004 cucina giapponese
-  { nome: "Teishoku (set meal)", codice: "G004" },
-  { nome: "Vegetariano / Vegano", codice: "G014" }      // non ideale, ma G014 è il più adatto
+const ristoranti = [
+  { nome: "Izakaya", codice: "G001" },                        // 居酒屋
+  { nome: "Dining Bar / Bal", codice: "G002" },              // ダイニングバー・バル
+  { nome: "Cucina creativa", codice: "G003" },               // 創作料理
+  { nome: "Cucina giapponese (Washoku)", codice: "G004" },   // 和食
+  { nome: "Cucina occidentale", codice: "G005" },            // 洋食
+  { nome: "Italiana / Francese", codice: "G006" },           // イタリアン・フレンチ
+  { nome: "Cucina cinese", codice: "G007" },                 // 中華
+  { nome: "Yakiniku / Frattaglie", codice: "G008" },         // 焼肉・ホルモン
+  { nome: "Cucina asiatica / etnica", codice: "G009" },      // アジア・エスニック料理
+  { nome: "Cucina internazionale", codice: "G010" },         // 各国料理
+  { nome: "Ramen", codice: "G013" },                         // ラーメン
+  { nome: "Caffè / Dolci / Vegano", codice: "G014" },        // カフェ・スイーツ
+  { nome: "Okonomiyaki / Monjayaki", codice: "G016" },       // お好み焼き・もんじゃ
+  { nome: "Cucina coreana", codice: "G017" },                // 韓国料理
+
+  // 🔁 Fallback Google
+  { nome: "Sushi", codice: "X001" },                         // Sushi non ha categoria propria
+  { nome: "Shabu-shabu", codice: "X002" },                   // Fonduta giapponese
+  { nome: "Curry giapponese", codice: "X003" },
+  { nome: "Udon / Soba", codice: "X004" },
+  { nome: "Teishoku (set meal)", codice: "X005" }
 ];
 
 const locali = [
-  { nome: "Karaoke", codice: "G011" },
-  { nome: "Bar", codice: "G012" },
-  { nome: "Lounge Bar", codice: "G012" }, // categoria condivisa
-  { nome: "Discoteca / Club", codice: null }, // cercare via keyword
-  { nome: "Live Music / Live House", codice: null }, // keyword search only
-  { nome: "Snack Bar / Hostess", codice: null }, // non supportato
-  { nome: "Game Bar", codice: null }, // keyword: ゲームバー
-  { nome: "Maid Café / Themed Café", codice: "G014" } // caffetteria a tema
+  { nome: "Karaoke", codice: "G011" },               // カラオケ・パーティ
+  { nome: "Bar / Cocktail", codice: "G012" },        // バー・カクテル
+
+  // 🔁 Google fallback
+  { nome: "Lounge Bar", codice: "X101" },
+  { nome: "Discoteca / Club", codice: "X102" },
+  { nome: "Live Music / Live House", codice: "X103" },
+  { nome: "Snack Bar / Hostess", codice: "X104" },
+  { nome: "Game Bar", codice: "X105" },
+  { nome: "Maid Café / Themed Café", codice: "X106" }
 ];
 
   sotto.innerHTML = '<option value="">— Seleziona sottocategoria —</option>';
