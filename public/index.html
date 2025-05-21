@@ -2528,28 +2528,28 @@ function aggiornaSottocategoria() {
   const sotto = document.getElementById("sottocategoriaYUTA");
 
   const ristoranti = [
-    { nome: "Sushi", codice: "G001" },
-    { nome: "Ramen", codice: "G013" },
-    { nome: "Izakaya", codice: "G007" },
-    { nome: "Yakiniku", codice: "G008" },
-    { nome: "Okonomiyaki", codice: "G017" },
-    { nome: "Curry giapponese", codice: "G010" },
-    { nome: "Udon / Soba", codice: "G011" },
-    { nome: "Shabu-shabu", codice: "G006" },
-    { nome: "Teishoku (set meal)", codice: "G004" },
-    { nome: "Vegetariano / Vegano", codice: "G014" }
-  ];
+  { nome: "Sushi", codice: "G001" },
+  { nome: "Ramen", codice: "G013" },
+  { nome: "Izakaya", codice: "G001" },
+  { nome: "Yakiniku", codice: "G008" },
+  { nome: "Okonomiyaki", codice: "G016" },
+  { nome: "Curry giapponese", codice: "G004" },        // meglio G004 = 和食
+  { nome: "Udon / Soba", codice: "G004" },              // era sbagliato (G011 = karaoke)
+  { nome: "Shabu-shabu", codice: "G004" },              // G004 cucina giapponese
+  { nome: "Teishoku (set meal)", codice: "G004" },
+  { nome: "Vegetariano / Vegano", codice: "G014" }      // non ideale, ma G014 è il più adatto
+];
 
-  const locali = [
-    { nome: "Karaoke", codice: "Z011" },
-    { nome: "Bar", codice: "Z003" },
-    { nome: "Discoteca / Club", codice: "Z005" },
-    { nome: "Lounge Bar", codice: "Z002" },
-    { nome: "Live Music / Live House", codice: "Z004" },
-    { nome: "Snack Bar / Hostess", codice: "Z009" },
-    { nome: "Game Bar", codice: "Z013" },
-    { nome: "Maid Café / Themed Café", codice: "Z012" }
-  ];
+const locali = [
+  { nome: "Karaoke", codice: "G011" },
+  { nome: "Bar", codice: "G012" },
+  { nome: "Lounge Bar", codice: "G012" }, // categoria condivisa
+  { nome: "Discoteca / Club", codice: null }, // cercare via keyword
+  { nome: "Live Music / Live House", codice: null }, // keyword search only
+  { nome: "Snack Bar / Hostess", codice: null }, // non supportato
+  { nome: "Game Bar", codice: null }, // keyword: ゲームバー
+  { nome: "Maid Café / Themed Café", codice: "G014" } // caffetteria a tema
+];
 
   sotto.innerHTML = '<option value="">— Seleziona sottocategoria —</option>';
   const lista = cat === "ristorante" ? ristoranti : locali;
