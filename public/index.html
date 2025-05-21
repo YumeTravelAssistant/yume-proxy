@@ -2511,6 +2511,18 @@ function initAutocompleteForecast() {
 }
 window.addEventListener("load", initAutocompleteForecast);
 
+function initAutocompleteYUTATable() {
+  const zona = document.getElementById("zonaYUTA");
+  if (zona) {
+    new google.maps.places.Autocomplete(zona, {
+      types: ["geocode"],
+      componentRestrictions: { country: "jp" }
+    });
+  }
+}
+window.addEventListener("load", initAutocompleteYUTATable);
+
+
 function aggiornaSottocategoria() {
   const cat = document.getElementById("categoriaYUTA").value;
   const sotto = document.getElementById("sottocategoriaYUTA");
