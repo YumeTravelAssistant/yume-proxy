@@ -1613,46 +1613,62 @@ function scriviTypingYUTATable(testo) {
   target.innerHTML = "";
   output.classList.add("hidden");
 
-  // 🔍 Separiamo testo principale e link finali
-  const righe = testo.split("\n");
-  const corpo = [];
-  const bloccoLink = [];
+  // 🧠 Suddividi in blocchi ristorante + link
+  const blocchi = testo.split("• ").map(b => b.trim()).filter(b => b.length > 0);
 
-  for (const riga of righe) {
-    if (riga.includes('<a ') || riga.includes('href=')) {
-      bloccoLink.push(riga); // salviamo i link separati
+  let i = 0;
+  function digitaBlocco() {
+    if (i < blocchi.length) {
+      const bloccoTesto = blocchi[i];
+
+      // ✂️ Separiamo testo e link all'interno del blocco
+      const righe = bloccoTesto.split("\n");
+      const testoPuro = righe.filter(r => !r.includes('<a ') && !r.includes('href=')).join("\n");
+      const linksHTML = righe.filter(r => r.includes('<a ') || r.includes('href=')).join("<br>");
+
+      const container = document.createElement("div");
+      container.className = "output4 blocco-table-ai";
+      container.style.marginBottom = "20px";
+
+      const spanTyping = document.createElement("div");
+      container.appendChild(spanTyping);
+
+      output.appendChild(container);
+
+      let j = 0;
+      const typing = setInterval(() => {
+        if (j < testoPuro.length) {
+          spanTyping.innerHTML += testoPuro.charAt(j);
+          j++;
+        } else {
+          clearInterval(typing);
+
+          // 👇 Alla fine del testo, inseriamo i link (Dettagli | Mappa)
+          if (linksHTML) {
+            const linkDiv = document.createElement("div");
+            linkDiv.innerHTML = linksHTML;
+            linkDiv.style.marginTop = "10px";
+            container.appendChild(linkDiv);
+          }
+
+          i++;
+          digitaBlocco(); // avanti con il prossimo blocco
+        }
+      }, 15);
     } else {
-      corpo.push(riga); // normale testo da tipizzare
+      // ✅ Footer finale
+      const footer = document.createElement("div");
+      footer.style.fontSize = "0.85em";
+      footer.style.color = "#444";
+      footer.style.marginTop = "16px";
+      footer.style.textAlign = "right";
+      footer.innerHTML = `✅ Analisi effettuata con <strong>YUTA Table AI</strong>`;
+      output.appendChild(footer);
+      output.classList.remove("hidden");
     }
   }
 
-  const testoTyping = corpo.join("\n");
-  const testoLink = bloccoLink.join("<br>");
-
-  let i = 0;
-  const intervallo = setInterval(() => {
-    if (i < testoTyping.length) {
-      target.innerHTML += testoTyping.charAt(i);
-      i++;
-    } else {
-      clearInterval(intervallo);
-      target.innerHTML = "";
-
-      output.innerHTML = `
-        <div class="output-fadein output4" style="white-space: pre-line;">
-          ${testoTyping}
-          <div style="margin-top: 12px; white-space: normal;">
-            ${testoLink}
-          </div>
-          <div style="font-size: 0.85em; color: #444; margin-top: 16px; text-align: right;">
-            ✅ Analisi effettuata con <strong>YUTA Table AI</strong>
-          </div>
-        </div>
-      `;
-
-      output.classList.remove("hidden");
-    }
-  }, 20);
+  digitaBlocco();
 }
 
 </script>
