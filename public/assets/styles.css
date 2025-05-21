@@ -443,3 +443,64 @@ select {
   100% { transform: rotate(360deg); }
 }
 
+/* Pulsanti tab meteo */
+.tabForecastBtn {
+  padding: 8px 14px;
+  background-color: #F9F8F4;
+  border: 1px solid #C9A86A;
+  border-radius: 8px;
+  margin-right: 8px;
+  cursor: pointer;
+  font-weight: 600;
+  color: #8B2C2B;
+  transition: background 0.2s;
+}
+
+.tabForecastBtn:hover {
+  background-color: #f1e8db;
+}
+
+.forecastTab {
+  display: none;
+  margin-top: 16px;
+}
+
+.forecastTab.active {
+  display: block;
+}
+
+/* Box previsione meteo */
+.previsione-box {
+  background: #FFF8F4;
+  border-left: 5px solid #C9A86A;
+  border-radius: 12px;
+  padding: 12px 16px;
+  margin-bottom: 10px;
+  font-size: 0.95em;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  box-shadow: 0 2px 6px rgba(0,0,0,0.06);
+}
+
+.previsione-fascia {
+  font-weight: 600;
+  color: #8B2C2B;
+  flex: 1;
+}
+
+.previsione-icona {
+  width: 36px;
+  height: 36px;
+  margin-right: 12px;
+  flex-shrink: 0;
+}
+
+.previsione-temp {
+  font-size: 1em;
+  color: #333;
+  font-weight: 500;
+  flex: 2;
+  text-align: right;
+}
+
