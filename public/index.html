@@ -1613,15 +1613,14 @@ function scriviTypingYUTATable(testo) {
   target.innerHTML = "";
   output.classList.add("hidden");
 
-  // 🔍 Prepara righe separando link dalle altre
   const righe = testo.split("\n");
-  const finali = [];   // link che appariranno solo dopo
-  const rendering = []; // righe da tipizzare
+  const finali = [];
+  const rendering = [];
 
   for (let r of righe) {
     if (r.includes("<a ") || r.includes("href=")) {
-      finali.push(r); // link da mostrare dopo
-      rendering.push("%%LINK%%"); // segnaposto temporaneo
+      finali.push(r);
+      rendering.push("%%LINK%%");
     } else {
       rendering.push(r);
     }
@@ -1637,18 +1636,15 @@ function scriviTypingYUTATable(testo) {
     } else {
       clearInterval(intervallo);
 
-      // 🔁 Ricostruzione con link al posto giusto
       let outputFinale = target.innerHTML;
       let idx = 0;
 
-      // Sostituisci ogni %%LINK%% con il link originale corrispondente
       outputFinale = outputFinale.replace(/%%LINK%%/g, () => {
         return finali[idx++] || "";
       });
 
-      // Mostra output completo
       output.innerHTML = `
-        <div class="output-fadein output4" style="white-space: pre-line;">
+        <div class="output-fadein output4" style="white-space: pre-line; padding: 12px 14px; border-radius: 10px;">
           ${outputFinale}
           <div style="font-size: 0.85em; color: #444; margin-top: 16px; text-align: right;">
             ✅ Analisi effettuata con <strong>YUTA Table AI</strong>
