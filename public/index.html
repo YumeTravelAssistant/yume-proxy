@@ -53,6 +53,8 @@
       <button onclick="apriCultureAI()">📚 Culture AI</button>
       <button onclick="apriInterpretAI()">🈶 Interpret AI</button>
       <button onclick="apriNaviAI()">🗺️ Navi AI</button>   
+      <button onclick="apriForecastAI()">🌤️ Forecast AI</button>
+
  </div>
   </div>
 </div>
@@ -281,6 +283,39 @@
   <div id="risultatoYUTANavi" style="margin-top: 20px;"></div>
   <div id="bloccoNavigazioneYUTA" style="margin-top: 16px;"></div>
 </div>
+
+<!-- YUTA Forecast AI -->
+<div id="yutaForecastAI" class="output2 hidden" style="margin-top: 30px;">
+  <h3>🌤️ YUTA Forecast AI</h3>
+
+  <label for="zonaForecast">📍 Località (inizia a scrivere):</label>
+  <input type="text" id="zonaForecast" placeholder="Es: Kyoto, Shinjuku, Nara..." />
+
+  <label for="rangeForecast" style="margin-top: 10px;">⏱️ Periodo:</label>
+  <select id="rangeForecast">
+    <option value="oggi">Oggi</option>
+    <option value="48h">Prossime 48 ore</option>
+    <option value="7gg">Prossimi 7 giorni</option>
+  </select>
+
+  <button style="margin-top: 14px;" onclick="inviaRichiestaYUTAForecast()">🌤️ Ottieni previsioni</button>
+
+  <div id="risultatoYUTAForecast" style="margin-top: 20px;"></div>
+<div id="tabsForecast" style="margin-top: 20px;">
+  <button onclick="mostraTabPrevisioni('oggi')" class="tabForecastBtn">☀️ Oggi</button>
+  <button onclick="mostraTabPrevisioni('48h')" class="tabForecastBtn">🕒 48h</button>
+  <button onclick="mostraTabPrevisioni('7gg')" class="tabForecastBtn">📅 7 Giorni</button>
+</div>
+
+<div id="contenitorePrevisioni" style="margin-top: 12px;">
+  <div id="forecastoggi" class="forecastTab hidden"></div>
+  <div id="forecast48h" class="forecastTab hidden"></div>
+  <div id="forecast7gg" class="forecastTab hidden"></div>
+</div>
+
+
+</div>
+
 
 
     <div class="output" id="risposta"></div>
@@ -1563,6 +1598,14 @@ function apriInterpretAI() {
     document.getElementById("nuovaDomandaBtn").style.display = "inline-block";
   }
 
+  function apriForecastAI() {
+  chiudiTuttiYUTA();
+  document.getElementById("yutaForecastAI").classList.remove("hidden");
+  document.getElementById("yutaForecastAI").scrollIntoView({ behavior: "smooth" });
+  document.getElementById("nuovaDomandaBtn").style.display = "inline-block";
+}
+
+
 function chiudiTuttiYUTA() {
   document.getElementById("menuYUTA").classList.add("hidden");
   document.getElementById("yutaFantasyAI")?.classList.add("hidden");
@@ -1571,6 +1614,7 @@ function chiudiTuttiYUTA() {
   document.getElementById("yutaCultureAI")?.classList.add("hidden");
   document.getElementById("yutaInterpretAI")?.classList.add("hidden");
   document.getElementById("yutaNaviAI")?.classList.add("hidden");
+  document.getElementById("yutaForecastAI")?.classList.add("hidden");
 }
 
 // ✅ Chiude il menu YUTA se si clicca fuori
@@ -2035,6 +2079,87 @@ if (json.puntiPercorso && Array.isArray(json.puntiPercorso)) {
   }
 }
 
+// 🌤️ Dizionario delle icone meteo personalizzate YUME
+const iconeMeteoYume = {
+  "Clear": "☀️",
+  "Clouds": "☁️",
+  "Rain": "🌧️",
+  "Drizzle": "🌦️",
+  "Thunderstorm": " ️",
+  "Snow": "❄️",
+  "Mist": "🌫️",
+  "Fog": "🌁",
+  "Smoke": "💨",
+  "Haze": "🌁",
+  "Dust": "🌬️",
+  "Sand": "🌬️",
+  "Ash": "🌋",
+  "Squall": "🌬️",
+  "Tornado": "🌪️"
+};
+
+async function inviaRichiestaYUTAForecast() {
+  const clienteId = document.getElementById("clienteId")?.value?.trim() || "anonimo";
+  const input = document.getElementById("zonaForecast").value;
+  const range = document.getElementById("rangeForecast").value || "oggi";
+  const output = document.getElementById("risultatoYUTAForecast");
+  output.innerHTML = "⏳ Analisi meteo in corso...";
+
+  // Usa Places API per lat/lon
+  const geocoder = new google.maps.Geocoder();
+  geocoder.geocode({ address: input }, async (results, status) => {
+    if (status !== "OK" || !results[0]) {
+      output.innerHTML = "❌ Località non riconosciuta.";
+      return;
+    }
+
+    const lat = results[0].geometry.location.lat();
+    const lon = results[0].geometry.location.lng();
+
+    try {
+      const response = await fetch("https://yuta-proxy-api.azurewebsites.net/api/proxy", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          tipoRichiesta: "yuta_forecast_ai",
+          clienteId,
+          lat,
+          lon,
+          range
+        })
+      });
+
+      const json = await response.json();
+      if (json.errore) {
+        output.innerHTML = `❌ Errore: ${json.errore}`;
+        return;
+      }
+
+      const descrizione = formattaMarkdownGenerico(json.descrizione);
+
+      renderPrevisioniYUTA({
+  hourly: json.previsioni.orarie,
+  daily: json.previsioni.giornaliere
+});
+
+      output.innerHTML = `<div class="output-fadein">${descrizione}</div>`;
+
+    } catch (err) {
+      console.error("❌ Errore richiesta forecast:", err);
+      output.innerHTML = "❌ Errore nella comunicazione.";
+    }
+  });
+}
+
+function mostraTabPrevisioni(tab) {
+  ["oggi", "48h", "7gg"].forEach(id => {
+    document.getElementById("forecast" + id).classList.remove("active");
+    document.getElementById("forecast" + id).classList.add("hidden");
+  });
+  document.getElementById("forecast" + tab).classList.add("active");
+  document.getElementById("forecast" + tab).classList.remove("hidden");
+}
+
 
 </script>
 
@@ -2088,6 +2213,71 @@ function generaImmagineDaScelta() {
     });
 }
 
+function renderPrevisioniYUTA({ hourly, daily }) {
+  const oggi = document.getElementById("forecastoggi");
+  const h48 = document.getElementById("forecast48h");
+  const giorni = document.getElementById("forecast7gg");
+
+  oggi.innerHTML = "";
+  h48.innerHTML = "";
+  giorni.innerHTML = "";
+
+  // ☀️ OGGI - prime 8 fasce (3h ciascuna)
+  hourly.slice(0, 8).forEach(d => {
+    const ora = new Date(d.dt * 1000).toLocaleTimeString("it-IT", { hour: "2-digit", minute: "2-digit" });
+    const main = d.weather[0].main;
+    const icona = iconeMeteoYume[main] || "❔";
+    const descrizione = d.weather[0].description;
+
+    oggi.innerHTML += `
+      <div class="previsione-box">
+        <div class="previsione-fascia">🕒 ${ora}</div>
+        <div class="previsione-temp">
+          ${icona} ${Math.round(d.temp)}°C – ${descrizione}
+        </div>
+      </div>
+    `;
+  });
+
+  // 🕒 48h – 16 fasce orarie (4 per ogni 12h)
+  hourly.slice(0, 16).forEach((d, i) => {
+    const giorno = new Date(d.dt * 1000).toLocaleDateString("it-IT", { weekday: "short", day: "numeric" });
+    const ora = new Date(d.dt * 1000).toLocaleTimeString("it-IT", { hour: "2-digit", minute: "2-digit" });
+    const main = d.weather[0].main;
+    const icona = iconeMeteoYume[main] || "❔";
+    const descrizione = d.weather[0].description;
+
+    h48.innerHTML += `
+      <div class="previsione-box">
+        <div class="previsione-fascia">${giorno}, ${ora}</div>
+        <div class="previsione-temp">
+          ${icona} ${Math.round(d.temp)}°C – ${descrizione}
+        </div>
+      </div>
+    `;
+  });
+
+  // 📅 7 GIORNI – 1 riga per giorno
+  daily.slice(0, 7).forEach(d => {
+    const giorno = new Date(d.dt * 1000).toLocaleDateString("it-IT", { weekday: "long", day: "numeric" });
+    const main = d.weather[0].main;
+    const icona = iconeMeteoYume[main] || "❔";
+    const descrizione = d.weather[0].description;
+
+    giorni.innerHTML += `
+      <div class="previsione-box">
+        <div class="previsione-fascia">📅 ${giorno}</div>
+        <div class="previsione-temp">
+          ${icona} ${Math.round(d.temp.min)}°–${Math.round(d.temp.max)}°C – ${descrizione}
+        </div>
+      </div>
+    `;
+  });
+
+  mostraTabPrevisioni("oggi");
+}
+
+
 </script>
 
 <script>
@@ -2109,6 +2299,18 @@ function generaImmagineDaScelta() {
   }
 
   window.addEventListener("load", initAutocompleteYUTA);
+
+function initAutocompleteForecast() {
+  const input = document.getElementById("zonaForecast");
+  if (input) {
+    new google.maps.places.Autocomplete(input, {
+      types: ["geocode"],
+      componentRestrictions: { country: "jp" }
+    });
+  }
+}
+window.addEventListener("load", initAutocompleteForecast);
+
 </script>
 
 <script>
@@ -2129,6 +2331,7 @@ function resettaOutputCompleto() {
   document.getElementById("yutaCultureAI")?.classList.add("hidden");
   document.getElementById("yutaInterpretAI")?.classList.add("hidden");
   document.getElementById("yutaNaviAI")?.classList.add("hidden");
+  document.getElementById("yutaForecastAI")?.classList.add("hidden");
 
   // Reset campi Culture AI
   document.getElementById("risultatoYUTACulture").innerHTML = "";
@@ -2154,6 +2357,17 @@ function resettaOutputCompleto() {
   document.getElementById("arrivo").value = "";
   document.getElementById("mezzo").value = "walking";
   document.getElementById("bloccoNavigazioneYUTA").innerHTML = "";
+
+  // Reset campi YUTA Forecast AI
+  document.getElementById("zonaForecast").value = "";
+  document.getElementById("rangeForecast").value = "oggi";
+  document.getElementById("risultatoYUTAForecast").innerHTML = "";
+  document.getElementById("forecastoggi").innerHTML = "";
+  document.getElementById("forecast48h").innerHTML = "";
+  document.getElementById("forecast7gg").innerHTML = "";
+  document.getElementById("forecastoggi").classList.add("hidden");
+  document.getElementById("forecast48h").classList.add("hidden");
+  document.getElementById("forecast7gg").classList.add("hidden");
 
   // Reset meteo
   document.getElementById("toggleMeteoBtn").style.display = "none";
