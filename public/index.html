@@ -1613,23 +1613,43 @@ function scriviTypingYUTATable(testo) {
   target.innerHTML = "";
   output.classList.add("hidden");
 
+  // 🔍 Separiamo testo principale e link finali
+  const righe = testo.split("\n");
+  const corpo = [];
+  const bloccoLink = [];
+
+  for (const riga of righe) {
+    if (riga.includes('<a ') || riga.includes('href=')) {
+      bloccoLink.push(riga); // salviamo i link separati
+    } else {
+      corpo.push(riga); // normale testo da tipizzare
+    }
+  }
+
+  const testoTyping = corpo.join("\n");
+  const testoLink = bloccoLink.join("<br>");
+
   let i = 0;
   const intervallo = setInterval(() => {
-    if (i < testo.length) {
-      target.innerHTML += testo.charAt(i);
+    if (i < testoTyping.length) {
+      target.innerHTML += testoTyping.charAt(i);
       i++;
     } else {
       clearInterval(intervallo);
       target.innerHTML = "";
 
       output.innerHTML = `
-        <div class="output-fadein" style="white-space: pre-line;">
-          ${testo}
+        <div class="output-fadein output4" style="white-space: pre-line;">
+          ${testoTyping}
+          <div style="margin-top: 12px; white-space: normal;">
+            ${testoLink}
+          </div>
           <div style="font-size: 0.85em; color: #444; margin-top: 16px; text-align: right;">
             ✅ Analisi effettuata con <strong>YUTA Table AI</strong>
           </div>
         </div>
       `;
+
       output.classList.remove("hidden");
     }
   }, 20);
@@ -2296,6 +2316,7 @@ async function cercaYUTATable() {
   const codiceGenere = document.getElementById("sottocategoriaYUTA").value;
   const categoria = document.getElementById("categoriaYUTA").value;
   const out = document.getElementById("risultatoYUTATable");
+  out.classList.remove("hidden");
   out.innerHTML = "⏳ Analisi in corso...";
 
   const payload = {
