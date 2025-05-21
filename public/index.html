@@ -1610,17 +1610,19 @@ function scriviTypingYUTATable(testo) {
   const target = document.getElementById("typingYUTATable");
   const output = document.getElementById("risultatoYUTATable");
 
+  // Reset iniziale
   target.innerHTML = "";
   output.classList.add("hidden");
 
+  // Separiamo righe di link da righe di testo puro
   const righe = testo.split("\n");
   const finali = [];
   const rendering = [];
 
   for (let r of righe) {
     if (r.includes("<a ") || r.includes("href=")) {
-      finali.push(r);
-      rendering.push("%%LINK%%");
+      finali.push(r); // salva link da reinserire dopo
+      rendering.push("%%LINK%%"); // segnaposto
     } else {
       rendering.push(r);
     }
@@ -1636,21 +1638,21 @@ function scriviTypingYUTATable(testo) {
     } else {
       clearInterval(intervallo);
 
+      // Rimpiazza i %%LINK%% con i link veri, uno per uno
       let outputFinale = target.innerHTML;
       let idx = 0;
+      outputFinale = outputFinale.replace(/%%LINK%%/g, () => finali[idx++] || "");
 
-      outputFinale = outputFinale.replace(/%%LINK%%/g, () => {
-        return finali[idx++] || "";
-      });
-
+      // Inserisci tutto nel blocco output4 UNA SOLA VOLTA (no matrioska)
       output.innerHTML = `
-        <div class="output-fadein output4" style="white-space: pre-line; padding: 12px 14px; border-radius: 10px;">
+        <div class="output-fadein" style="white-space: pre-line;">
           ${outputFinale}
           <div style="font-size: 0.85em; color: #444; margin-top: 16px; text-align: right;">
             ✅ Analisi effettuata con <strong>YUTA Table AI</strong>
           </div>
         </div>
       `;
+
       target.innerHTML = "";
       output.classList.remove("hidden");
     }
