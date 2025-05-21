@@ -553,3 +553,29 @@ select {
   margin-bottom: 8px;
 }
 
+.forecastDettagli {
+  margin-top: 10px;
+  padding: 10px 14px;
+  background: #FFF8F4;
+  border-left: 4px solid #C9A86A;
+  border-radius: 10px;
+  font-size: 0.92em;
+}
+
+.forecastDettagli h4 {
+  margin-bottom: 6px;
+  font-weight: bold;
+  color: #8B2C2B;
+}
+
+#listaDettagliForecast {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+
+#listaDettagliForecast li {
+  padding: 2px 0;
+  color: #333;
+}
+
