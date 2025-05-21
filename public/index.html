@@ -301,10 +301,19 @@
   <button style="margin-top: 14px;" onclick="inviaRichiestaYUTAForecast()">🌤️ Ottieni previsioni</button>
 
   <div id="risultatoYUTAForecast" style="margin-top: 20px;"></div>
+
+<div id="dettagliForecastAvanzati" class="forecastDettagli hidden">
+  <h4>🌡️ Dettagli Avanzati</h4>
+  <ul id="listaDettagliForecast">
+    <!-- Popolato dinamicamente -->
+  </ul>
+</div>
+
 <div id="tabsForecast" class="tabForecastFlex">
   <button onclick="mostraTabPrevisioni('oggi')" class="tabForecastBtn">☀️ Oggi</button>
   <button onclick="mostraTabPrevisioni('48h')" class="tabForecastBtn">🕒 48h</button>
   <button onclick="mostraTabPrevisioni('7gg')" class="tabForecastBtn">📅 7 Giorni</button>
+  <button onclick="toggleForecastDettagli()">🔍 Mostra dettagli avanzati</button>
 </div>
 
 <div id="contenitorePrevisioni" style="margin-top: 12px;">
@@ -2180,6 +2189,24 @@ setTimeout(() => {
   });
 }
 
+// Dati meteo tecnici
+const attuale = json.previsioni.attuale;
+const lista = document.getElementById("listaDettagliForecast");
+lista.innerHTML = `
+  <li>💨 Vento: ${attuale.wind_speed} m/s</li>
+  <li>🔆 UV Index: ${attuale.uvi}</li>
+  <li>☁️ Copertura nuvolosa: ${attuale.clouds}%</li>
+  <li>💧 Umidità: ${attuale.humidity}%</li>
+  <li>📈 Pressione atmosferica: ${attuale.pressure} hPa</li>
+  <li>👁️ Visibilità: ${attuale.visibility / 1000} km</li>
+`;
+
+// Mostra la sezione
+document.getElementById("dettagliForecastAvanzati").classList.remove("hidden");
+
+attuale.wind_speed !== undefined ? `<li>💨 Vento: ${attuale.wind_speed} m/s</li>` : ""
+
+
 function mostraTabPrevisioni(tab) {
   ["oggi", "48h", "7gg"].forEach(id => {
     document.getElementById("forecast" + id).classList.remove("active");
@@ -2187,6 +2214,11 @@ function mostraTabPrevisioni(tab) {
   });
   document.getElementById("forecast" + tab).classList.add("active");
   document.getElementById("forecast" + tab).classList.remove("hidden");
+}
+
+function toggleForecastDettagli() {
+  const dettagli = document.getElementById("dettagliForecastAvanzati");
+  dettagli.classList.toggle("hidden");
 }
 
 
