@@ -1536,6 +1536,35 @@ function scriviTypingYUTANavi(testoFinaleHTML, contenitoreID = "risultatoYUTANav
   typeChar();
 }
 
+function scriviTypingYUTAForecast(testoFinaleHTML, contenitoreID = "risultatoYUTAForecast") {
+  const testoGrezzato = testoFinaleHTML.replace(/<[^>]*>?/gm, "");
+  let i = 0;
+  const target = document.getElementById(contenitoreID);
+  if (!target) return;
+
+  target.innerHTML = `<div id="typingYUTAForecast" class="output-fadein" style="white-space: pre-wrap;"></div>`;
+  const typingEl = document.getElementById("typingYUTAForecast");
+
+  function typeChar() {
+    if (i < testoGrezzato.length) {
+      typingEl.textContent += testoGrezzato.charAt(i);
+      i++;
+      setTimeout(typeChar, 20);
+    } else {
+      typingEl.innerHTML = `
+        <div class="output-fadein" style="white-space: pre-line;">
+          ${testoFinaleHTML}
+          <div style="font-size: 0.85em; color: #444; margin-top: 16px; text-align: right;">
+            ✅ Analisi effettuata con <strong>YUTA Forecast AI</strong>
+          </div>
+        </div>
+      `;
+    }
+  }
+
+  typeChar();
+}
+
 
 </script>
 
@@ -2142,7 +2171,9 @@ async function inviaRichiestaYUTAForecast() {
   daily: json.previsioni.giornaliere
 });
 
-      output.innerHTML = `<div class="output-fadein">${descrizione}</div>`;
+setTimeout(() => {
+  scriviTypingYUTAForecast(descrizione, "risultatoYUTAForecast");
+}, 800);
 
     } catch (err) {
       console.error("❌ Errore richiesta forecast:", err);
