@@ -1613,62 +1613,52 @@ function scriviTypingYUTATable(testo) {
   target.innerHTML = "";
   output.classList.add("hidden");
 
-  // 🧠 Suddividi in blocchi ristorante + link
-  const blocchi = testo.split("• ").map(b => b.trim()).filter(b => b.length > 0);
+  // 🔍 Prepara righe separando link dalle altre
+  const righe = testo.split("\n");
+  const finali = [];   // link che appariranno solo dopo
+  const rendering = []; // righe da tipizzare
 
-  let i = 0;
-  function digitaBlocco() {
-    if (i < blocchi.length) {
-      const bloccoTesto = blocchi[i];
-
-      // ✂️ Separiamo testo e link all'interno del blocco
-      const righe = bloccoTesto.split("\n");
-      const testoPuro = righe.filter(r => !r.includes('<a ') && !r.includes('href=')).join("\n");
-      const linksHTML = righe.filter(r => r.includes('<a ') || r.includes('href=')).join("<br>");
-
-      const container = document.createElement("div");
-      container.className = "output4 blocco-table-ai";
-      container.style.marginBottom = "20px";
-
-      const spanTyping = document.createElement("div");
-      container.appendChild(spanTyping);
-
-      output.appendChild(container);
-
-      let j = 0;
-      const typing = setInterval(() => {
-        if (j < testoPuro.length) {
-          spanTyping.innerHTML += testoPuro.charAt(j);
-          j++;
-        } else {
-          clearInterval(typing);
-
-          // 👇 Alla fine del testo, inseriamo i link (Dettagli | Mappa)
-          if (linksHTML) {
-            const linkDiv = document.createElement("div");
-            linkDiv.innerHTML = linksHTML;
-            linkDiv.style.marginTop = "10px";
-            container.appendChild(linkDiv);
-          }
-
-          i++;
-          digitaBlocco(); // avanti con il prossimo blocco
-        }
-      }, 15);
+  for (let r of righe) {
+    if (r.includes("<a ") || r.includes("href=")) {
+      finali.push(r); // link da mostrare dopo
+      rendering.push("%%LINK%%"); // segnaposto temporaneo
     } else {
-      // ✅ Footer finale
-      const footer = document.createElement("div");
-      footer.style.fontSize = "0.85em";
-      footer.style.color = "#444";
-      footer.style.marginTop = "16px";
-      footer.style.textAlign = "right";
-      footer.innerHTML = `✅ Analisi effettuata con <strong>YUTA Table AI</strong>`;
-      output.appendChild(footer);
-      output.classList.remove("hidden");
+      rendering.push(r);
     }
   }
 
-  digitaBlocco();
+  const flat = rendering.join("\n");
+  let i = 0;
+
+  const intervallo = setInterval(() => {
+    if (i < flat.length) {
+      target.innerHTML += flat.charAt(i);
+      i++;
+    } else {
+      clearInterval(intervallo);
+
+      // 🔁 Ricostruzione con link al posto giusto
+      let outputFinale = target.innerHTML;
+      let idx = 0;
+
+      // Sostituisci ogni %%LINK%% con il link originale corrispondente
+      outputFinale = outputFinale.replace(/%%LINK%%/g, () => {
+        return finali[idx++] || "";
+      });
+
+      // Mostra output completo
+      output.innerHTML = `
+        <div class="output-fadein output4" style="white-space: pre-line;">
+          ${outputFinale}
+          <div style="font-size: 0.85em; color: #444; margin-top: 16px; text-align: right;">
+            ✅ Analisi effettuata con <strong>YUTA Table AI</strong>
+          </div>
+        </div>
+      `;
+      target.innerHTML = "";
+      output.classList.remove("hidden");
+    }
+  }, 15);
 }
 
 </script>
