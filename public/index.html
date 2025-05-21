@@ -2178,17 +2178,6 @@ async function inviaRichiestaYUTAForecast() {
   daily: json.previsioni.giornaliere
 });
 
-setTimeout(() => {
-  scriviTypingYUTAForecast(descrizione, "risultatoYUTAForecast");
-}, 800);
-
-    } catch (err) {
-      console.error("❌ Errore richiesta forecast:", err);
-      output.innerHTML = "❌ Errore nella comunicazione.";
-    }
-  });
-}
-
 // Dati meteo tecnici
 const attuale = json.previsioni.attuale;
 const lista = document.getElementById("listaDettagliForecast");
@@ -2204,7 +2193,20 @@ lista.innerHTML = `
 // Mostra la sezione
 document.getElementById("dettagliForecastAvanzati").classList.remove("hidden");
 
-attuale.wind_speed !== undefined ? `<li>💨 Vento: ${attuale.wind_speed} m/s</li>` : ""
+attuale.wind_speed !== undefined ? `<li>💨 Vento: ${attuale.wind_speed} m/s</li>` : "
+
+setTimeout(() => {
+  scriviTypingYUTAForecast(descrizione, "risultatoYUTAForecast");
+}, 800);
+
+
+
+    } catch (err) {
+      console.error("❌ Errore richiesta forecast:", err);
+      output.innerHTML = "❌ Errore nella comunicazione.";
+    }
+  });
+}
 
 
 function mostraTabPrevisioni(tab) {
