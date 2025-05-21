@@ -285,7 +285,7 @@
 </div>
 
 <!-- YUTA Forecast AI -->
-<div id="yutaForecastAI" class="output2 hidden" style="margin-top: 30px;">
+<div id="yutaForecastAI" class="output3 hidden" style="margin-top: 30px;">
   <h3>🌤️ YUTA Forecast AI</h3>
 
   <label for="zonaForecast">📍 Località (inizia a scrivere):</label>
@@ -301,7 +301,7 @@
   <button style="margin-top: 14px;" onclick="inviaRichiestaYUTAForecast()">🌤️ Ottieni previsioni</button>
 
   <div id="risultatoYUTAForecast" style="margin-top: 20px;"></div>
-<div id="tabsForecast" style="margin-top: 20px;">
+<div id="tabsForecast" class="tabForecastFlex">
   <button onclick="mostraTabPrevisioni('oggi')" class="tabForecastBtn">☀️ Oggi</button>
   <button onclick="mostraTabPrevisioni('48h')" class="tabForecastBtn">🕒 48h</button>
   <button onclick="mostraTabPrevisioni('7gg')" class="tabForecastBtn">📅 7 Giorni</button>
@@ -315,8 +315,6 @@
 
 
 </div>
-
-
 
     <div class="output" id="risposta"></div>
     <div id="spinner" class="spinner" style="display:none;"></div>
