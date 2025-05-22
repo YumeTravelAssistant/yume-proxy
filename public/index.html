@@ -2523,7 +2523,7 @@ async function inviaRichiestaYUTAInclusive() {
       output.innerHTML = `❌ Errore: ${json.errore}`;
     } else {
       const risultato = formattaMarkdownGenerico(json.descrizione || json.risultato || "⚠️ Nessuna informazione trovata.");
-      scriviTypingYUTAForecast(risultato, "risultatoYUTAInclusive"); // riusa lo stesso typing lento
+      scriviTypingYUTAInclusive(risultato, "risultatoYUTAInclusive"); // riusa lo stesso typing lento
 
 // Mostra i POI inclusivi, se presenti
 if (Array.isArray(json.pois) && json.pois.length > 0) {
@@ -2562,9 +2562,15 @@ poisInclusivi.forEach((poi, index) => {
         }
       });
 
-      const infowindow = new google.maps.InfoWindow({
-        content: `<strong>${nomePoi}</strong><br><a href="https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(nomePoi)}" target="_blank">📍 Apri in Google Maps</a>`
-      });
+const linkMaps = `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(nome)}&query_place_id=${latNum},${lonNum}`;
+
+const infowindow = new google.maps.InfoWindow({
+  content: `
+    <strong>${nome}</strong><br>
+    <em>${categoria}</em><br>
+    <a href="${linkMaps}" target="_blank">📍 Apri in Google Maps</a>
+  `
+});
 
       marker.addListener("click", () => infowindow.open(map, marker));
       markers.push(marker);
@@ -2596,7 +2602,20 @@ function mostraPoisInclusivi() {
   const pagina = poisInclusivi.slice(start, end);
 
   const div = document.getElementById("listaPoisInclusivi");
-  div.innerHTML = pagina.map(p => `<div style="margin-bottom: 8px;">${p}</div>`).join("");
+  div.innerHTML = pagina.map(p => {
+  const match = p.match(/^(.*?)\s+— Categoria: (.*?)\s+— 📍 ([\d\.\-]+), ([\d\.\-]+)/);
+  if (!match) return `<div>${p}</div>`; // fallback se formato non corrisponde
+
+  const [_, nome, categoria, lat, lon] = match;
+  const link = `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(nome)}&query_place_id=${lat},${lon}`;
+  
+  return `
+    <div style="margin-bottom: 10px;">
+      <strong>${nome}</strong> <em>(${categoria})</em><br>
+      <a href="${link}" target="_blank">📍 Vedi su Google Maps</a>
+    </div>
+  `;
+}).join("");
 
   document.getElementById("poisInclusiviBox").style.display = "block";
 }
