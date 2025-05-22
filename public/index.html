@@ -323,47 +323,18 @@
 
   <label for="zonaInclusive">📍 Zona o città:</label>
   <input type="text" id="zonaInclusive" placeholder="Es: Asakusa, Kyoto, Ueno..." />
+<div style="margin-top: 1em;">
+  <label for="temaInclusivo">🎯 Tema inclusivo (opzionale):</label>
+  <select id="temaInclusivo" class="form-control" style="margin-top: 0.3em;">
+    <option value="">— Nessun tema —</option>
+    <option value="accessibilita">♿ Accessibilità</option>
+    <option value="bambini">👶 Per bambini</option>
+    <option value="animali">🐾 Con animali</option>
+  </select>
+</div>
+
 <label for="categorieInclusive" style="margin-top: 12px;">🏷️ Tipologia di luogo (max 5 selezioni):</label>
-<select id="categorieInclusive" multiple size="12" onchange="limitaSelezioniInclusive()">
-  <optgroup label="🍱 Cibo e bevande">
-    <option value="101">Ristoranti</option>
-    <option value="102">Bar e caffetterie</option>
-    <option value="103">Fast food</option>
-    <option value="104">Gelaterie / Dolci</option>
-    <option value="105">Pub e birrerie</option>
-  </optgroup>
-  <optgroup label="🎭 Cultura e arte">
-    <option value="106">Cinema</option>
-    <option value="107">Teatri</option>
-    <option value="108">Musei</option>
-    <option value="109">Biblioteche</option>
-    <option value="110">Monumenti / Siti storici</option>
-  </optgroup>
-  <optgroup label="♿ Servizi pubblici e igienici">
-    <option value="121">Fontane</option>
-    <option value="122">Acqua potabile</option>
-    <option value="123">Infermerie</option>
-    <option value="124">Toilette pubbliche</option>
-  </optgroup>
-  <optgroup label="🚉 Trasporti">
-    <option value="131">Stazioni ferroviarie</option>
-    <option value="132">Fermate autobus</option>
-    <option value="133">Metropolitana</option>
-    <option value="134">Tram / Monorotaie</option>
-    <option value="135">Parcheggi</option>
-    <option value="136">Taxi / Noleggio</option>
-  </optgroup>
-  <optgroup label="🌸 Turismo e natura">
-    <option value="151">Attrazioni turistiche</option>
-    <option value="152">Parchi</option>
-    <option value="153">Punti panoramici</option>
-    <option value="154">Spiagge</option>
-    <option value="155">Aree ricreative / Zoo</option>
-  </optgroup>
-  <optgroup label="🏨 Altro (via analisi OSM)">
-    <option value="osm:hotel">Hotel</option>
-  </optgroup>
-</select>
+<select id="categorieInclusive" multiple size="12" onchange="limitaSelezioniInclusive()"></select>
 
   <button style="margin-top: 14px;" onclick="inviaRichiestaYUTAInclusive()">♿ Verifica accessibilità</button>
 
@@ -2603,21 +2574,45 @@ function mostraPoisInclusivi() {
 
   const div = document.getElementById("listaPoisInclusivi");
   div.innerHTML = pagina.map(p => {
-  const match = p.match(/^(.*?)\s+— Categoria: (.*?)\s+— 📍 ([\d\.\-]+), ([\d\.\-]+)/);
-  if (!match) return `<div>${p}</div>`; // fallback se formato non corrisponde
+    const match = p.match(/^(.*?)\s+— Categoria: (.*?)\s+— 📍 ([\d\.\-]+), ([\d\.\-]+)/);
+    if (!match) return `<div>${p}</div>`; // fallback
 
-  const [_, nome, categoria, lat, lon] = match;
-  const link = `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(nome)}&query_place_id=${lat},${lon}`;
-  
-  return `
-    <div style="margin-bottom: 10px;">
-      <strong>${nome}</strong> <em>(${categoria})</em><br>
-      <a href="${link}" target="_blank">📍 Vedi su Google Maps</a>
-    </div>
-  `;
-}).join("");
+    const [_, nome, categoria, lat, lon] = match;
+    const link = `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(nome)}&query_place_id=${lat},${lon}`;
+    
+    // 🔵 Marker dinamico
+    const marker = new google.maps.Marker({
+      position: { lat: parseFloat(lat), lng: parseFloat(lon) },
+      map,
+      title: nome,
+      icon: {
+        path: google.maps.SymbolPath.CIRCLE,
+        scale: 6,
+        fillColor: "#1E88E5",
+        fillOpacity: 0.85,
+        strokeWeight: 2,
+        strokeColor: "#fff"
+      }
+    });
+
+    const infowindow = new google.maps.InfoWindow({
+      content: `<strong>${nome}</strong><br><em>${categoria}</em><br><a href="${link}" target="_blank">📍 Apri in Google Maps</a>`
+    });
+
+    marker.addListener("click", () => infowindow.open(map, marker));
+    markers.push(marker);
+
+    return `
+      <div style="margin-bottom: 10px;">
+        <strong>${nome}</strong> <em>(${categoria})</em><br>
+        <a href="${link}" target="_blank">📍 Vedi su Google Maps</a>
+      </div>
+    `;
+  }).join("");
 
   document.getElementById("poisInclusiviBox").style.display = "block";
+  document.getElementById("map").style.display = "block";
+  document.getElementById("toggleMappaBtn").style.display = "inline-block";
 }
 
 function paginaPrecedentePOI() {
@@ -2643,6 +2638,74 @@ function limitaSelezioniInclusive() {
   }
 }
 
+const categoriePerTemaORS = {
+  handicap: {
+    label: "Per persone con disabilità",
+    categorie: {
+      "Toilette accessibili": "179",
+      "Panchine / rifugi": "162",
+      "Farmacie": "208",
+      "Ospedali": "206",
+      "Ristoranti accessibili": "570",
+      "Parcheggi accessibili": "601",
+      "Stazioni ferroviarie": "604",
+      "Musei accessibili": "134",
+      "Cinema accessibili": "299",
+      "Hotel": "108",
+      "Tag: wheelchair": "osm:wheelchair"
+    }
+  },
+  bambini: {
+    label: "Per famiglie con bambini",
+    categorie: {
+      "Scuole e asili": "153",
+      "Parchi giochi": "283",
+      "Zoo / acquari": "310",
+      "Cinema per bambini": "299",
+      "Punti panoramici": "627",
+      "Ristoranti family-friendly": "570",
+      "Hotel family": "108",
+      "Librerie": "430",
+      "Tag: playground": "osm:playground"
+    }
+  },
+  animali: {
+    label: "Accessibile con animali",
+    categorie: {
+      "Dog park": "268",
+      "Veterinario": "123",
+      "Pet shop": "124",
+      "Parco urbano": "280",
+      "Ristoranti informali": "570",
+      "Hotel pet-friendly": "108",
+      "Taxi / spostamenti": "606",
+      "Tag: dog friendly": "osm:dog_friendly"
+    }
+  }
+};
+
+document.getElementById("temaInclusivo").addEventListener("change", function() {
+  const tema = this.value;
+  const select = document.getElementById("categorieInclusive");
+
+  // Svuota le opzioni precedenti
+  select.innerHTML = "";
+
+  if (!categoriePerTemaORS[tema]) return;
+
+  const gruppo = document.createElement("optgroup");
+  gruppo.label = "⚙️ Opzioni disponibili";
+
+  for (const nome in categoriePerTemaORS[tema].categorie) {
+    const codice = categoriePerTemaORS[tema].categorie[nome];
+    const option = document.createElement("option");
+    option.value = codice;
+    option.textContent = nome;
+    gruppo.appendChild(option);
+  }
+
+  select.appendChild(gruppo);
+});
 
 </script>
 
