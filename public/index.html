@@ -2690,6 +2690,17 @@ function resettaOutputCompleto() {
 </script>
 
 <script>
+  function toggleFoto(id, button) {
+    const box = document.getElementById(id);
+    if (!box) return;
+
+    const isHidden = box.classList.toggle("hidden");
+    button.textContent = isHidden ? "📸 Mostra Foto" : "📸 Nascondi Foto";
+  }
+</script>
+
+
+<script>
   window.addEventListener("DOMContentLoaded", () => {
     caricaDizionarioYUTAMusic(); // Pre-carica tutto
     caricaDizionarioYUTACulture();
