@@ -591,3 +591,27 @@ select {
   box-shadow: none
 }
 
+.bottone-foto {
+  background-color: #F4F0E2;
+  border: 1px solid #C9A86A;
+  color: #8B2C2B;
+  font-size: 0.95em;
+  font-weight: 600;
+  padding: 8px 12px;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  margin-top: 8px;
+}
+
+.bottone-foto:hover {
+  background-color: #f1e8db;
+  color: #6e221f;
+}
+
+.foto-hotpepper {
+  margin-top: 8px;
+  padding-top: 6px;
+  border-top: 1px dashed #C9A86A;
+}
+
