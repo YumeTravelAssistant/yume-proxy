@@ -2463,6 +2463,7 @@ async function inviaRichiestaYUTAInclusive() {
   const zona = document.getElementById("zonaInclusive").value.trim();
   const categoriaSel = document.getElementById("categorieInclusive");
   const categoria = Array.from(categoriaSel.selectedOptions).map(opt => opt.value);
+  const tema = document.getElementById("temaInclusivo").value
 
   const output = document.getElementById("risultatoYUTAInclusive");
   const spinner = document.getElementById("spinnerInclusive");
