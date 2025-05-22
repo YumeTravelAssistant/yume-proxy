@@ -55,6 +55,7 @@
       <button onclick="apriNaviAI()">🗺️ Navi AI</button>   
       <button onclick="apriForecastAI()">🌤️ Forecast AI</button>
       <button onclick="apriTableAI()">🍽️ Table AI</button>
+      <button onclick="apriInclusiveAI()">♿ Inclusive AI</button>
 
  </div>
   </div>
@@ -314,6 +315,30 @@
 
   <!-- Risultato finale -->
   <div id="risultatoYUTATable" class="output4 hidden" style="white-space: pre-line;"></div>
+</div>
+
+<!-- YUTA Inclusive AI -->
+<div id="yutaInclusiveAI" class="output2 hidden" style="margin-top: 30px;">
+  <h3>♿ YUTA Inclusive AI – Accessibilità e supporto personalizzato</h3>
+
+  <label for="zonaInclusive">📍 Zona o città:</label>
+  <input type="text" id="zonaInclusive" placeholder="Es: Asakusa, Kyoto, Ueno..." />
+
+  <button style="margin-top: 14px;" onclick="inviaRichiestaYUTAInclusive()">♿ Verifica accessibilità</button>
+
+  <div id="risultatoYUTAInclusive" style="margin-top: 20px;"></div>
+<!-- POI accessibili -->
+<div id="poisInclusiviBox" style="margin-top: 20px; display: none;">
+  <h4>📍 Luoghi inclusivi trovati</h4>
+  <div id="listaPoisInclusivi" style="margin-bottom: 10px;"></div>
+  <div style="display: flex; gap: 10px;">
+    <button onclick="paginaPrecedentePOI()">⬅️ Indietro</button>
+    <button onclick="paginaSuccessivaPOI()">➡️ Avanti</button>
+  </div>
+</div>
+
+
+  <div id="spinnerInclusive" class="spinner" style="display:none;"></div>
 </div>
 
 
@@ -1656,6 +1681,36 @@ function scriviTypingYUTATable(testo) {
   }, 15);
 }
 
+function scriviTypingYUTAInclusive(testoFinaleHTML, contenitoreID = "risultatoYUTAInclusive") {
+  const testoGrezzato = testoFinaleHTML.replace(/<[^>]*>?/gm, "");
+  let i = 0;
+  const target = document.getElementById(contenitoreID);
+  if (!target) return;
+
+  target.innerHTML = `<div id="typingYUTAInclusive" class="output-fadein" style="white-space: pre-wrap;"></div>`;
+  const typingEl = document.getElementById("typingYUTAInclusive");
+
+  function typeChar() {
+    if (i < testoGrezzato.length) {
+      typingEl.textContent += testoGrezzato.charAt(i);
+      i++;
+      setTimeout(typeChar, 20);
+    } else {
+      typingEl.innerHTML = `
+        <div class="output-fadein" style="white-space: pre-line;">
+          ${testoFinaleHTML}
+          <div style="font-size: 0.85em; color: #444; margin-top: 16px; text-align: right;">
+            ✅ Analisi effettuata con <strong>YUTA Inclusive AI</strong>
+          </div>
+        </div>
+      `;
+    }
+  }
+
+  typeChar();
+}
+
+
 </script>
 
 <script>
@@ -1731,6 +1786,13 @@ function apriTableAI() {
   document.getElementById("nuovaDomandaBtn").style.display = "inline-block";
 }
 
+function apriInclusiveAI() {
+  chiudiTuttiYUTA();
+  document.getElementById("yutaInclusiveAI").classList.remove("hidden");
+  document.getElementById("yutaInclusiveAI").scrollIntoView({ behavior: "smooth" });
+  document.getElementById("nuovaDomandaBtn").style.display = "inline-block";
+}
+
 
 function chiudiTuttiYUTA() {
   document.getElementById("menuYUTA").classList.add("hidden");
@@ -1742,6 +1804,7 @@ function chiudiTuttiYUTA() {
   document.getElementById("yutaNaviAI")?.classList.add("hidden");
   document.getElementById("yutaForecastAI")?.classList.add("hidden");
   document.getElementById("yutaTableAI")?.classList.add("hidden");
+  document.getElementById("yutaInclusiveAI")?.classList.add("hidden");
 }
 
 // ✅ Chiude il menu YUTA se si clicca fuori
@@ -2383,6 +2446,131 @@ async function cercaYUTATable() {
 }
 
 
+async function inviaRichiestaYUTAInclusive() {
+  const clienteId = document.getElementById("clienteId")?.value?.trim() || "anonimo";
+  const zona = document.getElementById("zonaInclusive").value.trim();
+  const output = document.getElementById("risultatoYUTAInclusive");
+  const spinner = document.getElementById("spinnerInclusive");
+
+  output.innerHTML = "";
+  spinner.style.display = "block";
+
+  if (!zona) {
+    output.innerHTML = "⚠️ Inserisci una zona o città del Giappone.";
+    spinner.style.display = "none";
+    return;
+  }
+
+  try {
+    const response = await fetch("https://yuta-proxy-api.azurewebsites.net/api/proxy", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        tipoRichiesta: "yuta_inclusive_ai",
+        clienteId,
+        zona
+      })
+    });
+
+    const json = await response.json();
+
+    if (json.errore) {
+      output.innerHTML = `❌ Errore: ${json.errore}`;
+    } else {
+      const risultato = formattaMarkdownGenerico(json.descrizione || json.risultato || "⚠️ Nessuna informazione trovata.");
+      scriviTypingYUTAForecast(risultato, "risultatoYUTAInclusive"); // riusa lo stesso typing lento
+
+// Mostra i POI inclusivi, se presenti
+if (Array.isArray(json.pois) && json.pois.length > 0) {
+  poisInclusivi = json.pois;
+  paginaPOI = 0;
+  mostraPoisInclusivi();
+} else {
+  document.getElementById("poisInclusiviBox").style.display = "none";
+}
+
+// 🔁 Aggiunge i marker sulla mappa
+markers.forEach(m => m.setMap(null)); // pulizia vecchi marker
+markers = [];
+
+const geocoder = new google.maps.Geocoder();
+
+poisInclusivi.forEach((poi, index) => {
+  // Estrai nome del POI dal testo grezzo
+  const nomePoi = poi.replace(/^\d+\.\s*/, "").split(" (")[0];
+
+  geocoder.geocode({ address: `${nomePoi}, ${zona}`, region: "jp" }, (results, status) => {
+    if (status === "OK" && results[0]) {
+      const posizione = results[0].geometry.location;
+
+      const marker = new google.maps.Marker({
+        position: posizione,
+        map: map,
+        title: nomePoi,
+        icon: {
+          path: google.maps.SymbolPath.CIRCLE,
+          scale: 6,
+          fillColor: "#1976D2",
+          fillOpacity: 0.8,
+          strokeWeight: 2,
+          strokeColor: "#fff"
+        }
+      });
+
+      const infowindow = new google.maps.InfoWindow({
+        content: `<strong>${nomePoi}</strong><br><a href="https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(nomePoi)}" target="_blank">📍 Apri in Google Maps</a>`
+      });
+
+      marker.addListener("click", () => infowindow.open(map, marker));
+      markers.push(marker);
+
+      // Mostra mappa
+      document.getElementById("map").style.display = "block";
+      document.getElementById("toggleMappaBtn").style.display = "inline-block";
+    }
+  });
+});
+
+
+    }
+  } catch (err) {
+    console.error("❌ Errore Inclusive AI:", err);
+    output.innerHTML = "❌ Errore durante la richiesta.";
+  } finally {
+    spinner.style.display = "none";
+  }
+}
+
+let poisInclusivi = [];
+let paginaPOI = 0;
+const poisPerPagina = 5;
+
+function mostraPoisInclusivi() {
+  const start = paginaPOI * poisPerPagina;
+  const end = start + poisPerPagina;
+  const pagina = poisInclusivi.slice(start, end);
+
+  const div = document.getElementById("listaPoisInclusivi");
+  div.innerHTML = pagina.map(p => `<div style="margin-bottom: 8px;">${p}</div>`).join("");
+
+  document.getElementById("poisInclusiviBox").style.display = "block";
+}
+
+function paginaPrecedentePOI() {
+  if (paginaPOI > 0) {
+    paginaPOI--;
+    mostraPoisInclusivi();
+  }
+}
+
+function paginaSuccessivaPOI() {
+  if ((paginaPOI + 1) * poisPerPagina < poisInclusivi.length) {
+    paginaPOI++;
+    mostraPoisInclusivi();
+  }
+}
+
+
 </script>
 
 <script>
@@ -2597,6 +2785,18 @@ const locali = [
   });
 }
 
+function initAutocompleteYUTAInclusive() {
+  const zona = document.getElementById("zonaInclusive");
+  if (zona) {
+    new google.maps.places.Autocomplete(zona, {
+      types: ["geocode"],
+      componentRestrictions: { country: "jp" }
+    });
+  }
+}
+window.addEventListener("load", initAutocompleteYUTAInclusive);
+
+
 </script>
 
 <script>
@@ -2619,6 +2819,7 @@ function resettaOutputCompleto() {
   document.getElementById("yutaNaviAI")?.classList.add("hidden");
   document.getElementById("yutaForecastAI")?.classList.add("hidden");
   document.getElementById("yutaTableAI")?.classList.add("hidden");
+  document.getElementById("yutaInclusiveAI")?.classList.add("hidden");
 
   // Reset campi Culture AI
   document.getElementById("risultatoYUTACulture").innerHTML = "";
@@ -2656,13 +2857,19 @@ function resettaOutputCompleto() {
   document.getElementById("forecast48h").classList.add("hidden");
   document.getElementById("forecast7gg").classList.add("hidden");
 
-  // Reset campi YUTA Forecast AI
+  // Reset campi YUTA Table AI
   document.getElementById("categoriaYUTA").value = "";
   document.getElementById("sottocategoriaYUTA").innerHTML = '<option value="">— Seleziona sottocategoria —</option>';
   document.getElementById("zonaYUTA").value = "";
   document.getElementById("risultatoYUTATable").innerHTML = "";
   document.getElementById("typingYUTATable").innerHTML = "";
   document.getElementById("risultatoYUTATable").classList.add("hidden");
+
+  // Reset campi YUTA Inclusive AI
+  document.getElementById("yutaInclusiveAI")?.classList.add("hidden");
+  document.getElementById("zonaInclusive").value = "";
+  document.getElementById("risultatoYUTAInclusive").innerHTML = "";
+  document.getElementById("spinnerInclusive").style.display = "none";
 
 
   // Reset meteo
