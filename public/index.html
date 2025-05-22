@@ -323,6 +323,47 @@
 
   <label for="zonaInclusive">📍 Zona o città:</label>
   <input type="text" id="zonaInclusive" placeholder="Es: Asakusa, Kyoto, Ueno..." />
+<label for="categorieInclusive" style="margin-top: 12px;">🏷️ Tipologia di luogo (max 5 selezioni):</label>
+<select id="categorieInclusive" multiple size="12" onchange="limitaSelezioniInclusive()">
+  <optgroup label="🍱 Cibo e bevande">
+    <option value="101">Ristoranti</option>
+    <option value="102">Bar e caffetterie</option>
+    <option value="103">Fast food</option>
+    <option value="104">Gelaterie / Dolci</option>
+    <option value="105">Pub e birrerie</option>
+  </optgroup>
+  <optgroup label="🎭 Cultura e arte">
+    <option value="106">Cinema</option>
+    <option value="107">Teatri</option>
+    <option value="108">Musei</option>
+    <option value="109">Biblioteche</option>
+    <option value="110">Monumenti / Siti storici</option>
+  </optgroup>
+  <optgroup label="♿ Servizi pubblici e igienici">
+    <option value="121">Fontane</option>
+    <option value="122">Acqua potabile</option>
+    <option value="123">Infermerie</option>
+    <option value="124">Toilette pubbliche</option>
+  </optgroup>
+  <optgroup label="🚉 Trasporti">
+    <option value="131">Stazioni ferroviarie</option>
+    <option value="132">Fermate autobus</option>
+    <option value="133">Metropolitana</option>
+    <option value="134">Tram / Monorotaie</option>
+    <option value="135">Parcheggi</option>
+    <option value="136">Taxi / Noleggio</option>
+  </optgroup>
+  <optgroup label="🌸 Turismo e natura">
+    <option value="151">Attrazioni turistiche</option>
+    <option value="152">Parchi</option>
+    <option value="153">Punti panoramici</option>
+    <option value="154">Spiagge</option>
+    <option value="155">Aree ricreative / Zoo</option>
+  </optgroup>
+  <optgroup label="🏨 Altro (via analisi OSM)">
+    <option value="osm:hotel">Hotel</option>
+  </optgroup>
+</select>
 
   <button style="margin-top: 14px;" onclick="inviaRichiestaYUTAInclusive()">♿ Verifica accessibilità</button>
 
@@ -2449,6 +2490,8 @@ async function cercaYUTATable() {
 async function inviaRichiestaYUTAInclusive() {
   const clienteId = document.getElementById("clienteId")?.value?.trim() || "anonimo";
   const zona = document.getElementById("zonaInclusive").value.trim();
+  const categoria = document.getElementById("categoriaInclusive")?.value || "";
+
   const output = document.getElementById("risultatoYUTAInclusive");
   const spinner = document.getElementById("spinnerInclusive");
 
@@ -2462,15 +2505,16 @@ async function inviaRichiestaYUTAInclusive() {
   }
 
   try {
-    const response = await fetch("https://yuta-proxy-api.azurewebsites.net/api/proxy", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({
-        tipoRichiesta: "yuta_inclusive_ai",
-        clienteId,
-        zona
-      })
-    });
+      const response = await fetch("https://yuta-proxy-api.azurewebsites.net/api/proxy", {
+  method: "POST",
+  headers: { "Content-Type": "application/json" },
+  body: JSON.stringify({
+    tipoRichiesta: "yuta_inclusive_ai",
+    clienteId,
+    zona,
+    categoria // 👈 viene passato al backend
+  })
+});
 
     const json = await response.json();
 
@@ -2567,6 +2611,15 @@ function paginaSuccessivaPOI() {
   if ((paginaPOI + 1) * poisPerPagina < poisInclusivi.length) {
     paginaPOI++;
     mostraPoisInclusivi();
+  }
+}
+
+function limitaSelezioniInclusive() {
+  const select = document.getElementById("categorieInclusive");
+  const selezionati = Array.from(select.selectedOptions);
+  if (selezionati.length > 5) {
+    selezionati[selezionati.length - 1].selected = false;
+    alert("⚠️ Puoi selezionare al massimo 5 categorie alla volta.");
   }
 }
 
