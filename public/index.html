@@ -2490,7 +2490,8 @@ async function cercaYUTATable() {
 async function inviaRichiestaYUTAInclusive() {
   const clienteId = document.getElementById("clienteId")?.value?.trim() || "anonimo";
   const zona = document.getElementById("zonaInclusive").value.trim();
-  const categoria = document.getElementById("categoriaInclusive")?.value || "";
+  const categoriaSel = document.getElementById("categorieInclusive");
+  const categoria = Array.from(categoriaSel.selectedOptions).map(opt => opt.value);
 
   const output = document.getElementById("risultatoYUTAInclusive");
   const spinner = document.getElementById("spinnerInclusive");
