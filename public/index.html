@@ -893,34 +893,39 @@ let posizioneUtente = null;
 let markers = []; // array per tenere traccia dei marker attivi
 
 async function ottieniMeteo(lat, lon) {
-  const apiKey = "7b514410b5b297ed1e5590442ff67eca"; // tua API key attiva
-  const url = `https://api.openweathermap.org/data/3.0/onecall?lat=${lat}&lon=${lon}&exclude=minutely,alerts&appid=${apiKey}&lang=it&units=metric`;
-
   try {
-    const response = await fetch(url);
+    const response = await fetch("https://yuta-proxy-api.azurewebsites.net/api/proxy", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        tipoRichiesta: "meteo",
+        lat,
+        lon
+      })
+    });
+
     const json = await response.json();
 
-window.previsioniMeteoGiorni = [];
+    window.previsioniMeteoGiorni = [];
 
-if (json.daily && Array.isArray(json.daily)) {
-  json.daily.slice(0, 7).forEach((giorno, index) => {
-    const data = new Date(giorno.dt * 1000).toLocaleDateString("it-IT", { weekday: 'long', day: 'numeric', month: 'long' });
-    const descrizione = giorno.weather[0].description;
-    const tempMin = Math.round(giorno.temp.min);
-    const tempMax = Math.round(giorno.temp.max);
-    const pioggia = Math.round((giorno.pop || 0) * 100);
+    if (json.daily && Array.isArray(json.daily)) {
+      json.daily.slice(0, 7).forEach((giorno, index) => {
+        const data = new Date(giorno.dt * 1000).toLocaleDateString("it-IT", { weekday: 'long', day: 'numeric', month: 'long' });
+        const descrizione = giorno.weather[0].description;
+        const tempMin = Math.round(giorno.temp.min);
+        const tempMax = Math.round(giorno.temp.max);
+        const pioggia = Math.round((giorno.pop || 0) * 100);
 
-    const frase = `📅 ${data}: ${descrizione}, min ${tempMin}°C / max ${tempMax}°C, probabilità di pioggia ${pioggia}%.`;
+        const frase = `📅 ${data}: ${descrizione}, min ${tempMin}°C / max ${tempMax}°C, probabilità di pioggia ${pioggia}%.`;
 
-    window.previsioniMeteoGiorni.push(frase);
-  });
-}
+        window.previsioniMeteoGiorni.push(frase);
+      });
+    }
 
     const condizioneAttuale = json.current.weather[0].description;
     const temperatura = Math.round(json.current.temp);
     const pioveOra = condizioneAttuale.includes("pioggia");
 
-    // Analizza se pioverà nelle prossime 8 ore
     const previsionePioggia = json.hourly.slice(0, 8).some(hour => {
       return hour.weather[0].description.includes("pioggia") || (hour.pop && hour.pop > 0.4);
     });
@@ -934,8 +939,9 @@ if (json.daily && Array.isArray(json.daily)) {
     }
 
     window.fraseMeteoUtente = frase;
+
   } catch (err) {
-    console.error("🌧️ Errore One Call API:", err);
+    console.error("🌧️ Errore proxy meteo:", err);
     window.fraseMeteoUtente = "";
   }
 }
@@ -1285,9 +1291,8 @@ function toggleMappa() {
 }
 </script>
 
-
 <script
-  src="https://maps.googleapis.com/maps/api/js?key=AIzaSyCAG11Uloyz4kU6doqFu1WHkg3HhIWH8L8&libraries=places&callback=initMap"
+  src="https://maps.googleapis.com/maps/api/js?key=AIzaSyBxVkvJw2z-xpE4-4jEk_adWnnKqU5EG1s&libraries=places&callback=initMap"
   async defer>
 </script>
 
